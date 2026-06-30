@@ -15,7 +15,7 @@ https://github.com/ymsh003/Drill-3D-Model.git
 Current local commit:
 
 ```text
-8ca93b0 Add handoff notes
+665219f Update push instructions
 ```
 
 From a terminal with GitHub network access and credentials, run:
