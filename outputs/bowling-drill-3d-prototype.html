@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bowling Drill Grip Center Prototype</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f1114;
+      --panel: #181d22;
+      --panel-2: #20262c;
+      --line: #39434c;
+      --text: #eef3f5;
+      --muted: #aeb8bf;
+      --accent: #59c9a7;
+      --thumb: #f1c75f;
+      --middle: #69b8ff;
+      --ring: #f179a5;
+      --gc: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 460px;
+      min-height: 100vh;
+    }
+
+    .viewer {
+      position: relative;
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,.035) 1px, transparent 1px),
+        #111417;
+      background-size: 40px 40px;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    canvas:active { cursor: grabbing; }
+
+    .title {
+      position: absolute;
+      left: 20px;
+      top: 18px;
+      max-width: 560px;
+      pointer-events: none;
+      text-shadow: 0 1px 8px rgba(0,0,0,.65);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      line-height: 1.15;
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .legend {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 8px;
+      background: rgba(15,17,20,.76);
+      backdrop-filter: blur(10px);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: -1px;
+    }
+
+    aside {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-content: start;
+      gap: 10px;
+      min-height: 100vh;
+      padding: 12px;
+      overflow: auto;
+      border-left: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+
+    .section-wide { grid-column: 1 / -1; }
+
+    .sheet-section {
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,.05) 1px, transparent 1px),
+        var(--panel-2);
+      background-size: 28px 28px;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .control {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 74px;
+      gap: 5px 8px;
+      align-items: center;
+      padding: 6px 0;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .control:first-of-type { border-top: 0; }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mini-field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .mini-field input[type="text"], .mini-field select { width: 100%; }
+
+    .pitch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .pitch-pad {
+      display: grid;
+      gap: 7px;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      background: rgba(12, 15, 18, .35);
+    }
+
+    .pitch-pad h3 {
+      grid-column: 1 / -1;
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .pitch-axis {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) 42px;
+      grid-template-rows: auto auto;
+      gap: 4px 5px;
+      align-items: center;
+    }
+
+    .axis-label {
+      color: var(--muted);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .axis-label.left { text-align: left; }
+    .axis-label.right { text-align: right; }
+
+    .pitch-axis input[type="range"] {
+      grid-column: 1 / -1;
+      width: 100%;
+      margin: 0;
+    }
+
+    .pitch-readout {
+      display: block;
+      min-width: 0;
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1.25;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .fixed-spec {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .fixed-spec strong {
+      display: block;
+      color: var(--text);
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    input[type="range"] {
+      grid-column: 1 / -1;
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    input[type="text"], select {
+      width: 74px;
+      min-height: 27px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #11161a;
+      color: var(--text);
+      padding: 4px 6px;
+      font: inherit;
+      font-size: 12px;
+    }
+
+    .warning {
+      display: none;
+      margin: 0;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 177, 86, .65);
+      border-radius: 8px;
+      background: rgba(255, 177, 86, .14);
+      color: #ffd9a3;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .warning.is-active { display: block; }
+
+    .readout {
+      width: 100%;
+      border-collapse: collapse;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .readout th,
+    .readout td {
+      padding: 6px 4px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .readout th:first-child,
+    .readout td:first-child {
+      color: var(--text);
+      text-align: left;
+    }
+
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 920px) {
+      .app { grid-template-columns: 1fr; }
+      .viewer { min-height: 62vh; }
+      aside {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+      .pitch-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="viewer">
+      <canvas id="scene" aria-label="grip center drill layout preview"></canvas>
+      <div class="title">
+        <h1>Grip Center Drill Layout</h1>
+        <p>仮のグリップセンターを基準に、水平線と垂線、端点間スパン、ブリッジから三穴の位置を描画します。</p>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background: var(--gc)"></i>Grip center</span>
+        <span><i class="dot" style="background: var(--thumb)"></i>Thumb</span>
+        <span><i class="dot" style="background: var(--middle)"></i>Middle</span>
+        <span><i class="dot" style="background: var(--ring)"></i>Ring</span>
+      </div>
+    </section>
+
+    <aside>
+      <section class="section">
+        <h2>Ball</h2>
+        <p class="fixed-spec">
+          <strong>Diameter 8.595"</strong>
+          規定範囲: 周 26.704" - 27.002"、直径 8.500" - 8.595"。この試作では最大径で固定しています。
+        </p>
+      </section>
+
+      <section class="section sheet-section">
+        <h2>Measure Sheet</h2>
+        <div class="control">
+          <label for="middleSpan">Middle span, edge to edge (inch)</label>
+          <input id="middleSpanValue" type="text" value="4" />
+          <input id="middleSpan" type="range" min="2.5" max="5.5" step="0.015625" value="4" />
+        </div>
+        <div class="control">
+          <label for="ringSpanOffset">Ring span offset from middle (inch)</label>
+          <input id="ringSpanOffsetValue" type="text" value="-1/8" />
+          <input id="ringSpanOffset" type="range" min="-0.5" max="0.5" step="0.015625" value="-0.125" />
+        </div>
+        <div class="control">
+          <label for="bridge">Bridge between finger holes (inch)</label>
+          <input id="bridgeValue" type="text" value="1/4" />
+          <input id="bridge" type="range" min="0.1875" max="0.5" step="0.015625" value="0.25" />
+        </div>
+      </section>
+
+      <section class="section sheet-section">
+        <h2>Hole Size / Drill</h2>
+        <div class="control">
+          <label for="thumbDiameter">Thumb hole (inch)</label>
+          <input id="thumbDiameterValue" type="text" value="1" />
+          <input id="thumbDiameter" type="range" min="0.6875" max="1.3125" step="0.015625" value="1" />
+        </div>
+        <div class="control">
+          <label for="middleDiameter">Middle finger hole (inch)</label>
+          <input id="middleDiameterValue" type="text" value="25/32" />
+          <input id="middleDiameter" type="range" min="0.5" max="1.09375" step="0.015625" value="0.78125" />
+        </div>
+        <div class="control">
+          <label for="ringDiameter">Ring finger hole (inch)</label>
+          <input id="ringDiameterValue" type="text" value="3/4" />
+          <input id="ringDiameter" type="range" min="0.5" max="1.09375" step="0.015625" value="0.75" />
+        </div>
+        <div class="control">
+          <label for="drillDepth">Drill depth (inch)</label>
+          <input id="drillDepthValue" type="text" value="2 1/2" />
+          <input id="drillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" />
+        </div>
+      </section>
+
+      <section class="section sheet-section section-wide">
+        <h2>Pitch</h2>
+        <div class="pitch-grid">
+          <div class="pitch-pad" data-hole="thumb">
+            <h3>Thumb Pitch</h3>
+            <div class="pitch-axis">
+              <span class="axis-label left">Left 1"</span>
+              <output id="thumbLateralAxisValue" class="pitch-readout">L/R 0</output>
+              <span class="axis-label right">Right 1"</span>
+              <input id="thumbLateralAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Thumb left right pitch" />
+            </div>
+            <div class="pitch-axis">
+              <span class="axis-label left">Reverse 1"</span>
+              <output id="thumbVerticalAxisValue" class="pitch-readout">F/R 0</output>
+              <span class="axis-label right">Forward 1"</span>
+              <input id="thumbVerticalAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Thumb forward reverse pitch" />
+            </div>
+          </div>
+
+          <div class="pitch-pad" data-hole="middle">
+            <h3>Middle Finger Pitch</h3>
+            <div class="pitch-axis">
+              <span class="axis-label left">Left 1"</span>
+              <output id="middleLateralAxisValue" class="pitch-readout">L/R 0</output>
+              <span class="axis-label right">Right 1"</span>
+              <input id="middleLateralAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Middle left right pitch" />
+            </div>
+            <div class="pitch-axis">
+              <span class="axis-label left">Reverse 1"</span>
+              <output id="middleVerticalAxisValue" class="pitch-readout">F/R 0</output>
+              <span class="axis-label right">Forward 1"</span>
+              <input id="middleVerticalAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Middle forward reverse pitch" />
+            </div>
+          </div>
+
+          <div class="pitch-pad" data-hole="ring">
+            <h3>Ring Finger Pitch</h3>
+            <div class="pitch-axis">
+              <span class="axis-label left">Left 1"</span>
+              <output id="ringLateralAxisValue" class="pitch-readout">L/R 0</output>
+              <span class="axis-label right">Right 1"</span>
+              <input id="ringLateralAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Ring left right pitch" />
+            </div>
+            <div class="pitch-axis">
+              <span class="axis-label left">Reverse 1"</span>
+              <output id="ringVerticalAxisValue" class="pitch-readout">F/R 0</output>
+              <span class="axis-label right">Forward 1"</span>
+              <input id="ringVerticalAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Ring forward reverse pitch" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <p id="warning" class="warning section-wide"></p>
+
+      <section class="section section-wide">
+        <h2>Computed Position</h2>
+        <table class="readout">
+          <thead>
+            <tr>
+              <th>Point</th>
+              <th>X</th>
+              <th>Y</th>
+              <th>Radius</th>
+              <th>Depth</th>
+              <th>L/R</th>
+              <th>F/R</th>
+            </tr>
+          </thead>
+          <tbody id="readout"></tbody>
+        </table>
+      </section>
+
+      <section class="section section-wide">
+        <p class="note">0 ピッチは球中心方向です。各横軸は中央が 0、左右端が 1 インチです。L/R は左が Left、右が Right。F/R は左が Reverse、右が Forward です。</p>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const canvas = document.querySelector("#scene");
+    const ctx = canvas.getContext("2d");
+    const inputs = new Map();
+    const BALL_DIAMETER = 8.595;
+    const state = { yaw: -0.35, pitch: 0.12, dragging: false, lastX: 0, lastY: 0 };
+
+    document.querySelectorAll("input[type='range']").forEach((range) => {
+      const valueOutput = document.querySelector(`#${range.id}Value`);
+      inputs.set(range.id, range);
+      const sync = (fromRange) => {
+        if (fromRange) {
+          range.value = snap64(range.value);
+          setValueOutput(range, valueOutput);
+        } else {
+          if (valueOutput && valueOutput.tagName !== "OUTPUT") {
+            const parsed = parseInch(valueOutput.value);
+            if (Number.isFinite(parsed)) {
+              range.value = clamp(snap64(parsed), Number(range.min), Number(range.max));
+            }
+          }
+          setValueOutput(range, valueOutput);
+        }
+        draw();
+      };
+      range.addEventListener("input", () => sync(true));
+      if (valueOutput && valueOutput.tagName !== "OUTPUT") valueOutput.addEventListener("change", () => sync(false));
+      setValueOutput(range, valueOutput);
+    });
+
+    function value(id) {
+      return Number(inputs.get(id).value);
+    }
+
+    function setValueOutput(range, output) {
+      if (!output) return;
+      if (output.tagName === "OUTPUT") {
+        output.value = pitchAxisLabel(range.id, Number(range.value));
+        output.textContent = output.value;
+        return;
+      }
+      output.value = formatInch(range.value);
+    }
+
+    function pitchAxisValue(id, invertVertical = false) {
+      const raw = value(id);
+      return invertVertical ? -raw : raw;
+    }
+
+    function pitchAxisLabel(id, number) {
+      if (!id.endsWith("Axis")) return formatInch(number);
+      if (Math.abs(number) < 1 / 128) return id.includes("Lateral") ? "L/R 0" : "F/R 0";
+      if (id.includes("Lateral")) return `${number > 0 ? "Right" : "Left"} ${formatInch(Math.abs(number))}`;
+      return `${number > 0 ? "Forward" : "Reverse"} ${formatInch(Math.abs(number))}`;
+    }
+
+    function snap64(number) {
+      return Math.round(Number(number) * 64) / 64;
+    }
+
+    function clamp(number, min, max) {
+      return Math.max(min, Math.min(max, number));
+    }
+
+    function parseInch(text) {
+      const raw = String(text).trim().replace(/"/g, "");
+      if (!raw) return NaN;
+      const sign = raw.startsWith("-") ? -1 : 1;
+      const clean = raw.replace(/^[+-]/, "").trim();
+      const parts = clean.split(/\s+/);
+      let whole = 0;
+      let fraction = 0;
+      for (const part of parts) {
+        if (part.includes("/")) {
+          const [n, d] = part.split("/").map(Number);
+          if (!Number.isFinite(n) || !Number.isFinite(d) || d === 0) return NaN;
+          fraction += n / d;
+        } else {
+          const n = Number(part);
+          if (!Number.isFinite(n)) return NaN;
+          whole += n;
+        }
+      }
+      return sign * (whole + fraction);
+    }
+
+    function formatInch(number) {
+      const rounded = snap64(number);
+      const sign = rounded < 0 ? "-" : "";
+      let units = Math.abs(Math.round(rounded * 64));
+      const whole = Math.floor(units / 64);
+      let numerator = units % 64;
+      if (numerator === 0) return `${sign}${whole}"`;
+      const divisor = gcd(numerator, 64);
+      numerator /= divisor;
+      const denominator = 64 / divisor;
+      if (whole === 0) return `${sign}${numerator}/${denominator}"`;
+      return `${sign}${whole} ${numerator}/${denominator}"`;
+    }
+
+    function gcd(a, b) {
+      while (b) {
+        const t = b;
+        b = a % b;
+        a = t;
+      }
+      return a;
+    }
+
+    function layout() {
+      const ballRadius = BALL_DIAMETER / 2;
+      const middleSpan = value("middleSpan");
+      const ringSpan = middleSpan + value("ringSpanOffset");
+      const bridge = value("bridge");
+      const thumbRadius = value("thumbDiameter") / 2;
+      const middleRadius = value("middleDiameter") / 2;
+      const ringRadius = value("ringDiameter") / 2;
+      const drillDepth = value("drillDepth");
+      const middleX = -(bridge / 2 + middleRadius);
+      const ringX = bridge / 2 + ringRadius;
+      const thumbEdgeY = -middleSpan / 2;
+      const middleEdgeY = middleSpan / 2;
+      const ringEdgeY = thumbEdgeY + ringSpan;
+
+      const data = {
+        ballRadius,
+        gripCenter: { name: "Grip center", x: 0, y: 0, radius: 0.045, color: "#ffffff" },
+        thumb: {
+          name: "Thumb",
+          x: 0,
+          y: thumbEdgeY - thumbRadius,
+          edgeY: thumbEdgeY,
+          radius: thumbRadius,
+          color: "#f1c75f",
+          lateral: pitchAxisValue("thumbLateralAxis"),
+          vertical: pitchAxisValue("thumbVerticalAxis"),
+          verticalDisplay: pitchAxisValue("thumbVerticalAxis")
+        },
+        middle: {
+          name: "Middle",
+          x: middleX,
+          y: middleEdgeY + middleRadius,
+          edgeY: middleEdgeY,
+          radius: middleRadius,
+          color: "#69b8ff",
+          lateral: pitchAxisValue("middleLateralAxis"),
+          vertical: -pitchAxisValue("middleVerticalAxis"),
+          verticalDisplay: pitchAxisValue("middleVerticalAxis")
+        },
+        ring: {
+          name: "Ring",
+          x: ringX,
+          y: ringEdgeY + ringRadius,
+          edgeY: ringEdgeY,
+          radius: ringRadius,
+          color: "#f179a5",
+          lateral: pitchAxisValue("ringLateralAxis"),
+          vertical: -pitchAxisValue("ringVerticalAxis"),
+          verticalDisplay: pitchAxisValue("ringVerticalAxis")
+        },
+        bridge,
+        middleSpan,
+        ringSpan,
+        drillDepth
+      };
+      data.holes = [data.thumb, data.middle, data.ring];
+      return data;
+    }
+
+    function toSphere(x, y, radius) {
+      const p = normalize({ x, y, z: radius });
+      return { x: p.x * radius, y: p.y * radius, z: p.z * radius };
+    }
+
+    function normalize(p) {
+      const len = Math.hypot(p.x, p.y, p.z) || 1;
+      return { x: p.x / len, y: p.y / len, z: p.z / len };
+    }
+
+    function rotate(p) {
+      const cy = Math.cos(state.yaw);
+      const sy = Math.sin(state.yaw);
+      const cp = Math.cos(state.pitch);
+      const sp = Math.sin(state.pitch);
+      const x1 = p.x * cy + p.z * sy;
+      const z1 = -p.x * sy + p.z * cy;
+      return {
+        x: x1,
+        y: p.y * cp - z1 * sp,
+        z: p.y * sp + z1 * cp
+      };
+    }
+
+    function project(p, scale, cx, cy) {
+      const r = rotate(p);
+      return { x: cx + r.x * scale, y: cy - r.y * scale, z: r.z };
+    }
+
+    function draw() {
+      resizeCanvas();
+      const w = canvas.width / devicePixelRatio;
+      const h = canvas.height / devicePixelRatio;
+      ctx.clearRect(0, 0, w, h);
+
+      const data = layout();
+      const radius = data.ballRadius;
+      const cx = w * 0.5;
+      const cy = h * 0.54;
+      const scale = Math.min(w, h) * 0.39 / radius;
+      const collisions = findCollisions(data);
+
+      drawBall(cx, cy, radius, scale);
+      drawGuideLines(data, cx, cy, scale);
+      data.holes.forEach((hole) => drawTrajectory(hole, data, cx, cy, scale));
+      drawHole(data.thumb, radius, cx, cy, scale);
+      drawHole(data.middle, radius, cx, cy, scale);
+      drawHole(data.ring, radius, cx, cy, scale);
+      drawGripCenter(data.gripCenter, radius, cx, cy, scale);
+      drawCollisionMarkers(collisions, cx, cy, scale);
+      renderReadout(data);
+      renderWarning(collisions);
+    }
+
+    function drawBall(cx, cy, radius, scale) {
+      const pr = radius * scale;
+      const gradient = ctx.createRadialGradient(cx - pr * 0.28, cy - pr * 0.34, pr * 0.08, cx, cy, pr);
+      gradient.addColorStop(0, "rgba(110, 220, 190, 0.86)");
+      gradient.addColorStop(0.55, "rgba(48, 145, 125, 0.56)");
+      gradient.addColorStop(1, "rgba(17, 46, 43, 0.44)");
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, pr, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(230,255,250,.55)";
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+      ctx.globalAlpha = 0.28;
+      for (let i = -60; i <= 60; i += 20) drawLatitude(i, radius, cx, cy, scale);
+      for (let i = -80; i <= 80; i += 20) drawLongitude(i, radius, cx, cy, scale);
+      ctx.restore();
+    }
+
+    function drawLatitude(deg, radius, cx, cy, scale) {
+      const lat = deg * Math.PI / 180;
+      const pts = [];
+      for (let i = 0; i <= 180; i++) {
+        const lon = -Math.PI / 2 + i * Math.PI / 180;
+        pts.push({
+          x: radius * Math.cos(lat) * Math.sin(lon),
+          y: radius * Math.sin(lat),
+          z: radius * Math.cos(lat) * Math.cos(lon)
+        });
+      }
+      strokeProjected(pts, cx, cy, scale, "rgba(255,255,255,.36)", 1);
+    }
+
+    function drawLongitude(deg, radius, cx, cy, scale) {
+      const lon = deg * Math.PI / 180;
+      const pts = [];
+      for (let i = -85; i <= 85; i++) {
+        const lat = i * Math.PI / 180;
+        pts.push({
+          x: radius * Math.cos(lat) * Math.sin(lon),
+          y: radius * Math.sin(lat),
+          z: radius * Math.cos(lat) * Math.cos(lon)
+        });
+      }
+      strokeProjected(pts, cx, cy, scale, "rgba(255,255,255,.28)", 1);
+    }
+
+    function strokeProjected(points, cx, cy, scale, color, width) {
+      ctx.beginPath();
+      let started = false;
+      for (const p of points) {
+        const q = project(p, scale, cx, cy);
+        if (q.z <= 0) {
+          started = false;
+          continue;
+        }
+        if (!started) {
+          ctx.moveTo(q.x, q.y);
+          started = true;
+        } else {
+          ctx.lineTo(q.x, q.y);
+        }
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+
+    function drawGuideLines(data, cx, cy, scale) {
+      const r = data.ballRadius;
+      const spanY = Math.max(2.6, data.middleSpan / 2 + value("thumbDiameter") / 2 + 0.6);
+      strokeLayoutLine([{ x: -1.8, y: 0 }, { x: 1.8, y: 0 }], r, cx, cy, scale, "rgba(255,255,255,.72)", 1.2);
+      strokeLayoutLine([{ x: 0, y: -spanY }, { x: 0, y: spanY }], r, cx, cy, scale, "rgba(255,255,255,.72)", 1.2);
+      strokeLayoutLine([{ x: -1.2, y: data.thumb.edgeY }, { x: 1.2, y: data.thumb.edgeY }], r, cx, cy, scale, "rgba(241,199,95,.72)", 1);
+      strokeLayoutLine([{ x: -1.2, y: data.middle.edgeY }, { x: 1.2, y: data.middle.edgeY }], r, cx, cy, scale, "rgba(105,184,255,.72)", 1);
+      strokeLayoutLine([{ x: -1.2, y: data.ring.edgeY }, { x: 1.2, y: data.ring.edgeY }], r, cx, cy, scale, "rgba(241,121,165,.72)", 1);
+    }
+
+    function strokeLayoutLine(points, radius, cx, cy, scale, color, width) {
+      const samples = [];
+      const a = points[0];
+      const b = points[1];
+      for (let i = 0; i <= 64; i++) {
+        const t = i / 64;
+        samples.push(toSphere(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, radius));
+      }
+      strokeProjected(samples, cx, cy, scale, color, width);
+    }
+
+    function drillSegment(hole, data) {
+      const start = toSphere(hole.x, hole.y, data.ballRadius);
+      const inward = normalize({ x: -start.x, y: -start.y, z: -start.z });
+      const right = normalize(cross(inward, { x: 0, y: 1, z: 0 }));
+      const forward = normalize(cross(right, inward));
+      const pitchEnd = {
+        x: start.x + inward.x * data.drillDepth + right.x * hole.lateral + forward.x * hole.vertical,
+        y: start.y + inward.y * data.drillDepth + right.y * hole.lateral + forward.y * hole.vertical,
+        z: start.z + inward.z * data.drillDepth + right.z * hole.lateral + forward.z * hole.vertical
+      };
+      const axis = normalize(sub(pitchEnd, start));
+      const pointLength = Math.min(Math.max(hole.radius * 0.72, 0.22), data.drillDepth * 0.35);
+      const cylinderLength = Math.max(0, data.drillDepth - pointLength);
+      const cylinderEnd = addScaled(start, axis, cylinderLength);
+      const tip = addScaled(start, axis, data.drillDepth);
+      return { start, cylinderEnd, tip, axis, radius: hole.radius, pointLength, cylinderLength, hole };
+    }
+
+    function drawTrajectory(hole, data, cx, cy, scale) {
+      const segment = drillSegment(hole, data);
+      const axis = [];
+      for (let i = 0; i <= 48; i++) axis.push(lerpPoint(segment.start, segment.tip, i / 48));
+      strokeProjected(axis, cx, cy, scale, "rgba(255,255,255,.78)", 1.2);
+      drawDrillBitEnvelope(segment, cx, cy, scale, hole.color);
+    }
+
+    function drawDrillBitEnvelope(segment, cx, cy, scale, color) {
+      const a = project(segment.start, scale, cx, cy);
+      const c = project(segment.cylinderEnd, scale, cx, cy);
+      const tip = project(segment.tip, scale, cx, cy);
+      if (a.z <= 0 && c.z <= 0 && tip.z <= 0) return;
+      const dx = tip.x - a.x;
+      const dy = tip.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      const ny = dx / len;
+      const r0 = segment.radius * scale;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(a.x + nx * r0, a.y + ny * r0);
+      ctx.lineTo(c.x + nx * r0, c.y + ny * r0);
+      ctx.lineTo(tip.x, tip.y);
+      ctx.lineTo(c.x - nx * r0, c.y - ny * r0);
+      ctx.lineTo(a.x - nx * r0, a.y - ny * r0);
+      ctx.closePath();
+      ctx.fillStyle = hexToRgba(color, 0.22);
+      ctx.strokeStyle = hexToRgba(color, 0.72);
+      ctx.lineWidth = 1.4;
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drillRadiusAt(segment, t) {
+      const total = segment.cylinderLength + segment.pointLength;
+      const distanceAlong = t * total;
+      if (distanceAlong <= segment.cylinderLength) return segment.radius;
+      const coneT = segment.pointLength === 0 ? 1 : (distanceAlong - segment.cylinderLength) / segment.pointLength;
+      return segment.radius * Math.max(0, 1 - coneT);
+    }
+
+    function findCollisions(data) {
+      const segments = data.holes.map((hole) => drillSegment(hole, data));
+      const collisions = [];
+      for (let i = 0; i < segments.length; i++) {
+        for (let j = i + 1; j < segments.length; j++) {
+          const a = segments[i];
+          const b = segments[j];
+          const closest = closestConePoints(a, b);
+          const clearance = closest.clearance;
+          if (clearance < 0) {
+            collisions.push({
+              a: a.hole.name,
+              b: b.hole.name,
+              clearance,
+              point: midpoint(closest.a, closest.b)
+            });
+          }
+        }
+      }
+      return collisions;
+    }
+
+    function closestConePoints(a, b) {
+      let best = { clearance: Infinity, point: midpoint(a.start, b.start), a: a.start, b: b.start };
+      for (let i = 0; i <= 40; i++) {
+        const ta = i / 40;
+        const pa = lerpPoint(a.start, a.tip, ta);
+        const ra = drillRadiusAt(a, ta);
+        for (let j = 0; j <= 40; j++) {
+          const tb = j / 40;
+          const pb = lerpPoint(b.start, b.tip, tb);
+          const rb = drillRadiusAt(b, tb);
+          const clearance = distance(pa, pb) - (ra + rb);
+          if (clearance < best.clearance) {
+            best = { clearance, point: midpoint(pa, pb), a: pa, b: pb };
+          }
+        }
+      }
+      return best;
+    }
+
+    function drawCollisionMarkers(collisions, cx, cy, scale) {
+      for (const collision of collisions) {
+        const p = project(collision.point, scale, cx, cy);
+        if (p.z <= 0) continue;
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 92, 92, .98)";
+        ctx.fillStyle = "rgba(255, 92, 92, .22)";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(p.x - 16, p.y - 16);
+        ctx.lineTo(p.x + 16, p.y + 16);
+        ctx.moveTo(p.x + 16, p.y - 16);
+        ctx.lineTo(p.x - 16, p.y + 16);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function renderWarning(collisions) {
+      const warning = document.querySelector("#warning");
+      if (!collisions.length) {
+        warning.classList.remove("is-active");
+        warning.textContent = "";
+        return;
+      }
+      warning.classList.add("is-active");
+      warning.textContent = collisions.map((collision) => {
+        return `${collision.a} と ${collision.b} のドリル軌跡が約 ${formatInch(Math.abs(collision.clearance))} 干渉しています。`;
+      }).join(" ");
+    }
+
+    function pitchLabel(value, positive, negative) {
+      if (Math.abs(value) < 1 / 128) return "0";
+      return `${value > 0 ? positive : negative} ${formatInch(Math.abs(value))}`;
+    }
+
+    function closestSegmentPoints(p1, q1, p2, q2) {
+      const d1 = sub(q1, p1);
+      const d2 = sub(q2, p2);
+      const r = sub(p1, p2);
+      const a = dot(d1, d1);
+      const e = dot(d2, d2);
+      const f = dot(d2, r);
+      let s = 0;
+      let t = 0;
+      const epsilon = 1e-8;
+
+      if (a <= epsilon && e <= epsilon) {
+        return { a: p1, b: p2, distance: distance(p1, p2) };
+      }
+      if (a <= epsilon) {
+        t = clamp(f / e, 0, 1);
+      } else {
+        const c = dot(d1, r);
+        if (e <= epsilon) {
+          s = clamp(-c / a, 0, 1);
+        } else {
+          const b = dot(d1, d2);
+          const denom = a * e - b * b;
+          if (denom !== 0) s = clamp((b * f - c * e) / denom, 0, 1);
+          t = (b * s + f) / e;
+          if (t < 0) {
+            t = 0;
+            s = clamp(-c / a, 0, 1);
+          } else if (t > 1) {
+            t = 1;
+            s = clamp((b - c) / a, 0, 1);
+          }
+        }
+      }
+
+      const aPoint = lerpPoint(p1, q1, s);
+      const bPoint = lerpPoint(p2, q2, t);
+      return { a: aPoint, b: bPoint, distance: distance(aPoint, bPoint) };
+    }
+
+    function sub(a, b) {
+      return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
+    }
+
+    function addScaled(a, b, scale) {
+      return { x: a.x + b.x * scale, y: a.y + b.y * scale, z: a.z + b.z * scale };
+    }
+
+    function dot(a, b) {
+      return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
+
+    function cross(a, b) {
+      return {
+        x: a.y * b.z - a.z * b.y,
+        y: a.z * b.x - a.x * b.z,
+        z: a.x * b.y - a.y * b.x
+      };
+    }
+
+    function distance(a, b) {
+      return Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+    }
+
+    function lerpPoint(a, b, t) {
+      return {
+        x: a.x + (b.x - a.x) * t,
+        y: a.y + (b.y - a.y) * t,
+        z: a.z + (b.z - a.z) * t
+      };
+    }
+
+    function midpoint(a, b) {
+      return {
+        x: (a.x + b.x) / 2,
+        y: (a.y + b.y) / 2,
+        z: (a.z + b.z) / 2
+      };
+    }
+
+    function drawGripCenter(point, radius, cx, cy, scale) {
+      const p = project(toSphere(point.x, point.y, radius), scale, cx, cy);
+      if (p.z <= 0) return;
+      ctx.save();
+      ctx.fillStyle = point.color;
+      ctx.strokeStyle = "rgba(0,0,0,.55)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, Math.max(4, point.radius * scale), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawHole(hole, radius, cx, cy, scale) {
+      const edge = [];
+      for (let i = 0; i <= 96; i++) {
+        const t = i / 96 * Math.PI * 2;
+        edge.push(toSphere(
+          hole.x + Math.cos(t) * hole.radius,
+          hole.y + Math.sin(t) * hole.radius,
+          radius
+        ));
+      }
+
+      ctx.save();
+      ctx.beginPath();
+      let started = false;
+      for (const p of edge) {
+        const q = project(p, scale, cx, cy);
+        if (!started) {
+          ctx.moveTo(q.x, q.y);
+          started = true;
+        } else {
+          ctx.lineTo(q.x, q.y);
+        }
+      }
+      ctx.closePath();
+      ctx.fillStyle = hexToRgba(hole.color, 0.72);
+      ctx.strokeStyle = "rgba(255,255,255,.85)";
+      ctx.lineWidth = 1.6;
+      ctx.fill();
+      ctx.stroke();
+
+      const center = project(toSphere(hole.x, hole.y, radius), scale, cx, cy);
+      ctx.fillStyle = "rgba(0,0,0,.55)";
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function hexToRgba(hex, alpha) {
+      const n = Number.parseInt(hex.slice(1), 16);
+      const r = (n >> 16) & 255;
+      const g = (n >> 8) & 255;
+      const b = n & 255;
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    function renderReadout(data) {
+      const rows = [
+        data.gripCenter,
+        data.thumb,
+        data.middle,
+        data.ring
+      ].map((p) => `
+        <tr>
+          <td>${p.name}</td>
+          <td>${formatInch(p.x)}</td>
+          <td>${formatInch(p.y)}</td>
+          <td>${formatInch(p.radius)}</td>
+          <td>${p.name === "Grip center" ? "-" : formatInch(data.drillDepth)}</td>
+          <td>${p.name === "Grip center" ? "-" : pitchLabel(p.lateral, "R", "L")}</td>
+          <td>${p.name === "Grip center" ? "-" : pitchLabel(p.verticalDisplay, "F", "Reverse")}</td>
+        </tr>
+      `).join("");
+      document.querySelector("#readout").innerHTML = rows;
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const width = Math.max(1, Math.floor(rect.width * dpr));
+      const height = Math.max(1, Math.floor(rect.height * dpr));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      state.dragging = true;
+      state.lastX = event.clientX;
+      state.lastY = event.clientY;
+      canvas.setPointerCapture(event.pointerId);
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      if (!state.dragging) return;
+      const dx = event.clientX - state.lastX;
+      const dy = event.clientY - state.lastY;
+      state.lastX = event.clientX;
+      state.lastY = event.clientY;
+      state.yaw += dx * 0.008;
+      state.pitch = Math.max(-0.85, Math.min(0.85, state.pitch + dy * 0.008));
+      draw();
+    });
+
+    canvas.addEventListener("pointerup", () => {
+      state.dragging = false;
+    });
+
+    canvas.addEventListener("pointercancel", () => {
+      state.dragging = false;
+    });
+
+    window.addEventListener("resize", draw);
+    draw();
+  </script>
+</body>
+</html>
