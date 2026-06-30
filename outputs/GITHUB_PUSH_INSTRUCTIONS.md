@@ -15,7 +15,7 @@ https://github.com/ymsh003/Drill-3D-Model.git
 Current local commit:
 
 ```text
-b852c89 Add bowling drill 3D prototype
+8ca93b0 Add handoff notes
 ```
 
 From a terminal with GitHub network access and credentials, run:
