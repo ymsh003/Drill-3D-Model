@@ -87,3 +87,13 @@ The right-hand control panel has been compacted:
 - Build a measure-sheet style layout that resembles the user-provided sheet more closely.
 - Add import/export of measure sheets.
 - Add persistent project files for different bowlers.
+
+## Latest Progress
+
+- Hole interiors are now generated as fixed 3D geometry rather than 2D envelope drawings.
+- Surface opening diameter and internal cylinder diameter use the same start-ring geometry.
+- Angle visualization was revised to match the requested reference style:
+  - center-origin rays to the thumb and finger hole positions
+  - a central angle arc with arrow
+  - `Thumb-Middle` and `Thumb-Ring` labels near the angle arc
+- The previous sphere-surface angle arc was removed.

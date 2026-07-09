@@ -673,10 +673,11 @@
 
       drawBall(cx, cy, radius, scale);
       drawGuideLines(data, cx, cy, scale);
+      drawSpanAngles(data, cx, cy, scale);
       data.holes.forEach((hole) => drawTrajectory(hole, data, cx, cy, scale));
-      drawHole(data.thumb, radius, cx, cy, scale);
-      drawHole(data.middle, radius, cx, cy, scale);
-      drawHole(data.ring, radius, cx, cy, scale);
+      drawHole(data.thumb, data, cx, cy, scale);
+      drawHole(data.middle, data, cx, cy, scale);
+      drawHole(data.ring, data, cx, cy, scale);
       drawGripCenter(data.gripCenter, radius, cx, cy, scale);
       drawCollisionMarkers(collisions, cx, cy, scale);
       renderReadout(data);
@@ -773,6 +774,100 @@
       strokeProjected(samples, cx, cy, scale, color, width);
     }
 
+    function drawSpanAngles(data, cx, cy, scale) {
+      drawDrillAxisAngle(data, data.middle, "Thumb-Middle", cx, cy, scale, "rgba(255,74,54,.95)");
+      drawDrillAxisAngle(data, data.ring, "Thumb-Ring", cx, cy, scale, "rgba(255,148,64,.9)");
+    }
+
+    function drawDrillAxisAngle(data, finger, label, cx, cy, scale, color) {
+      const thumbSegment = drillSegment(data.thumb, data);
+      const fingerSegment = drillSegment(finger, data);
+      const origin = { x: 0, y: 0, z: 0 };
+      const thumbDir = normalize(thumbSegment.start);
+      const fingerDir = normalize(fingerSegment.start);
+      const angle = Math.acos(clamp(dot(thumbDir, fingerDir), -1, 1));
+      const angleDeg = angle * 180 / Math.PI;
+      strokeProjected([origin, thumbSegment.start], cx, cy, scale, color, 2.6);
+      strokeProjected([origin, fingerSegment.start], cx, cy, scale, color, 2.6);
+      drawCenterAngleArc(origin, thumbDir, fingerDir, data.ballRadius * 0.28, cx, cy, scale, color);
+      const labelDir = normalize(addScaled(thumbDir, fingerDir, 1));
+      const labelPoint = addScaled(origin, labelDir, data.ballRadius * 0.36);
+      const p = project(labelPoint, scale, cx, cy);
+      if (p.z > 0) drawAngleLabel(`${label} ${angleDeg.toFixed(1)}°`, p.x, p.y, color);
+    }
+
+    function drawCenterAngleArc(origin, fromDir, toDir, radius, cx, cy, scale, color) {
+      const normal = normalize(cross(fromDir, toDir));
+      const angle = Math.acos(clamp(dot(fromDir, toDir), -1, 1));
+      if (!Number.isFinite(angle) || angle < 0.001) return;
+      const points = [];
+      const steps = 32;
+      for (let i = 0; i <= steps; i++) {
+        points.push(addScaled(origin, rotateAroundAxis(fromDir, normal, angle * i / steps), radius));
+      }
+      strokeProjected(points, cx, cy, scale, color, 3.2);
+      drawArcArrow(points, cx, cy, scale, color);
+    }
+
+    function drawArcArrow(points, cx, cy, scale, color) {
+      if (points.length < 3) return;
+      const a = project(points[points.length - 3], scale, cx, cy);
+      const b = project(points[points.length - 1], scale, cx, cy);
+      if (a.z <= 0 || b.z <= 0) return;
+      const angle = Math.atan2(b.y - a.y, b.x - a.x);
+      const size = 8;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(b.x - Math.cos(angle - 0.55) * size, b.y - Math.sin(angle - 0.55) * size);
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(b.x - Math.cos(angle + 0.55) * size, b.y - Math.sin(angle + 0.55) * size);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function rotateAroundAxis(vector, axis, angle) {
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      const term1 = scalePoint(vector, c);
+      const term2 = scalePoint(cross(axis, vector), s);
+      const term3 = scalePoint(axis, dot(axis, vector) * (1 - c));
+      return add(add(term1, term2), term3);
+    }
+
+    function drawAngleLabel(text, x, y, color) {
+      ctx.save();
+      ctx.font = "12px Segoe UI, system-ui, sans-serif";
+      const width = ctx.measureText(text).width + 10;
+      ctx.fillStyle = "rgba(9,12,15,.76)";
+      ctx.strokeStyle = "rgba(255,255,255,.18)";
+      ctx.lineWidth = 1;
+      roundRect(x - width / 2, y - 18, width, 18, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, x, y - 9);
+      ctx.restore();
+    }
+
+    function roundRect(x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
     function drillSegment(hole, data) {
       const start = toSphere(hole.x, hole.y, data.ballRadius);
       const inward = normalize({ x: -start.x, y: -start.y, z: -start.z });
@@ -796,35 +891,97 @@
       const axis = [];
       for (let i = 0; i <= 48; i++) axis.push(lerpPoint(segment.start, segment.tip, i / 48));
       strokeProjected(axis, cx, cy, scale, "rgba(255,255,255,.78)", 1.2);
-      drawDrillBitEnvelope(segment, cx, cy, scale, hole.color);
+      drawDrillHoleMesh(segment, cx, cy, scale);
     }
 
-    function drawDrillBitEnvelope(segment, cx, cy, scale, color) {
-      const a = project(segment.start, scale, cx, cy);
-      const c = project(segment.cylinderEnd, scale, cx, cy);
-      const tip = project(segment.tip, scale, cx, cy);
-      if (a.z <= 0 && c.z <= 0 && tip.z <= 0) return;
-      const dx = tip.x - a.x;
-      const dy = tip.y - a.y;
-      const len = Math.hypot(dx, dy) || 1;
-      const nx = -dy / len;
-      const ny = dx / len;
-      const r0 = segment.radius * scale;
+    function drawDrillHoleMesh(segment, cx, cy, scale) {
+      const mesh = buildDrillMesh(segment, 24);
+      const faces = mesh.faces.map((face) => {
+        const rotated = face.points.map((point) => rotate(point));
+        return {
+          points: face.points,
+          avgZ: rotated.reduce((sum, point) => sum + point.z, 0) / rotated.length,
+          normal: face.normal,
+          type: face.type
+        };
+      }).sort((a, b) => a.avgZ - b.avgZ);
 
       ctx.save();
+      for (const face of faces) drawMeshFace(face, cx, cy, scale);
+      drawMeshRing(mesh.startRing, cx, cy, scale, "rgba(245,250,252,.62)", 1.25);
+      drawMeshRing(mesh.cylinderRing, cx, cy, scale, "rgba(245,250,252,.38)", 1);
+      ctx.restore();
+    }
+
+    function buildDrillMesh(segment, sides) {
+      const basis = drillBasis(segment.axis);
+      const startRing = [];
+      const cylinderRing = [];
+      for (let i = 0; i < sides; i++) {
+        const angle = i / sides * Math.PI * 2;
+        const radial = addScaled(
+          scalePoint(basis.u, Math.cos(angle)),
+          basis.v,
+          Math.sin(angle)
+        );
+        startRing.push(addScaled(segment.start, radial, segment.radius));
+        cylinderRing.push(addScaled(segment.cylinderEnd, radial, segment.radius));
+      }
+      const faces = [];
+      for (let i = 0; i < sides; i++) {
+        const next = (i + 1) % sides;
+        const midAngle = (i + 0.5) / sides * Math.PI * 2;
+        const radialNormal = normalize(addScaled(scalePoint(basis.u, Math.cos(midAngle)), basis.v, Math.sin(midAngle)));
+        faces.push({
+          type: "cylinder",
+          points: [startRing[i], startRing[next], cylinderRing[next], cylinderRing[i]],
+          normal: radialNormal
+        });
+        const coneNormal = normalize(addScaled(radialNormal, segment.axis, segment.radius / Math.max(segment.pointLength, 0.001)));
+        faces.push({
+          type: "cone",
+          points: [cylinderRing[i], cylinderRing[next], segment.tip],
+          normal: coneNormal
+        });
+      }
+      return { startRing, cylinderRing, faces };
+    }
+
+    function drillBasis(axis) {
+      const seed = Math.abs(axis.y) > 0.92 ? { x: 1, y: 0, z: 0 } : { x: 0, y: 1, z: 0 };
+      const u = normalize(cross(axis, seed));
+      const v = normalize(cross(axis, u));
+      return { u, v };
+    }
+
+    function drawMeshFace(face, cx, cy, scale) {
+      const projected = face.points.map((point) => project(point, scale, cx, cy));
+      if (projected.every((point) => point.z <= 0)) return;
+      const light = normalize({ x: -0.45, y: 0.65, z: 0.62 });
+      const shade = clamp((dot(normalize(face.normal), light) + 1) / 2, 0, 1);
+      const alpha = face.type === "cone" ? 0.58 : 0.46;
+      const value = Math.round(20 + shade * 150);
       ctx.beginPath();
-      ctx.moveTo(a.x + nx * r0, a.y + ny * r0);
-      ctx.lineTo(c.x + nx * r0, c.y + ny * r0);
-      ctx.lineTo(tip.x, tip.y);
-      ctx.lineTo(c.x - nx * r0, c.y - ny * r0);
-      ctx.lineTo(a.x - nx * r0, a.y - ny * r0);
+      ctx.moveTo(projected[0].x, projected[0].y);
+      for (let i = 1; i < projected.length; i++) ctx.lineTo(projected[i].x, projected[i].y);
       ctx.closePath();
-      ctx.fillStyle = hexToRgba(color, 0.22);
-      ctx.strokeStyle = hexToRgba(color, 0.72);
-      ctx.lineWidth = 1.4;
+      ctx.fillStyle = `rgba(${value},${value + 5},${value + 8},${alpha})`;
+      ctx.strokeStyle = `rgba(235,242,245,${face.type === "cone" ? 0.18 : 0.12})`;
+      ctx.lineWidth = 0.7;
       ctx.fill();
       ctx.stroke();
-      ctx.restore();
+    }
+
+    function drawMeshRing(points, cx, cy, scale, color, width) {
+      const projected = points.map((point) => project(point, scale, cx, cy));
+      if (projected.every((point) => point.z <= 0)) return;
+      ctx.beginPath();
+      ctx.moveTo(projected[0].x, projected[0].y);
+      for (let i = 1; i < projected.length; i++) ctx.lineTo(projected[i].x, projected[i].y);
+      ctx.closePath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
     }
 
     function drillRadiusAt(segment, t) {
@@ -964,6 +1121,14 @@
       return { x: a.x + b.x * scale, y: a.y + b.y * scale, z: a.z + b.z * scale };
     }
 
+    function add(a, b) {
+      return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z };
+    }
+
+    function scalePoint(a, scale) {
+      return { x: a.x * scale, y: a.y * scale, z: a.z * scale };
+    }
+
     function dot(a, b) {
       return a.x * b.x + a.y * b.y + a.z * b.z;
     }
@@ -1010,17 +1175,10 @@
       ctx.restore();
     }
 
-    function drawHole(hole, radius, cx, cy, scale) {
-      const edge = [];
-      for (let i = 0; i <= 96; i++) {
-        const t = i / 96 * Math.PI * 2;
-        edge.push(toSphere(
-          hole.x + Math.cos(t) * hole.radius,
-          hole.y + Math.sin(t) * hole.radius,
-          radius
-        ));
-      }
-
+    function drawHole(hole, data, cx, cy, scale) {
+      const segment = drillSegment(hole, data);
+      const mesh = buildDrillMesh(segment, 48);
+      const edge = mesh.startRing;
       ctx.save();
       ctx.beginPath();
       let started = false;
@@ -1034,16 +1192,20 @@
         }
       }
       ctx.closePath();
-      ctx.fillStyle = hexToRgba(hole.color, 0.72);
-      ctx.strokeStyle = "rgba(255,255,255,.85)";
-      ctx.lineWidth = 1.6;
+      const center = project(segment.start, scale, cx, cy);
+      const openingGradient = ctx.createRadialGradient(center.x, center.y, 1, center.x, center.y, Math.max(4, hole.radius * scale));
+      openingGradient.addColorStop(0, "rgba(0,0,0,0.96)");
+      openingGradient.addColorStop(0.72, "rgba(8,11,14,0.9)");
+      openingGradient.addColorStop(1, "rgba(205,215,220,0.32)");
+      ctx.fillStyle = openingGradient;
+      ctx.strokeStyle = "rgba(235,242,245,0.72)";
+      ctx.lineWidth = 1.8;
       ctx.fill();
       ctx.stroke();
 
-      const center = project(toSphere(hole.x, hole.y, radius), scale, cx, cy);
-      ctx.fillStyle = "rgba(0,0,0,.55)";
+      ctx.fillStyle = "rgba(255,255,255,.42)";
       ctx.beginPath();
-      ctx.arc(center.x, center.y, 3, 0, Math.PI * 2);
+      ctx.arc(center.x, center.y, 2.2, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
