@@ -25,6 +25,7 @@
     body {
       margin: 0;
       min-height: 100vh;
+      overflow: hidden;
       font-family: "Segoe UI", system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -33,13 +34,23 @@
 
     .app {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 460px;
-      min-height: 100vh;
+      grid-template-columns: minmax(420px, 46vw) minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr);
+      grid-template-areas:
+        "measure measure"
+        "controls viewer";
+      gap: 12px;
+      padding: 12px;
+      height: 100vh;
+      overflow: hidden;
     }
 
     .viewer {
+      grid-area: viewer;
       position: relative;
-      min-height: 100vh;
+      min-height: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
       background:
         linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
         linear-gradient(0deg, rgba(255,255,255,.035) 1px, transparent 1px),
@@ -96,6 +107,23 @@
       font-size: 13px;
     }
 
+    .zoom-hud {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 8px;
+      background: rgba(15,17,20,.76);
+      backdrop-filter: blur(10px);
+      color: var(--muted);
+      font-size: 12px;
+      pointer-events: none;
+    }
+
     .dot {
       display: inline-block;
       width: 10px;
@@ -106,14 +134,15 @@
     }
 
     aside {
+      grid-area: controls;
       display: grid;
       grid-template-columns: 1fr 1fr;
       align-content: start;
       gap: 10px;
-      min-height: 100vh;
-      padding: 12px;
+      min-height: 0;
+      height: 100%;
+      padding: 0;
       overflow: auto;
-      border-left: 1px solid var(--line);
       background: var(--panel);
     }
 
@@ -132,6 +161,319 @@
         linear-gradient(0deg, rgba(255,255,255,.05) 1px, transparent 1px),
         var(--panel-2);
       background-size: 28px 28px;
+    }
+
+    .measure-section {
+      grid-area: measure;
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 8px 12px;
+      align-items: start;
+      min-height: 0;
+    }
+
+    .measure-section h2 { margin-bottom: 0; }
+    .measure-section .measure-toolbar { grid-column: 1; }
+    .measure-section .measure-diagram { grid-column: 2; grid-row: 1 / span 2; }
+
+    .measure-diagram {
+      position: relative;
+      width: min(100%, 460px);
+      min-height: 0;
+      margin-inline: auto;
+      aspect-ratio: 1100 / 760;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      background: #f7f8f6;
+      color: #0b0d0f;
+      overflow: hidden;
+    }
+
+    .measure-diagram svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .measure-toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 138px;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .measure-toolbar select {
+      width: 100%;
+      min-height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #11161a;
+      color: var(--text);
+      padding: 4px 6px;
+      font: inherit;
+      font-size: 12px;
+    }
+
+    .measure-diagram .sheet-input {
+      position: absolute;
+      width: 15%;
+      height: 7%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #0b0d0f;
+      text-align: center;
+      font-size: clamp(13px, 1.25vw, 18px);
+      font-weight: 800;
+      line-height: 1;
+      padding: 0 4px;
+      outline: 0;
+    }
+
+    .measure-diagram .sheet-input.small,
+    .measure-diagram .sheet-input.wide,
+    .measure-diagram .sheet-input.grip { width: 15%; }
+    .measure-diagram .sheet-input.hole-size {
+      border-radius: 999px;
+      border: 0;
+      background: transparent;
+      font-size: clamp(11px, 1.05vw, 15px);
+    }
+
+    .sheet-label {
+      position: absolute;
+      color: #0b0d0f;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      pointer-events: none;
+      line-height: 1.25;
+      width: 92px;
+      text-align: center;
+    }
+
+    .measure-diagram[data-hand="left"] .right-hand-only,
+    .measure-diagram[data-hand="right"] .left-hand-only { display: none; }
+
+    .sheet-hidden-controls { display: none; }
+
+    .measure-diagram[data-hand="right"] .field-middle-grip,
+    .measure-diagram[data-hand="left"] .field-ring-grip { left: 39.091%; }
+    .measure-diagram[data-hand="right"] .field-ring-grip,
+    .measure-diagram[data-hand="left"] .field-middle-grip { left: 60.909%; }
+    .field-middle-grip,
+    .field-ring-grip { top: 5.5%; transform: translate(-50%, -50%); }
+    .field-bridge { left: 50%; top: 16%; transform: translate(-50%, -50%); }
+    .measure-diagram[data-hand="right"] .field-middle-hole,
+    .measure-diagram[data-hand="left"] .field-ring-hole { left: 39.091%; }
+    .measure-diagram[data-hand="right"] .field-ring-hole,
+    .measure-diagram[data-hand="left"] .field-middle-hole { left: 60.909%; }
+    .field-middle-hole,
+    .field-ring-hole { top: 28.947%; transform: translate(-50%, -50%); }
+    .measure-diagram[data-hand="right"] .field-main-span,
+    .measure-diagram[data-hand="left"] .field-offset-span { left: 25.455%; }
+    .measure-diagram[data-hand="right"] .field-offset-span,
+    .measure-diagram[data-hand="left"] .field-main-span { left: 74.545%; }
+    .field-main-span,
+    .field-offset-span { top: 47.895%; transform: translate(-50%, -50%); }
+    .field-thumb-hole { left: 50%; top: 73.684%; transform: translate(-50%, -50%); }
+    .field-thumb-solid { left: 50%; top: 93.289%; transform: translate(-50%, -50%); }
+    .pitch-token {
+      position: absolute;
+      color: #0b0d0f;
+      min-width: 0;
+      width: max-content;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.05;
+      pointer-events: none;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .pitch-token strong {
+      display: block;
+      min-height: 11px;
+      color: #0b0d0f;
+      font-size: clamp(11px, 1.05vw, 16px);
+      line-height: .9;
+    }
+
+    .pitch-token span {
+      display: none;
+    }
+
+    .pitch-token.left { transform: translate(-100%, -50%); }
+    .pitch-token.right { transform: translate(0, -50%); }
+    .pitch-token.top { transform: translate(-50%, -100%); }
+    .pitch-token.bottom { transform: translate(-50%, 0); }
+
+    .left-cross-left { left: 12.727%; top: 28.947%; transform: translate(calc(-100% - 4px), -50%); }
+    .left-cross-right { left: 20.909%; top: 28.947%; transform: translate(4px, -50%); }
+    .left-cross-top { left: 16.818%; top: 23.158%; }
+    .left-cross-bottom { left: 16.818%; top: 34.737%; }
+    .right-cross-left { left: 80.909%; top: 28.947%; transform: translate(calc(-100% - 4px), -50%); }
+    .right-cross-right { left: 88.636%; top: 28.947%; transform: translate(4px, -50%); }
+    .right-cross-top { left: 84.773%; top: 23.158%; }
+    .right-cross-bottom { left: 84.773%; top: 34.737%; }
+    .thumb-cross-left { left: 73.182%; top: 73.421%; }
+    .thumb-cross-right { left: 81.364%; top: 73.421%; }
+    .thumb-cross-top { left: 77.273%; top: 67.368%; }
+    .thumb-cross-bottom { left: 77.273%; top: 79.474%; }
+
+    .measure-indicators {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .sheet-control-groups {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .sheet-card {
+      display: grid;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      background: rgba(12, 15, 18, .35);
+    }
+
+    .sheet-card h3 {
+      margin: 0;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .sheet-card .measure-indicators,
+    .sheet-card .material-grid,
+    .sheet-card .pitch-grid {
+      margin-top: 0;
+    }
+
+    .sheet-card .measure-indicators {
+      gap: 8px;
+    }
+
+    .sheet-card .indicator-control {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .sheet-card .indicator-control + .indicator-control {
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .sheet-two-column {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .indicator-control {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .indicator-control label {
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .indicator-wrap {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .indicator-wrap input[type="range"] {
+      width: 100%;
+      margin: 0;
+    }
+
+    .indicator-wrap select {
+      width: 100%;
+      min-height: 30px;
+    }
+
+    .indicator-wrap input[type="range"]:disabled,
+    .indicator-wrap select:disabled,
+    .measure-diagram .sheet-input:disabled,
+    .measure-diagram .sheet-input[aria-disabled="true"] {
+      opacity: .45;
+    }
+
+    .indicator-scale {
+      position: relative;
+      height: 21px;
+      margin: 0 8px;
+    }
+
+    .indicator-tick {
+      position: absolute;
+      bottom: 8px;
+      width: 1px;
+      background: rgba(238,243,245,.55);
+      transform: translateX(-50%);
+    }
+
+    .indicator-tick.tick-16 { height: 5px; opacity: .5; }
+    .indicator-tick.tick-32 { height: 3px; opacity: .38; }
+    .indicator-tick.tick-8 { height: 8px; opacity: .62; }
+    .indicator-tick.tick-4 { height: 12px; opacity: .78; }
+    .indicator-tick.tick-2 { height: 17px; opacity: .95; }
+
+    .indicator-tick-label {
+      position: absolute;
+      top: 14px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    .material-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .material-field {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .material-field select {
+      width: 100%;
+      min-height: 30px;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 84px;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
     }
 
     h2 {
@@ -167,17 +509,21 @@
 
     .pitch-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
+    }
+
+    .pitch-grid.single {
+      grid-template-columns: 1fr;
     }
 
     .pitch-pad {
       display: grid;
       gap: 7px;
       padding: 8px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 8px;
-      background: rgba(12, 15, 18, .35);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .03);
     }
 
     .pitch-pad h3 {
@@ -190,7 +536,7 @@
     .pitch-axis {
       display: grid;
       grid-template-columns: 42px minmax(0, 1fr) 42px;
-      grid-template-rows: auto auto;
+      grid-template-rows: auto auto auto;
       gap: 4px 5px;
       align-items: center;
     }
@@ -208,6 +554,11 @@
       grid-column: 1 / -1;
       width: 100%;
       margin: 0;
+    }
+
+    .pitch-axis .indicator-scale {
+      grid-column: 1 / -1;
+      margin: -1px 8px 0;
     }
 
     .pitch-readout {
@@ -232,6 +583,12 @@
       color: var(--text);
       font-size: 15px;
       margin-bottom: 2px;
+    }
+
+    .field-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
     }
 
     label {
@@ -301,163 +658,334 @@
     }
 
     @media (max-width: 920px) {
-      .app { grid-template-columns: 1fr; }
+      body { overflow: auto; }
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 62vh auto;
+        grid-template-areas:
+          "measure"
+          "viewer"
+          "controls";
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+      }
       .viewer { min-height: 62vh; }
       aside {
         grid-template-columns: 1fr;
+        height: auto;
         min-height: auto;
-        border-left: 0;
-        border-top: 1px solid var(--line);
+        overflow: visible;
       }
+      .sheet-two-column { grid-template-columns: 1fr; }
       .pitch-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <main class="app">
-    <section class="viewer">
-      <canvas id="scene" aria-label="grip center drill layout preview"></canvas>
-      <div class="title">
-        <h1>Grip Center Drill Layout</h1>
-        <p>仮のグリップセンターを基準に、水平線と垂線、端点間スパン、ブリッジから三穴の位置を描画します。</p>
+    <section class="section sheet-section measure-section">
+      <h2>メジャーシート</h2>
+      <div class="measure-toolbar">
+        <label for="handedness">利き手</label>
+        <select id="handedness">
+          <option value="right" selected>右投げ</option>
+          <option value="left">左投げ</option>
+        </select>
       </div>
-      <div class="legend">
-        <span><i class="dot" style="background: var(--gc)"></i>Grip center</span>
-        <span><i class="dot" style="background: var(--thumb)"></i>Thumb</span>
-        <span><i class="dot" style="background: var(--middle)"></i>Middle</span>
-        <span><i class="dot" style="background: var(--ring)"></i>Ring</span>
+      <div id="measureDiagram" class="measure-diagram" data-hand="right">
+          <svg viewBox="0 0 1100 760" aria-hidden="true">
+            <g fill="none" stroke="#0b0d0f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="430" cy="220" r="62"></circle>
+              <circle cx="670" cy="220" r="62"></circle>
+              <circle cx="550" cy="560" r="62"></circle>
+              <line x1="495" y1="220" x2="605" y2="220"></line>
+              <line x1="433" y1="285" x2="520" y2="498"></line>
+              <line x1="667" y1="285" x2="580" y2="498"></line>
+              <path d="M390 10 H358 V76 H390 M470 10 H502 V76 H470"></path>
+              <path d="M630 10 H598 V76 H630 M710 10 H742 V76 H710"></path>
+              <path d="M510 100 H478 V142 H510 M590 100 H622 V142 H590"></path>
+              <path d="M240 332 H206 V396 H240 M320 332 H354 V396 H320"></path>
+              <path d="M780 332 H746 V396 H780 M860 332 H894 V396 H860"></path>
+              <path d="M510 680 H478 V738 H510 M590 680 H622 V738 H590"></path>
+            </g>
+            <g fill="none" stroke="#0b0d0f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M185 176 L185 264 M140 220 L230 220"></path>
+              <path d="M932.5 176 L932.5 264 M890 220 L975 220"></path>
+              <path d="M850 512 L850 604 M805 558 L895 558"></path>
+            </g>
+          </svg>
+          <span class="pitch-token left left-cross-left" data-cross="left" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
+          <span class="pitch-token right left-cross-right" data-cross="left" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
+          <span class="pitch-token top left-cross-top" data-cross="left" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
+          <span class="pitch-token bottom left-cross-bottom" data-cross="left" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
+          <span class="pitch-token left right-cross-left" data-cross="right" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
+          <span class="pitch-token right right-cross-right" data-cross="right" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
+          <span class="pitch-token top right-cross-top" data-cross="right" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
+          <span class="pitch-token bottom right-cross-bottom" data-cross="right" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
+          <span class="pitch-token left thumb-cross-left" data-hole="thumb" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
+          <span class="pitch-token right thumb-cross-right" data-hole="thumb" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
+          <span class="pitch-token top thumb-cross-top" data-hole="thumb" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
+          <span class="pitch-token bottom thumb-cross-bottom" data-hole="thumb" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
+          <div id="middleGripIdValue" class="sheet-input grip field-middle-grip" contenteditable="true" role="textbox" aria-label="中指グリップ内径">25/32</div>
+          <div id="ringGripIdValue" class="sheet-input grip field-ring-grip" contenteditable="true" role="textbox" aria-label="薬指グリップ内径">3/4</div>
+          <div id="middleDiameterValue" class="sheet-input small hole-size field-middle-hole" contenteditable="true" role="textbox" aria-label="中指ホールサイズ">25/32</div>
+          <div id="ringDiameterValue" class="sheet-input small hole-size field-ring-hole" contenteditable="true" role="textbox" aria-label="薬指ホールサイズ">3/4</div>
+          <div id="bridgeValue" class="sheet-input small field-bridge" contenteditable="true" role="textbox" aria-label="ブリッジ">1/4</div>
+          <div id="middleSpanValue" class="sheet-input wide field-main-span" contenteditable="true" role="textbox" aria-label="メインスパン">4</div>
+          <div id="ringSpanOffsetValue" class="sheet-input wide field-offset-span" contenteditable="true" role="textbox" aria-label="スパン差分">-1/8</div>
+          <div id="thumbDiameterValue" class="sheet-input small hole-size field-thumb-hole" contenteditable="true" role="textbox" aria-label="サム内径">1</div>
+          <div id="thumbSolidValue" class="sheet-input grip field-thumb-solid" contenteditable="true" role="textbox" aria-label="サムソリッド外径">1 1/4</div>
       </div>
     </section>
 
     <aside>
       <section class="section">
-        <h2>Ball</h2>
+        <h2>ボール</h2>
         <p class="fixed-spec">
-          <strong>Diameter 8.595"</strong>
+          <strong>直径 8.595"</strong>
           規定範囲: 周 26.704" - 27.002"、直径 8.500" - 8.595"。この試作では最大径で固定しています。
         </p>
       </section>
 
-      <section class="section sheet-section">
-        <h2>Measure Sheet</h2>
-        <div class="control">
-          <label for="middleSpan">Middle span, edge to edge (inch)</label>
-          <input id="middleSpanValue" type="text" value="4" />
-          <input id="middleSpan" type="range" min="2.5" max="5.5" step="0.015625" value="4" />
-        </div>
-        <div class="control">
-          <label for="ringSpanOffset">Ring span offset from middle (inch)</label>
-          <input id="ringSpanOffsetValue" type="text" value="-1/8" />
-          <input id="ringSpanOffset" type="range" min="-0.5" max="0.5" step="0.015625" value="-0.125" />
-        </div>
-        <div class="control">
-          <label for="bridge">Bridge between finger holes (inch)</label>
-          <input id="bridgeValue" type="text" value="1/4" />
-          <input id="bridge" type="range" min="0.1875" max="0.5" step="0.015625" value="0.25" />
-        </div>
-      </section>
+      <div class="sheet-control-groups section-wide">
+          <section class="sheet-card">
+            <h3>スパン / ブリッジ</h3>
+            <div class="measure-indicators">
+              <div class="indicator-control">
+                <label for="middleSpan">メインスパン</label>
+                <div class="indicator-wrap">
+                  <input id="middleSpan" type="range" min="2.5" max="5.5" step="0.03125" value="4" />
+                  <div class="indicator-scale" data-range="middleSpan"></div>
+                </div>
+              </div>
+              <div class="indicator-control">
+                <label for="ringSpanOffset">スパン +/-</label>
+                <div class="indicator-wrap">
+                  <input id="ringSpanOffset" type="range" min="-0.5" max="0.5" step="0.03125" value="-0.125" />
+                  <div class="indicator-scale" data-range="ringSpanOffset"></div>
+                </div>
+              </div>
+              <div class="indicator-control">
+                <label for="bridge">ブリッジ</label>
+                <div class="indicator-wrap">
+                  <input id="bridge" type="range" min="0.1875" max="0.5" step="0.015625" value="0.25" />
+                  <div class="indicator-scale" data-range="bridge"></div>
+                </div>
+              </div>
+            </div>
+          </section>
 
-      <section class="section sheet-section">
-        <h2>Hole Size / Drill</h2>
-        <div class="control">
-          <label for="thumbDiameter">Thumb hole (inch)</label>
-          <input id="thumbDiameterValue" type="text" value="1" />
-          <input id="thumbDiameter" type="range" min="0.6875" max="1.3125" step="0.015625" value="1" />
-        </div>
-        <div class="control">
-          <label for="middleDiameter">Middle finger hole (inch)</label>
-          <input id="middleDiameterValue" type="text" value="25/32" />
-          <input id="middleDiameter" type="range" min="0.5" max="1.09375" step="0.015625" value="0.78125" />
-        </div>
-        <div class="control">
-          <label for="ringDiameter">Ring finger hole (inch)</label>
-          <input id="ringDiameterValue" type="text" value="3/4" />
-          <input id="ringDiameter" type="range" min="0.5" max="1.09375" step="0.015625" value="0.75" />
-        </div>
-        <div class="control">
-          <label for="drillDepth">Drill depth (inch)</label>
-          <input id="drillDepthValue" type="text" value="2 1/2" />
-          <input id="drillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" />
-        </div>
-      </section>
+          <section class="sheet-card">
+            <h3>フィンガーホール</h3>
+            <div class="material-grid">
+              <div class="material-field">
+                <label for="middleGripType">中指グリップ</label>
+                <select id="middleGripType">
+                  <option value="none">使用なし</option>
+                  <option value="semi">セミグリップ</option>
+                  <option value="tip">チップグリップ</option>
+                  <option value="oval" selected>オーバルグリップ</option>
+                  <option value="powerOval">パワーオーバルグリップ</option>
+                  <option value="rubberSheet">板ゴム</option>
+                </select>
+              </div>
+              <div class="material-field">
+                <label for="ringGripType">薬指グリップ</label>
+                <select id="ringGripType">
+                  <option value="none">使用なし</option>
+                  <option value="semi">セミグリップ</option>
+                  <option value="tip">チップグリップ</option>
+                  <option value="oval" selected>オーバルグリップ</option>
+                  <option value="powerOval">パワーオーバルグリップ</option>
+                  <option value="rubberSheet">板ゴム</option>
+                </select>
+              </div>
+              <div class="material-field">
+                <label for="middleGripOuter">中指グリップ外径</label>
+                <select id="middleGripOuter">
+                  <option value="0.875">7/8"</option>
+                  <option value="0.96875" selected>31/32"</option>
+                  <option value="1.03125">1 1/32"</option>
+                </select>
+              </div>
+              <div class="material-field">
+                <label for="ringGripOuter">薬指グリップ外径</label>
+                <select id="ringGripOuter">
+                  <option value="0.875">7/8"</option>
+                  <option value="0.96875" selected>31/32"</option>
+                  <option value="1.03125">1 1/32"</option>
+                </select>
+              </div>
+            </div>
+            <div class="sheet-two-column">
+              <div class="measure-indicators">
+                <div class="indicator-control">
+                  <label for="middleGripId">中指グリップ内径</label>
+                  <div class="indicator-wrap">
+                    <select id="middleGripId"></select>
+                  </div>
+                </div>
+                <div class="indicator-control">
+                  <label for="middleBareDiameter">中指 素掘り径</label>
+                  <div class="indicator-wrap">
+                    <select id="middleBareDiameter"></select>
+                  </div>
+                </div>
+                <div class="indicator-control">
+                  <label for="middleGripWall">中指 肉厚</label>
+                  <div class="indicator-wrap">
+                    <output id="middleGripWall" class="pitch-readout">0"</output>
+                  </div>
+                </div>
+              </div>
+              <div class="measure-indicators">
+                <div class="indicator-control">
+                  <label for="ringGripId">薬指グリップ内径</label>
+                  <div class="indicator-wrap">
+                    <select id="ringGripId"></select>
+                  </div>
+                </div>
+                <div class="indicator-control">
+                  <label for="ringBareDiameter">薬指 素掘り径</label>
+                  <div class="indicator-wrap">
+                    <select id="ringBareDiameter"></select>
+                  </div>
+                </div>
+                <div class="indicator-control">
+                  <label for="ringGripWall">薬指 肉厚</label>
+                  <div class="indicator-wrap">
+                    <output id="ringGripWall" class="pitch-readout">0"</output>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="pitch-grid">
+              <div class="pitch-pad" data-hole="middle">
+                <h3>中指ピッチ</h3>
+                <div class="pitch-axis">
+                  <span class="axis-label left">左 1"</span>
+                  <output id="middleLateralAxisValue" class="pitch-readout">左右 0</output>
+                  <span class="axis-label right">右 1"</span>
+                  <input id="middleLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 左右ピッチ" />
+                  <div class="indicator-scale" data-range="middleLateralAxis"></div>
+                </div>
+                <div class="pitch-axis">
+                  <span class="axis-label left">リバース 1"</span>
+                  <output id="middleVerticalAxisValue" class="pitch-readout">前後 0</output>
+                  <span class="axis-label right">フォワード 1"</span>
+                  <input id="middleVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 前後ピッチ" />
+                  <div class="indicator-scale" data-range="middleVerticalAxis"></div>
+                </div>
+              </div>
 
-      <section class="section sheet-section section-wide">
-        <h2>Pitch</h2>
-        <div class="pitch-grid">
-          <div class="pitch-pad" data-hole="thumb">
-            <h3>Thumb Pitch</h3>
-            <div class="pitch-axis">
-              <span class="axis-label left">Left 1"</span>
-              <output id="thumbLateralAxisValue" class="pitch-readout">L/R 0</output>
-              <span class="axis-label right">Right 1"</span>
-              <input id="thumbLateralAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Thumb left right pitch" />
+              <div class="pitch-pad" data-hole="ring">
+                <h3>薬指ピッチ</h3>
+                <div class="pitch-axis">
+                  <span class="axis-label left">左 1"</span>
+                  <output id="ringLateralAxisValue" class="pitch-readout">左右 0</output>
+                  <span class="axis-label right">右 1"</span>
+                  <input id="ringLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 左右ピッチ" />
+                  <div class="indicator-scale" data-range="ringLateralAxis"></div>
+                </div>
+                <div class="pitch-axis">
+                  <span class="axis-label left">リバース 1"</span>
+                  <output id="ringVerticalAxisValue" class="pitch-readout">前後 0</output>
+                  <span class="axis-label right">フォワード 1"</span>
+                  <input id="ringVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 前後ピッチ" />
+                  <div class="indicator-scale" data-range="ringVerticalAxis"></div>
+                </div>
+              </div>
             </div>
-            <div class="pitch-axis">
-              <span class="axis-label left">Reverse 1"</span>
-              <output id="thumbVerticalAxisValue" class="pitch-readout">F/R 0</output>
-              <span class="axis-label right">Forward 1"</span>
-              <input id="thumbVerticalAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Thumb forward reverse pitch" />
-            </div>
-          </div>
+          </section>
 
-          <div class="pitch-pad" data-hole="middle">
-            <h3>Middle Finger Pitch</h3>
-            <div class="pitch-axis">
-              <span class="axis-label left">Left 1"</span>
-              <output id="middleLateralAxisValue" class="pitch-readout">L/R 0</output>
-              <span class="axis-label right">Right 1"</span>
-              <input id="middleLateralAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Middle left right pitch" />
+          <section class="sheet-card">
+            <h3>サムホール</h3>
+            <div class="material-grid">
+              <div class="material-field">
+                <label for="thumbSolidMode">サムソリッド</label>
+                <select id="thumbSolidMode">
+                  <option value="yes" selected>使用する</option>
+                  <option value="no">使用しない</option>
+                </select>
+              </div>
             </div>
-            <div class="pitch-axis">
-              <span class="axis-label left">Reverse 1"</span>
-              <output id="middleVerticalAxisValue" class="pitch-readout">F/R 0</output>
-              <span class="axis-label right">Forward 1"</span>
-              <input id="middleVerticalAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Middle forward reverse pitch" />
+            <div class="measure-indicators">
+              <div class="indicator-control">
+                <label for="thumbDiameter">サム内径</label>
+                <div class="indicator-wrap">
+                  <input id="thumbDiameter" type="range" min="0.6875" max="1.3125" step="0.015625" value="1" />
+                  <div class="indicator-scale" data-range="thumbDiameter"></div>
+                </div>
+              </div>
+              <div class="indicator-control">
+                <label for="thumbSolid">サムソリッド外径</label>
+                <div class="indicator-wrap">
+                  <select id="thumbSolid">
+                    <option value="1.125">1 1/8"</option>
+                    <option value="1.25" selected>1 1/4"</option>
+                    <option value="1.375">1 3/8"</option>
+                  </select>
+                </div>
+              </div>
+              <div class="indicator-control">
+                <label for="thumbSolidWall">サムソリッド肉厚</label>
+                <div class="indicator-wrap">
+                  <output id="thumbSolidWall" class="pitch-readout">1/8"</output>
+                </div>
+              </div>
+              <div class="indicator-control">
+                <label for="drillDepth">ドリル深さ</label>
+                <div class="indicator-wrap">
+                  <input id="drillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" />
+                  <div class="indicator-scale" data-range="drillDepth"></div>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div class="pitch-pad" data-hole="ring">
-            <h3>Ring Finger Pitch</h3>
-            <div class="pitch-axis">
-              <span class="axis-label left">Left 1"</span>
-              <output id="ringLateralAxisValue" class="pitch-readout">L/R 0</output>
-              <span class="axis-label right">Right 1"</span>
-              <input id="ringLateralAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Ring left right pitch" />
+            <div class="pitch-grid single">
+              <div class="pitch-pad" data-hole="thumb">
+                <h3>サムピッチ</h3>
+                <div class="pitch-axis">
+                  <span class="axis-label left">左 1"</span>
+                  <output id="thumbLateralAxisValue" class="pitch-readout">左右 0</output>
+                  <span class="axis-label right">右 1"</span>
+                  <input id="thumbLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="サム 左右ピッチ" />
+                  <div class="indicator-scale" data-range="thumbLateralAxis"></div>
+                </div>
+                <div class="pitch-axis">
+                  <span class="axis-label left">リバース 1"</span>
+                  <output id="thumbVerticalAxisValue" class="pitch-readout">前後 0</output>
+                  <span class="axis-label right">フォワード 1"</span>
+                  <input id="thumbVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="サム 前後ピッチ" />
+                  <div class="indicator-scale" data-range="thumbVerticalAxis"></div>
+                </div>
+              </div>
             </div>
-            <div class="pitch-axis">
-              <span class="axis-label left">Reverse 1"</span>
-              <output id="ringVerticalAxisValue" class="pitch-readout">F/R 0</output>
-              <span class="axis-label right">Forward 1"</span>
-              <input id="ringVerticalAxis" type="range" min="-1" max="1" step="0.015625" value="0" aria-label="Ring forward reverse pitch" />
-            </div>
-          </div>
+          </section>
         </div>
-      </section>
+      </div>
 
       <p id="warning" class="warning section-wide"></p>
 
       <section class="section section-wide">
-        <h2>Computed Position</h2>
-        <table class="readout">
-          <thead>
-            <tr>
-              <th>Point</th>
-              <th>X</th>
-              <th>Y</th>
-              <th>Radius</th>
-              <th>Depth</th>
-              <th>L/R</th>
-              <th>F/R</th>
-            </tr>
-          </thead>
-          <tbody id="readout"></tbody>
-        </table>
-      </section>
-
-      <section class="section section-wide">
-        <p class="note">0 ピッチは球中心方向です。各横軸は中央が 0、左右端が 1 インチです。L/R は左が Left、右が Right。F/R は左が Reverse、右が Forward です。</p>
+        <p class="note">スパンは 1/32 インチ刻み、ピッチは 1/16 インチ刻みです。0 ピッチは球中心方向です。左右は左がレフト、右がライト。前後は左がリバース、右がフォワードです。</p>
       </section>
     </aside>
+
+    <section class="viewer">
+      <canvas id="scene" aria-label="grip center drill layout preview"></canvas>
+      <div class="title">
+        <h1>グリップセンター ドリルレイアウト</h1>
+        <p>仮のグリップセンターを基準に、水平線と垂線、端点間スパン、ブリッジから三穴の位置を描画します。</p>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background: var(--gc)"></i>グリップセンター</span>
+        <span><i class="dot" style="background: var(--thumb)"></i>サム</span>
+        <span><i class="dot" style="background: var(--middle)"></i>中指</span>
+        <span><i class="dot" style="background: var(--ring)"></i>薬指</span>
+      </div>
+      <div class="zoom-hud">ズーム <output id="zoomValue">100%</output></div>
+    </section>
   </main>
 
   <script>
@@ -465,20 +993,40 @@
     const ctx = canvas.getContext("2d");
     const inputs = new Map();
     const BALL_DIAMETER = 8.595;
-    const state = { yaw: -0.35, pitch: 0.12, dragging: false, lastX: 0, lastY: 0 };
+    const GRIP_INNER_BY_OUTER = {
+      "0.875": range64(34, 49),
+      "0.96875": range64(36, 52),
+      "1.03125": [53, 54, 55, 56, 58].map((size) => size / 64)
+    };
+    const BARE_FINGER_SIZES = range64(34, 58);
+    const DEFAULT_GRIP_INNER = {
+      middle: 25 / 32,
+      ring: 3 / 4
+    };
+    const state = {
+      yaw: -0.35,
+      pitch: 0.12,
+      zoom: 1,
+      dragging: false,
+      lastX: 0,
+      lastY: 0,
+      pointers: new Map(),
+      pinchDistance: 0,
+      pinchZoom: 1
+    };
 
     document.querySelectorAll("input[type='range']").forEach((range) => {
       const valueOutput = document.querySelector(`#${range.id}Value`);
       inputs.set(range.id, range);
       const sync = (fromRange) => {
         if (fromRange) {
-          range.value = snap64(range.value);
+          range.value = snapToStep(range.value, range.step);
           setValueOutput(range, valueOutput);
         } else {
           if (valueOutput && valueOutput.tagName !== "OUTPUT") {
-            const parsed = parseInch(valueOutput.value);
+            const parsed = parseInch(getFieldText(valueOutput));
             if (Number.isFinite(parsed)) {
-              range.value = clamp(snap64(parsed), Number(range.min), Number(range.max));
+              range.value = clamp(snapToStep(parsed, range.step), Number(range.min), Number(range.max));
             }
           }
           setValueOutput(range, valueOutput);
@@ -486,22 +1034,152 @@
         draw();
       };
       range.addEventListener("input", () => sync(true));
-      if (valueOutput && valueOutput.tagName !== "OUTPUT") valueOutput.addEventListener("change", () => sync(false));
+      if (valueOutput && valueOutput.tagName !== "OUTPUT") {
+        valueOutput.addEventListener("blur", () => sync(false));
+        valueOutput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            valueOutput.blur();
+          }
+        });
+      }
       setValueOutput(range, valueOutput);
     });
+
+    document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
+
+    document.querySelector("#handedness").addEventListener("change", (event) => {
+      document.querySelector("#measureDiagram").dataset.hand = event.target.value;
+      draw();
+    });
+
+    updateAllFingerGripControls();
+
+    document.querySelector("#thumbSolidMode").addEventListener("change", updateThumbSolidMode);
+    document.querySelectorAll("select").forEach((select) => {
+      if (select.id !== "handedness" && select.id !== "thumbSolidMode") {
+        select.addEventListener("change", () => {
+          updateAllFingerGripControls();
+          draw();
+        });
+      }
+    });
+    updateThumbSolidMode();
 
     function value(id) {
       return Number(inputs.get(id).value);
     }
 
+    function selectValue(id) {
+      return document.querySelector(`#${id}`)?.value ?? "";
+    }
+
+    function selectNumber(id, fallback = 0) {
+      const number = Number(selectValue(id));
+      return Number.isFinite(number) ? number : fallback;
+    }
+
+    function range64(start, end) {
+      return Array.from({ length: end - start + 1 }, (_, index) => (start + index) / 64);
+    }
+
+    function isLeftHanded() {
+      return document.querySelector("#handedness").value === "left";
+    }
+
     function setValueOutput(range, output) {
       if (!output) return;
+      if (range.id === "thumbSolid" && document.querySelector("#thumbSolidMode")?.value === "no") {
+        setFieldText(output, "なし");
+        return;
+      }
       if (output.tagName === "OUTPUT") {
         output.value = pitchAxisLabel(range.id, Number(range.value));
         output.textContent = output.value;
         return;
       }
-      output.value = formatInch(range.value);
+      setFieldText(output, formatInch(range.value));
+    }
+
+    function getFieldText(field) {
+      return field.value ?? field.textContent ?? "";
+    }
+
+    function setFieldText(field, text) {
+      if (!field) return;
+      if ("value" in field) field.value = text;
+      else field.textContent = text;
+    }
+
+    function populateSelect(select, values, preferredValue) {
+      if (!select) return;
+      const current = select.value || String(preferredValue);
+      select.innerHTML = values.map((number) => {
+        const value = String(number);
+        return `<option value="${value}">${formatInch(number)}</option>`;
+      }).join("");
+      const options = Array.from(select.options);
+      const exact = options.find((option) => Math.abs(Number(option.value) - Number(current)) < 1e-8);
+      const preferred = options.find((option) => Math.abs(Number(option.value) - Number(preferredValue)) < 1e-8);
+      select.value = (exact || preferred || options[0])?.value ?? "";
+    }
+
+    function updateAllFingerGripControls() {
+      ["middle", "ring"].forEach(updateFingerGripControls);
+    }
+
+    function updateFingerGripControls(hole) {
+      const type = selectValue(`${hole}GripType`);
+      const useBare = type === "none" || type === "rubberSheet";
+      const outerSelect = document.querySelector(`#${hole}GripOuter`);
+      const innerSelect = document.querySelector(`#${hole}GripId`);
+      const bareSelect = document.querySelector(`#${hole}BareDiameter`);
+      const outerKey = outerSelect?.value || "0.96875";
+      populateSelect(innerSelect, GRIP_INNER_BY_OUTER[outerKey] || GRIP_INNER_BY_OUTER["0.96875"], DEFAULT_GRIP_INNER[hole]);
+      populateSelect(bareSelect, BARE_FINGER_SIZES, DEFAULT_GRIP_INNER[hole]);
+      if (outerSelect) outerSelect.disabled = useBare;
+      if (innerSelect) innerSelect.disabled = useBare;
+      if (bareSelect) bareSelect.disabled = !useBare;
+    }
+
+    function renderIndicatorScale(scaleEl) {
+      const range = document.querySelector(`#${scaleEl.dataset.range}`);
+      if (!range) return;
+      const min = Number(range.min);
+      const max = Number(range.max);
+      const useThirtySecond = Number(range.step) <= 1 / 32 && /Span/.test(range.id);
+      const tickUnit = useThirtySecond ? 1 / 32 : 1 / 16;
+      const first = Math.ceil(min / tickUnit) * tickUnit;
+      const ticks = [];
+      for (let value = first; value <= max + 1e-8; value += tickUnit) {
+        const rounded = Math.round(value * 64) / 64;
+        const unit32 = Math.round(Math.abs(rounded) * 32);
+        const percent = (rounded - min) / (max - min) * 100;
+        let kind = useThirtySecond && unit32 % 2 === 1 ? "tick-32" : "tick-16";
+        if (unit32 % 16 === 0) kind = "tick-2";
+        else if (unit32 % 8 === 0) kind = "tick-4";
+        else if (unit32 % 4 === 0) kind = "tick-8";
+        else if (unit32 % 2 === 0) kind = "tick-16";
+        const label = kind === "tick-2" || Math.abs(rounded - min) < 1e-8 || Math.abs(rounded - max) < 1e-8;
+        ticks.push(`<i class="indicator-tick ${kind}" style="left:${percent}%"></i>`);
+        if (label) ticks.push(`<span class="indicator-tick-label" style="left:${percent}%">${formatInch(rounded)}</span>`);
+      }
+      scaleEl.innerHTML = ticks.join("");
+    }
+
+    function updateThumbSolidMode() {
+      const useSolid = document.querySelector("#thumbSolidMode").value !== "no";
+      const solidSelect = document.querySelector("#thumbSolid");
+      const field = document.querySelector("#thumbSolidValue");
+      if (solidSelect) solidSelect.disabled = !useSolid;
+      if (field) {
+        field.disabled = !useSolid;
+        field.toggleAttribute("aria-disabled", !useSolid);
+        field.contentEditable = useSolid ? "true" : "false";
+        if (!useSolid) setFieldText(field, "なし");
+        else setFieldText(field, formatInch(selectNumber("thumbSolid", 1.25)));
+      }
+      draw();
     }
 
     function pitchAxisValue(id, invertVertical = false) {
@@ -511,13 +1189,18 @@
 
     function pitchAxisLabel(id, number) {
       if (!id.endsWith("Axis")) return formatInch(number);
-      if (Math.abs(number) < 1 / 128) return id.includes("Lateral") ? "L/R 0" : "F/R 0";
-      if (id.includes("Lateral")) return `${number > 0 ? "Right" : "Left"} ${formatInch(Math.abs(number))}`;
-      return `${number > 0 ? "Forward" : "Reverse"} ${formatInch(Math.abs(number))}`;
+      if (Math.abs(number) < 1 / 128) return id.includes("Lateral") ? "左右 0" : "前後 0";
+      if (id.includes("Lateral")) return `${number > 0 ? "ライト" : "レフト"} ${formatInch(Math.abs(number))}`;
+      return `${number > 0 ? "フォワード" : "リバース"} ${formatInch(Math.abs(number))}`;
     }
 
     function snap64(number) {
       return Math.round(Number(number) * 64) / 64;
+    }
+
+    function snapToStep(number, step) {
+      const unit = Number(step) || 1 / 64;
+      return Math.round(Number(number) / unit) * unit;
     }
 
     function clamp(number, min, max) {
@@ -574,47 +1257,63 @@
       const middleSpan = value("middleSpan");
       const ringSpan = middleSpan + value("ringSpanOffset");
       const bridge = value("bridge");
-      const thumbRadius = value("thumbDiameter") / 2;
-      const middleRadius = value("middleDiameter") / 2;
-      const ringRadius = value("ringDiameter") / 2;
+      const thumbSize = holeSizing("thumb");
+      const middleSize = holeSizing("middle");
+      const ringSize = holeSizing("ring");
+      const thumbRadius = thumbSize.innerRadius;
+      const middleRadius = middleSize.outerRadius;
+      const ringRadius = ringSize.outerRadius;
       const drillDepth = value("drillDepth");
-      const middleX = -(bridge / 2 + middleRadius);
-      const ringX = bridge / 2 + ringRadius;
+      const leftHanded = isLeftHanded();
+      const middleX = leftHanded ? bridge / 2 + middleRadius : -(bridge / 2 + middleRadius);
+      const ringX = leftHanded ? -(bridge / 2 + ringRadius) : bridge / 2 + ringRadius;
       const thumbEdgeY = -middleSpan / 2;
       const middleEdgeY = middleSpan / 2;
       const ringEdgeY = thumbEdgeY + ringSpan;
 
       const data = {
         ballRadius,
-        gripCenter: { name: "Grip center", x: 0, y: 0, radius: 0.045, color: "#ffffff" },
+        gripCenter: { name: "グリップセンター", x: 0, y: 0, radius: 0.045, color: "#ffffff" },
         thumb: {
-          name: "Thumb",
+          name: "サム",
           x: 0,
           y: thumbEdgeY - thumbRadius,
           edgeY: thumbEdgeY,
-          radius: thumbRadius,
+          radius: thumbSize.innerRadius,
+          innerRadius: thumbSize.innerRadius,
+          outerRadius: thumbSize.outerRadius,
+          insertLabel: thumbSize.label,
+          usesBare: false,
           color: "#f1c75f",
           lateral: pitchAxisValue("thumbLateralAxis"),
           vertical: pitchAxisValue("thumbVerticalAxis"),
           verticalDisplay: pitchAxisValue("thumbVerticalAxis")
         },
         middle: {
-          name: "Middle",
+          name: "中指",
           x: middleX,
           y: middleEdgeY + middleRadius,
           edgeY: middleEdgeY,
-          radius: middleRadius,
+          radius: middleSize.innerRadius,
+          innerRadius: middleSize.innerRadius,
+          outerRadius: middleSize.outerRadius,
+          insertLabel: middleSize.label,
+          usesBare: middleSize.usesBare,
           color: "#69b8ff",
           lateral: pitchAxisValue("middleLateralAxis"),
           vertical: -pitchAxisValue("middleVerticalAxis"),
           verticalDisplay: pitchAxisValue("middleVerticalAxis")
         },
         ring: {
-          name: "Ring",
+          name: "薬指",
           x: ringX,
           y: ringEdgeY + ringRadius,
           edgeY: ringEdgeY,
-          radius: ringRadius,
+          radius: ringSize.innerRadius,
+          innerRadius: ringSize.innerRadius,
+          outerRadius: ringSize.outerRadius,
+          insertLabel: ringSize.label,
+          usesBare: ringSize.usesBare,
           color: "#f179a5",
           lateral: pitchAxisValue("ringLateralAxis"),
           vertical: -pitchAxisValue("ringVerticalAxis"),
@@ -627,6 +1326,58 @@
       };
       data.holes = [data.thumb, data.middle, data.ring];
       return data;
+    }
+
+    function holeSizing(hole) {
+      if (hole === "thumb") {
+        const innerDiameter = value("thumbDiameter");
+        const useSolid = selectValue("thumbSolidMode") !== "no";
+        const selectedOuter = selectNumber("thumbSolid", innerDiameter);
+        const clampedInnerDiameter = useSolid ? Math.min(innerDiameter, selectedOuter) : innerDiameter;
+        const innerRange = inputs.get("thumbDiameter");
+        if (innerRange && innerDiameter !== clampedInnerDiameter) {
+          innerRange.value = clampedInnerDiameter;
+          setValueOutput(innerRange, document.querySelector("#thumbDiameterValue"));
+        }
+        const outerDiameter = useSolid ? selectedOuter : clampedInnerDiameter;
+        return {
+          innerRadius: clampedInnerDiameter / 2,
+          outerRadius: outerDiameter / 2,
+          label: useSolid ? "サムソリッド" : "サム素掘り"
+        };
+      }
+
+      const type = selectValue(`${hole}GripType`);
+      if (type === "none" || type === "rubberSheet") {
+        const bareDiameter = selectNumber(`${hole}BareDiameter`, DEFAULT_GRIP_INNER[hole]);
+        return {
+          innerRadius: bareDiameter / 2,
+          outerRadius: bareDiameter / 2,
+          label: type === "none" ? "素掘り" : "板ゴム",
+          usesBare: true
+        };
+      }
+
+      const innerDiameter = selectNumber(`${hole}GripId`, DEFAULT_GRIP_INNER[hole]);
+      const selectedOuter = selectNumber(`${hole}GripOuter`, innerDiameter);
+      const clampedInnerDiameter = Math.min(innerDiameter, selectedOuter);
+      return {
+        innerRadius: clampedInnerDiameter / 2,
+        outerRadius: selectedOuter / 2,
+        label: gripTypeLabel(type),
+        usesBare: false
+      };
+    }
+
+    function gripTypeLabel(type) {
+      return {
+        none: "素掘り",
+        semi: "セミグリップ",
+        tip: "チップグリップ",
+        oval: "オーバルグリップ",
+        powerOval: "パワーオーバル",
+        rubberSheet: "板ゴム"
+      }[type] || "グリップ";
     }
 
     function toSphere(x, y, radius) {
@@ -668,8 +1419,9 @@
       const radius = data.ballRadius;
       const cx = w * 0.5;
       const cy = h * 0.54;
-      const scale = Math.min(w, h) * 0.39 / radius;
+      const scale = Math.min(w, h) * 0.39 / radius * state.zoom;
       const collisions = findCollisions(data);
+      renderZoom();
 
       drawBall(cx, cy, radius, scale);
       drawGuideLines(data, cx, cy, scale);
@@ -678,10 +1430,46 @@
       drawHole(data.thumb, data, cx, cy, scale);
       drawHole(data.middle, data, cx, cy, scale);
       drawHole(data.ring, data, cx, cy, scale);
+      drawSpanDistanceAnnotations(data, cx, cy, scale);
       drawGripCenter(data.gripCenter, radius, cx, cy, scale);
       drawCollisionMarkers(collisions, cx, cy, scale);
-      renderReadout(data);
+      renderSheetPitchTokens(data);
+      renderGripWallOutputs(data);
       renderWarning(collisions);
+    }
+
+    function renderGripWallOutputs(data) {
+      [
+        ["middle", data.middle],
+        ["ring", data.ring]
+      ].forEach(([id, hole]) => {
+        const output = document.querySelector(`#${id}GripWall`);
+        if (!output) return;
+        const wallText = hole.usesBare ? "-" : formatInch(Math.max(0, hole.outerRadius - hole.innerRadius));
+        output.value = wallText;
+        output.textContent = wallText;
+      });
+      setFieldText(document.querySelector("#middleDiameterValue"), formatInch(data.middle.outerRadius * 2));
+      setFieldText(document.querySelector("#ringDiameterValue"), formatInch(data.ring.outerRadius * 2));
+      setFieldText(document.querySelector("#thumbDiameterValue"), formatInch(data.thumb.innerRadius * 2));
+      setFieldText(
+        document.querySelector("#middleGripIdValue"),
+        data.middle.usesBare ? data.middle.insertLabel : formatInch(data.middle.innerRadius * 2)
+      );
+      setFieldText(
+        document.querySelector("#ringGripIdValue"),
+        data.ring.usesBare ? data.ring.insertLabel : formatInch(data.ring.innerRadius * 2)
+      );
+      setFieldText(
+        document.querySelector("#thumbSolidValue"),
+        selectValue("thumbSolidMode") === "no" ? "なし" : formatInch(data.thumb.outerRadius * 2)
+      );
+      const thumbWall = document.querySelector("#thumbSolidWall");
+      if (thumbWall) {
+        const wall = Math.max(0, data.thumb.outerRadius - data.thumb.innerRadius);
+        thumbWall.value = formatInch(wall);
+        thumbWall.textContent = formatInch(wall);
+      }
     }
 
     function drawBall(cx, cy, radius, scale) {
@@ -774,26 +1562,186 @@
       strokeProjected(samples, cx, cy, scale, color, width);
     }
 
-    function drawSpanAngles(data, cx, cy, scale) {
-      drawDrillAxisAngle(data, data.middle, "Thumb-Middle", cx, cy, scale, "rgba(255,74,54,.95)");
-      drawDrillAxisAngle(data, data.ring, "Thumb-Ring", cx, cy, scale, "rgba(255,148,64,.9)");
+    function drawSpanDistanceAnnotations(data, cx, cy, scale) {
+      drawFingerSpanDistance(data, data.middle, data.middleSpan, 0, cx, cy, scale);
+      drawFingerSpanDistance(data, data.ring, data.ringSpan, 1, cx, cy, scale);
     }
 
-    function drawDrillAxisAngle(data, finger, label, cx, cy, scale, color) {
+    function drawFingerSpanDistance(data, finger, selectedSpan, index, cx, cy, scale) {
+      const outer = spanEndpoints(data.thumb, finger, finger.outerRadius, index, false);
+      const inner = spanEndpoints(data.thumb, finger, finger.innerRadius, index, true);
+      const wall = Math.max(0, finger.outerRadius - finger.innerRadius);
+      const side = index === 0 ? -1 : 1;
+      const labelX = side * 0.95;
+      drawSurfaceMeasureLine(
+        outer.a,
+        outer.b,
+        data.ballRadius,
+        cx,
+        cy,
+        scale,
+        "rgba(255,255,255,.96)",
+        2.4,
+        [],
+        `外径端点 ${formatInch(selectedSpan)}`,
+        0.5,
+        labelX,
+        0.1,
+        side
+      );
+      drawSurfaceMeasureLine(
+        inner.a,
+        inner.b,
+        data.ballRadius,
+        cx,
+        cy,
+        scale,
+        finger.color,
+        2.1,
+        [7, 5],
+        `内径端点 ${formatInch(selectedSpan + wall)}`,
+        0.5,
+        labelX,
+        -0.18,
+        side
+      );
+    }
+
+    function spanEndpoints(thumb, finger, fingerRadius, index, offsetInner) {
+      const direction = normalize2D({ x: finger.x - thumb.x, y: finger.y - thumb.y });
+      const normal = { x: -direction.y, y: direction.x };
+      const offset = offsetInner ? (index === 0 ? -0.055 : 0.055) : 0;
+      return {
+        a: {
+          x: thumb.x + direction.x * thumb.innerRadius + normal.x * offset,
+          y: thumb.y + direction.y * thumb.innerRadius + normal.y * offset
+        },
+        b: {
+          x: finger.x - direction.x * fingerRadius + normal.x * offset,
+          y: finger.y - direction.y * fingerRadius + normal.y * offset
+        }
+      };
+    }
+
+    function normalize2D(point) {
+      const length = Math.hypot(point.x, point.y) || 1;
+      return { x: point.x / length, y: point.y / length };
+    }
+
+    function drawSurfaceMeasureLine(a, b, radius, cx, cy, scale, color, width, dash, label, labelT = 0.5, labelXOffset = 0, labelYOffset = 0, labelSide = 0) {
+      const points = [];
+      for (let i = 0; i <= 48; i++) {
+        const t = i / 48;
+        points.push(toSphere(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, radius));
+      }
+      ctx.save();
+      ctx.setLineDash(dash);
+      strokeProjected(points, cx, cy, scale, color, width);
+      ctx.restore();
+
+      const labelPoint = toSphere(
+        a.x + (b.x - a.x) * labelT + labelXOffset,
+        a.y + (b.y - a.y) * labelT + labelYOffset,
+        radius
+      );
+      const anchorPoint = toSphere(
+        a.x + (b.x - a.x) * labelT,
+        a.y + (b.y - a.y) * labelT,
+        radius
+      );
+      const p = project(labelPoint, scale, cx, cy);
+      const anchor = project(anchorPoint, scale, cx, cy);
+      if (p.z > 0 && anchor.z > 0) drawMeasureConnector(anchor.x, anchor.y, p.x, p.y, color, dash);
+      if (p.z > 0) drawMeasureLabel(label, p.x, p.y, color, labelSide);
+    }
+
+    function drawMeasureConnector(fromX, fromY, toX, toY, color, dash) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.88;
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash(dash.length ? [4, 4] : []);
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.arc(fromX, fromY, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawMeasureLabel(text, x, y, color, side = 0) {
+      ctx.save();
+      ctx.font = "11px Segoe UI, system-ui, sans-serif";
+      const width = ctx.measureText(text).width + 10;
+      const boxX = side < 0 ? x - width : side > 0 ? x : x - width / 2;
+      ctx.fillStyle = "rgba(6,8,10,.82)";
+      ctx.strokeStyle = "rgba(255,255,255,.24)";
+      ctx.lineWidth = 1;
+      roundRect(boxX, y - 10, width, 20, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.textAlign = side < 0 ? "right" : side > 0 ? "left" : "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, side < 0 ? boxX + width - 5 : side > 0 ? boxX + 5 : x, y);
+      ctx.restore();
+    }
+
+    function drawSpanAngles(data, cx, cy, scale) {
+      drawDrillAxisAngle(data, data.middle, "サム-中指", 0, cx, cy, scale, "rgba(255,74,54,.95)");
+      drawDrillAxisAngle(data, data.ring, "サム-薬指", 1, cx, cy, scale, "rgba(255,148,64,.9)");
+    }
+
+    function drawDrillAxisAngle(data, finger, label, index, cx, cy, scale, color) {
       const thumbSegment = drillSegment(data.thumb, data);
       const fingerSegment = drillSegment(finger, data);
-      const origin = { x: 0, y: 0, z: 0 };
-      const thumbDir = normalize(thumbSegment.start);
-      const fingerDir = normalize(fingerSegment.start);
+      const axisIntersection = closestInfiniteLinePoints(
+        thumbSegment.start,
+        thumbSegment.axis,
+        fingerSegment.start,
+        fingerSegment.axis
+      );
+      const vertex = axisIntersection ? midpoint(axisIntersection.a, axisIntersection.b) : { x: 0, y: 0, z: 0 };
+      const thumbDir = normalize(sub(thumbSegment.start, vertex));
+      const fingerDir = normalize(sub(fingerSegment.start, vertex));
       const angle = Math.acos(clamp(dot(thumbDir, fingerDir), -1, 1));
       const angleDeg = angle * 180 / Math.PI;
-      strokeProjected([origin, thumbSegment.start], cx, cy, scale, color, 2.6);
-      strokeProjected([origin, fingerSegment.start], cx, cy, scale, color, 2.6);
-      drawCenterAngleArc(origin, thumbDir, fingerDir, data.ballRadius * 0.28, cx, cy, scale, color);
-      const labelDir = normalize(addScaled(thumbDir, fingerDir, 1));
-      const labelPoint = addScaled(origin, labelDir, data.ballRadius * 0.36);
+      const lineEndA = addScaled(vertex, thumbDir, data.ballRadius * 0.16);
+      const lineEndB = addScaled(vertex, fingerDir, data.ballRadius * 0.16);
+      strokeProjected([thumbSegment.start, vertex, lineEndB], cx, cy, scale, color, 2.3);
+      strokeProjected([fingerSegment.start, vertex, lineEndA], cx, cy, scale, color, 2.3);
+      drawCenterAngleArc(vertex, thumbDir, fingerDir, data.ballRadius * (0.2 + index * 0.11), cx, cy, scale, color);
+      const labelPoint = angleLabelPoint(vertex, thumbDir, fingerDir, data.ballRadius * (0.34 + index * 0.16), index);
       const p = project(labelPoint, scale, cx, cy);
       if (p.z > 0) drawAngleLabel(`${label} ${angleDeg.toFixed(1)}°`, p.x, p.y, color);
+    }
+
+    function closestInfiniteLinePoints(p1, d1, p2, d2) {
+      const r = sub(p1, p2);
+      const a = dot(d1, d1);
+      const e = dot(d2, d2);
+      const b = dot(d1, d2);
+      const c = dot(d1, r);
+      const f = dot(d2, r);
+      const denom = a * e - b * b;
+      if (Math.abs(denom) < 1e-8) return null;
+      const s = (b * f - c * e) / denom;
+      const t = (a * f - b * c) / denom;
+      return {
+        a: addScaled(p1, d1, s),
+        b: addScaled(p2, d2, t)
+      };
+    }
+
+    function angleLabelPoint(vertex, fromDir, toDir, radius, index) {
+      const bisector = normalize(add(fromDir, toDir));
+      const normal = normalize(cross(fromDir, toDir));
+      const side = normalize(cross(normal, bisector));
+      return addScaled(addScaled(vertex, bisector, radius), side, (index === 0 ? -0.12 : 0.12) * radius);
     }
 
     function drawCenterAngleArc(origin, fromDir, toDir, radius, cx, cy, scale, color) {
@@ -1068,6 +2016,34 @@
       }).join(" ");
     }
 
+    function renderSheetPitchTokens(data) {
+      const leftHole = isLeftHanded() ? data.ring : data.middle;
+      const rightHole = isLeftHanded() ? data.middle : data.ring;
+      document.querySelectorAll(".pitch-token").forEach((token) => {
+        const hole = token.dataset.hole === "thumb"
+          ? data.thumb
+          : token.dataset.cross === "left"
+            ? leftHole
+            : rightHole;
+        const valueForSide = pitchTokenValue(hole, token.dataset.axis, token.dataset.side);
+        const valueEl = token.querySelector("strong");
+        if (valueEl) valueEl.textContent = valueForSide ? formatInch(valueForSide) : "";
+      });
+    }
+
+    function pitchTokenValue(hole, axis, side) {
+      const epsilon = 1 / 128;
+      if (axis === "lateral") {
+        if (side === "left" && hole.lateral < -epsilon) return Math.abs(hole.lateral);
+        if (side === "right" && hole.lateral > epsilon) return Math.abs(hole.lateral);
+        return 0;
+      }
+      const vertical = hole.verticalDisplay;
+      if (side === "forward" && vertical > epsilon) return Math.abs(vertical);
+      if (side === "reverse" && vertical < -epsilon) return Math.abs(vertical);
+      return 0;
+    }
+
     function pitchLabel(value, positive, negative) {
       if (Math.abs(value) < 1 / 128) return "0";
       return `${value > 0 ? positive : negative} ${formatInch(Math.abs(value))}`;
@@ -1177,7 +2153,8 @@
 
     function drawHole(hole, data, cx, cy, scale) {
       const segment = drillSegment(hole, data);
-      const mesh = buildDrillMesh(segment, 48);
+      const outerSegment = { ...segment, radius: hole.outerRadius || hole.radius };
+      const mesh = buildDrillMesh(outerSegment, 48);
       const edge = mesh.startRing;
       ctx.save();
       ctx.beginPath();
@@ -1193,7 +2170,7 @@
       }
       ctx.closePath();
       const center = project(segment.start, scale, cx, cy);
-      const openingGradient = ctx.createRadialGradient(center.x, center.y, 1, center.x, center.y, Math.max(4, hole.radius * scale));
+      const openingGradient = ctx.createRadialGradient(center.x, center.y, 1, center.x, center.y, Math.max(4, (hole.outerRadius || hole.radius) * scale));
       openingGradient.addColorStop(0, "rgba(0,0,0,0.96)");
       openingGradient.addColorStop(0.72, "rgba(8,11,14,0.9)");
       openingGradient.addColorStop(1, "rgba(205,215,220,0.32)");
@@ -1203,10 +2180,38 @@
       ctx.fill();
       ctx.stroke();
 
+      if (hole.innerRadius && hole.innerRadius < hole.outerRadius - 1 / 128) {
+        drawInnerOpening(segment, hole.innerRadius, cx, cy, scale, hole.color);
+      }
+
       ctx.fillStyle = "rgba(255,255,255,.42)";
       ctx.beginPath();
       ctx.arc(center.x, center.y, 2.2, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
+    }
+
+    function drawInnerOpening(segment, innerRadius, cx, cy, scale, color) {
+      const innerSegment = { ...segment, radius: innerRadius };
+      const innerMesh = buildDrillMesh(innerSegment, 48);
+      const projected = innerMesh.startRing.map((point) => project(point, scale, cx, cy));
+      if (projected.every((point) => point.z <= 0)) return;
+      ctx.save();
+      ctx.beginPath();
+      projected.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.closePath();
+      const center = project(segment.start, scale, cx, cy);
+      const innerGradient = ctx.createRadialGradient(center.x, center.y, 1, center.x, center.y, Math.max(3, innerRadius * scale));
+      innerGradient.addColorStop(0, "rgba(0,0,0,0.98)");
+      innerGradient.addColorStop(1, "rgba(12,16,19,0.9)");
+      ctx.fillStyle = innerGradient;
+      ctx.strokeStyle = hexToRgba(color, 0.95);
+      ctx.lineWidth = 2;
+      ctx.fill();
+      ctx.stroke();
       ctx.restore();
     }
 
@@ -1216,26 +2221,6 @@
       const g = (n >> 8) & 255;
       const b = n & 255;
       return `rgba(${r},${g},${b},${alpha})`;
-    }
-
-    function renderReadout(data) {
-      const rows = [
-        data.gripCenter,
-        data.thumb,
-        data.middle,
-        data.ring
-      ].map((p) => `
-        <tr>
-          <td>${p.name}</td>
-          <td>${formatInch(p.x)}</td>
-          <td>${formatInch(p.y)}</td>
-          <td>${formatInch(p.radius)}</td>
-          <td>${p.name === "Grip center" ? "-" : formatInch(data.drillDepth)}</td>
-          <td>${p.name === "Grip center" ? "-" : pitchLabel(p.lateral, "R", "L")}</td>
-          <td>${p.name === "Grip center" ? "-" : pitchLabel(p.verticalDisplay, "F", "Reverse")}</td>
-        </tr>
-      `).join("");
-      document.querySelector("#readout").innerHTML = rows;
     }
 
     function resizeCanvas() {
@@ -1250,7 +2235,31 @@
       }
     }
 
+    function setZoom(nextZoom) {
+      state.zoom = clamp(nextZoom, 0.45, 2.6);
+      draw();
+    }
+
+    function renderZoom() {
+      const output = document.querySelector("#zoomValue");
+      if (output) output.textContent = `${Math.round(state.zoom * 100)}%`;
+    }
+
+    function pointerDistance() {
+      const points = Array.from(state.pointers.values());
+      if (points.length < 2) return 0;
+      return Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+    }
+
     canvas.addEventListener("pointerdown", (event) => {
+      state.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (state.pointers.size === 2) {
+        state.dragging = false;
+        state.pinchDistance = pointerDistance();
+        state.pinchZoom = state.zoom;
+        canvas.setPointerCapture(event.pointerId);
+        return;
+      }
       state.dragging = true;
       state.lastX = event.clientX;
       state.lastY = event.clientY;
@@ -1258,6 +2267,14 @@
     });
 
     canvas.addEventListener("pointermove", (event) => {
+      if (state.pointers.has(event.pointerId)) {
+        state.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      }
+      if (state.pointers.size >= 2) {
+        const distanceNow = pointerDistance();
+        if (state.pinchDistance > 0) setZoom(state.pinchZoom * distanceNow / state.pinchDistance);
+        return;
+      }
       if (!state.dragging) return;
       const dx = event.clientX - state.lastX;
       const dy = event.clientY - state.lastY;
@@ -1268,12 +2285,26 @@
       draw();
     });
 
-    canvas.addEventListener("pointerup", () => {
+    canvas.addEventListener("pointerup", (event) => {
+      state.pointers.delete(event.pointerId);
       state.dragging = false;
+      state.pinchDistance = 0;
     });
 
-    canvas.addEventListener("pointercancel", () => {
+    canvas.addEventListener("pointercancel", (event) => {
+      state.pointers.delete(event.pointerId);
       state.dragging = false;
+      state.pinchDistance = 0;
+    });
+
+    canvas.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const step = Math.exp(-event.deltaY * 0.0015);
+      setZoom(state.zoom * step);
+    }, { passive: false });
+
+    canvas.addEventListener("dblclick", () => {
+      setZoom(1);
     });
 
     window.addEventListener("resize", draw);
