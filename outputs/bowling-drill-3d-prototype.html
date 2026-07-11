@@ -182,10 +182,15 @@
       min-height: 0;
       margin-inline: auto;
       aspect-ratio: 1100 / 760;
-      border: 1px solid rgba(255,255,255,.1);
+      border: 1px solid rgba(154, 214, 220, .18);
       border-radius: 8px;
-      background: #f7f8f6;
-      color: #0b0d0f;
+      background:
+        radial-gradient(circle at 48% 18%, rgba(125,235,255,.14), transparent 30%),
+        linear-gradient(180deg, rgba(20, 39, 40, .92), rgba(8, 13, 16, .96));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        inset 0 -18px 42px rgba(0,0,0,.24);
+      color: var(--text);
       overflow: hidden;
     }
 
@@ -195,6 +200,14 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
+    }
+
+    .measure-diagram svg g:first-child {
+      stroke: rgba(226, 246, 246, .78);
+    }
+
+    .measure-diagram svg g:nth-child(2) {
+      stroke: rgba(125, 235, 255, .72);
     }
 
     .measure-toolbar {
@@ -227,13 +240,14 @@
       border: 0;
       border-radius: 0;
       background: transparent;
-      color: #0b0d0f;
+      color: var(--text);
       text-align: center;
       font-size: clamp(13px, 1.25vw, 18px);
       font-weight: 800;
       line-height: 1;
       padding: 0 4px;
       outline: 0;
+      text-shadow: 0 1px 8px rgba(0,0,0,.68);
     }
 
     .measure-diagram .sheet-input.small,
@@ -248,7 +262,7 @@
 
     .sheet-label {
       position: absolute;
-      color: #0b0d0f;
+      color: var(--text);
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
@@ -287,7 +301,7 @@
     .field-thumb-solid { left: 50%; top: 93.289%; transform: translate(-50%, -50%); }
     .pitch-token {
       position: absolute;
-      color: #0b0d0f;
+      color: var(--text);
       min-width: 0;
       width: max-content;
       font-size: 10px;
@@ -301,9 +315,10 @@
     .pitch-token strong {
       display: block;
       min-height: 11px;
-      color: #0b0d0f;
+      color: var(--text);
       font-size: clamp(11px, 1.05vw, 16px);
       line-height: .9;
+      text-shadow: 0 1px 8px rgba(0,0,0,.7);
     }
 
     .pitch-token span {
@@ -806,6 +821,7 @@
                 <select id="middleGripOuter">
                   <option value="0.875">7/8"</option>
                   <option value="0.96875" selected>31/32"</option>
+                  <option value="0.984375">63/64"</option>
                   <option value="1.03125">1 1/32"</option>
                 </select>
               </div>
@@ -814,6 +830,7 @@
                 <select id="ringGripOuter">
                   <option value="0.875">7/8"</option>
                   <option value="0.96875" selected>31/32"</option>
+                  <option value="0.984375">63/64"</option>
                   <option value="1.03125">1 1/32"</option>
                 </select>
               </div>
@@ -914,7 +931,7 @@
               <div class="indicator-control">
                 <label for="thumbDiameter">サム内径</label>
                 <div class="indicator-wrap">
-                  <input id="thumbDiameter" type="range" min="0.6875" max="1.3125" step="0.015625" value="1" />
+                  <input id="thumbDiameter" type="range" min="0.5" max="1.25" step="0.015625" value="1" />
                   <div class="indicator-scale" data-range="thumbDiameter"></div>
                 </div>
               </div>
@@ -993,12 +1010,19 @@
     const ctx = canvas.getContext("2d");
     const inputs = new Map();
     const BALL_DIAMETER = 8.595;
+    const THUMB_SOLID_LENGTH = 2 + 5 / 8;
+    const FINGER_GRIP_LENGTH = 1 + 5 / 8;
+    const TIP_FLAT_THICKNESS = 1 / 16;
+    const SEMI_BUMP_DEPTH = 1 / 16;
+    const SEMI_BUMP_THICKNESS = 1 / 16;
+    const DRILL_BIT_SIZES = range64(32, 80);
     const GRIP_INNER_BY_OUTER = {
       "0.875": range64(34, 49),
       "0.96875": range64(36, 52),
+      "0.984375": range64(36, 52),
       "1.03125": [53, 54, 55, 56, 58].map((size) => size / 64)
     };
-    const BARE_FINGER_SIZES = range64(34, 58);
+    const BARE_FINGER_SIZES = DRILL_BIT_SIZES;
     const DEFAULT_GRIP_INNER = {
       middle: 25 / 32,
       ring: 3 / 4
@@ -1283,6 +1307,8 @@
           innerRadius: thumbSize.innerRadius,
           outerRadius: thumbSize.outerRadius,
           insertLabel: thumbSize.label,
+          insertLength: thumbSize.length,
+          spanReference: thumbSize.spanReference,
           usesBare: false,
           color: "#f1c75f",
           lateral: pitchAxisValue("thumbLateralAxis"),
@@ -1298,6 +1324,9 @@
           innerRadius: middleSize.innerRadius,
           outerRadius: middleSize.outerRadius,
           insertLabel: middleSize.label,
+          insertLength: middleSize.length,
+          gripType: middleSize.type,
+          spanReference: middleSize.spanReference,
           usesBare: middleSize.usesBare,
           color: "#69b8ff",
           lateral: pitchAxisValue("middleLateralAxis"),
@@ -1313,6 +1342,9 @@
           innerRadius: ringSize.innerRadius,
           outerRadius: ringSize.outerRadius,
           insertLabel: ringSize.label,
+          insertLength: ringSize.length,
+          gripType: ringSize.type,
+          spanReference: ringSize.spanReference,
           usesBare: ringSize.usesBare,
           color: "#f179a5",
           lateral: pitchAxisValue("ringLateralAxis"),
@@ -1343,7 +1375,13 @@
         return {
           innerRadius: clampedInnerDiameter / 2,
           outerRadius: outerDiameter / 2,
-          label: useSolid ? "サムソリッド" : "サム素掘り"
+          label: useSolid ? "サムソリッド" : "サム素掘り",
+          length: useSolid ? THUMB_SOLID_LENGTH : value("drillDepth"),
+          spanReference: {
+            label: useSolid ? "サムソリッド内径端点" : "サム内径端点",
+            depth: 0,
+            radialOffset: 0
+          }
         };
       }
 
@@ -1354,6 +1392,9 @@
           innerRadius: bareDiameter / 2,
           outerRadius: bareDiameter / 2,
           label: type === "none" ? "素掘り" : "板ゴム",
+          type,
+          length: value("drillDepth"),
+          spanReference: fingerSpanReference(type),
           usesBare: true
         };
       }
@@ -1365,7 +1406,32 @@
         innerRadius: clampedInnerDiameter / 2,
         outerRadius: selectedOuter / 2,
         label: gripTypeLabel(type),
+        type,
+        length: FINGER_GRIP_LENGTH,
+        spanReference: fingerSpanReference(type),
         usesBare: false
+      };
+    }
+
+    function fingerSpanReference(type) {
+      if (type === "tip") {
+        return {
+          label: "チップ フラットゾーン",
+          depth: FINGER_GRIP_LENGTH,
+          radialOffset: TIP_FLAT_THICKNESS / 2
+        };
+      }
+      if (type === "semi") {
+        return {
+          label: "セミ こぶ中心",
+          depth: SEMI_BUMP_DEPTH + SEMI_BUMP_THICKNESS / 2,
+          radialOffset: SEMI_BUMP_THICKNESS / 2
+        };
+      }
+      return {
+        label: "フィンガー内径端点",
+        depth: 0,
+        radialOffset: 0
       };
     }
 
@@ -1563,19 +1629,24 @@
     }
 
     function drawSpanDistanceAnnotations(data, cx, cy, scale) {
+      const thumbEndpoint = thumbSpanEndpoint(data.thumb);
       drawFingerSpanDistance(data, data.middle, data.middleSpan, 0, cx, cy, scale);
       drawFingerSpanDistance(data, data.ring, data.ringSpan, 1, cx, cy, scale);
+      drawBridgeDistanceAnnotation(data, cx, cy, scale);
+      drawSpanEndpointMarkerOnOpening(data.thumb, thumbEndpoint, data.thumb.innerRadius, data, cx, cy, scale, "rgba(241,199,95,.98)");
     }
 
     function drawFingerSpanDistance(data, finger, selectedSpan, index, cx, cy, scale) {
-      const outer = spanEndpoints(data.thumb, finger, finger.outerRadius, index, false);
-      const inner = spanEndpoints(data.thumb, finger, finger.innerRadius, index, true);
-      const wall = Math.max(0, finger.outerRadius - finger.innerRadius);
+      const holeEdge = {
+        a: thumbSpanEndpoint(data.thumb),
+        b: fingerHoleOuterSpanEndpoint(finger)
+      };
+      const line = trimSpanStart(holeEdge, 0.055);
       const side = index === 0 ? -1 : 1;
       const labelX = side * 0.95;
       drawSurfaceMeasureLine(
-        outer.a,
-        outer.b,
+        line.a,
+        line.b,
         data.ballRadius,
         cx,
         cy,
@@ -1583,49 +1654,113 @@
         "rgba(255,255,255,.96)",
         2.4,
         [],
-        `外径端点 ${formatInch(selectedSpan)}`,
+        `スパン ${formatInch(selectedSpan)}`,
         0.5,
         labelX,
-        0.1,
+        0,
         side
       );
-      drawSurfaceMeasureLine(
-        inner.a,
-        inner.b,
-        data.ballRadius,
-        cx,
-        cy,
-        scale,
-        finger.color,
-        2.1,
-        [7, 5],
-        `内径端点 ${formatInch(selectedSpan + wall)}`,
-        0.5,
-        labelX,
-        -0.18,
-        side
-      );
+      drawSpanEndpointMarker(holeEdge.b, data.ballRadius, cx, cy, scale, finger.color);
     }
 
-    function spanEndpoints(thumb, finger, fingerRadius, index, offsetInner) {
-      const direction = normalize2D({ x: finger.x - thumb.x, y: finger.y - thumb.y });
-      const normal = { x: -direction.y, y: direction.x };
-      const offset = offsetInner ? (index === 0 ? -0.055 : 0.055) : 0;
+    function drawBridgeDistanceAnnotation(data, cx, cy, scale) {
+      const left = data.middle.x <= data.ring.x ? data.middle : data.ring;
+      const right = data.middle.x <= data.ring.x ? data.ring : data.middle;
+      const leftRing = projectedOpeningRing(left, left.outerRadius, data, cx, cy, scale);
+      const rightRing = projectedOpeningRing(right, right.outerRadius, data, cx, cy, scale);
+      if (!leftRing.length || !rightRing.length) return;
+
+      const leftContact = leftRing.reduce((best, point) => point.x > best.x ? point : best, leftRing[0]);
+      const rightContact = rightRing.reduce((best, point) => point.x < best.x ? point : best, rightRing[0]);
+      const allY = leftRing.concat(rightRing).map((point) => point.y);
+      const tangentTop = Math.min(...allY) - 8;
+      const tangentBottom = Math.max(...allY) + 8;
+      const labelY = tangentTop - 30;
+      const color = "rgba(125,235,255,.96)";
+
+      drawScreenLine(leftContact.x, tangentTop, leftContact.x, tangentBottom, color, 2.4);
+      drawScreenLine(rightContact.x, tangentTop, rightContact.x, tangentBottom, color, 2.4);
+      drawScreenLine(leftContact.x, labelY, rightContact.x, labelY, color, 2.1);
+      drawScreenLine(leftContact.x, labelY - 6, leftContact.x, labelY + 6, color, 1.7);
+      drawScreenLine(rightContact.x, labelY - 6, rightContact.x, labelY + 6, color, 1.7);
+      drawMeasureLabel(`ブリッジ ${formatInch(data.bridge)}`, (leftContact.x + rightContact.x) / 2, labelY - 14, color, 0);
+      drawSpanEndpointMarkerAtProjected(leftContact, left.color);
+      drawSpanEndpointMarkerAtProjected(rightContact, right.color);
+    }
+
+    function fingerReferenceDistance(selectedSpan, finger) {
+      const wall = Math.max(0, finger.outerRadius - finger.innerRadius);
+      const reference = finger.spanReference || { depth: 0, radialOffset: 0 };
+      const planar = Math.max(0, selectedSpan + wall - (reference.radialOffset || 0));
+      const depth = Math.min(reference.depth || 0, finger.insertLength || 0);
+      return {
+        distance: Math.hypot(planar, depth),
+        planar,
+        depth,
+        radialOffset: reference.radialOffset || 0,
+        label: reference.label || "フィンガー内径端点"
+      };
+    }
+
+    function thumbSpanEndpoint(thumb) {
+      return { x: thumb.x, y: thumb.y + thumb.innerRadius };
+    }
+
+    function fingerHoleOuterSpanEndpoint(finger) {
+      return { x: finger.x, y: finger.edgeY };
+    }
+
+    function spanEndpoints(thumb, finger, fingerRadius) {
+      const a = thumbSpanEndpoint(thumb);
+      const direction = normalize2D({ x: finger.x - a.x, y: finger.y - a.y });
+      return {
+        a,
+        b: {
+          x: finger.x - direction.x * fingerRadius,
+          y: finger.y - direction.y * fingerRadius
+        }
+      };
+    }
+
+    function trimSpanStart(segment, amount) {
+      const direction = normalize2D({ x: segment.b.x - segment.a.x, y: segment.b.y - segment.a.y });
       return {
         a: {
-          x: thumb.x + direction.x * thumb.innerRadius + normal.x * offset,
-          y: thumb.y + direction.y * thumb.innerRadius + normal.y * offset
+          x: segment.a.x + direction.x * amount,
+          y: segment.a.y + direction.y * amount
         },
-        b: {
-          x: finger.x - direction.x * fingerRadius + normal.x * offset,
-          y: finger.y - direction.y * fingerRadius + normal.y * offset
-        }
+        b: segment.b
       };
     }
 
     function normalize2D(point) {
       const length = Math.hypot(point.x, point.y) || 1;
       return { x: point.x / length, y: point.y / length };
+    }
+
+    function projectedOpeningRing(hole, openingRadius, data, cx, cy, scale) {
+      const segment = drillSegment(hole, data);
+      const basis = drillBasis(segment.axis);
+      const points = [];
+      for (let i = 0; i < 128; i++) {
+        const angle = i / 128 * Math.PI * 2;
+        const radial = addScaled(scalePoint(basis.u, Math.cos(angle)), basis.v, Math.sin(angle));
+        const point = addScaled(segment.start, radial, openingRadius);
+        const projected = project(point, scale, cx, cy);
+        if (projected.z > 0) points.push(projected);
+      }
+      return points;
+    }
+
+    function drawScreenLine(x1, y1, x2, y2, color, width) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.restore();
     }
 
     function drawSurfaceMeasureLine(a, b, radius, cx, cy, scale, color, width, dash, label, labelT = 0.5, labelXOffset = 0, labelYOffset = 0, labelSide = 0) {
@@ -1651,8 +1786,56 @@
       );
       const p = project(labelPoint, scale, cx, cy);
       const anchor = project(anchorPoint, scale, cx, cy);
-      if (p.z > 0 && anchor.z > 0) drawMeasureConnector(anchor.x, anchor.y, p.x, p.y, color, dash);
-      if (p.z > 0) drawMeasureLabel(label, p.x, p.y, color, labelSide);
+      if (label && p.z > 0 && anchor.z > 0) drawMeasureConnector(anchor.x, anchor.y, p.x, p.y, color, dash);
+      if (label && p.z > 0) drawMeasureLabel(label, p.x, p.y, color, labelSide);
+    }
+
+    function openingBoundaryPoint(hole, layoutPoint, openingRadius, data) {
+      const target = toSphere(layoutPoint.x, layoutPoint.y, data.ballRadius);
+      const segment = drillSegment(hole, data);
+      const basis = drillBasis(segment.axis);
+      let best = segment.start;
+      let bestDistance = Infinity;
+      for (let i = 0; i < 128; i++) {
+        const angle = i / 128 * Math.PI * 2;
+        const radial = addScaled(scalePoint(basis.u, Math.cos(angle)), basis.v, Math.sin(angle));
+        const point = addScaled(segment.start, radial, openingRadius);
+        const d = distance(point, target);
+        if (d < bestDistance) {
+          bestDistance = d;
+          best = point;
+        }
+      }
+      return best;
+    }
+
+    function drawSpanEndpointMarkerOnOpening(hole, layoutPoint, openingRadius, data, cx, cy, scale, color) {
+      const p = project(openingBoundaryPoint(hole, layoutPoint, openingRadius, data), scale, cx, cy);
+      drawSpanEndpointMarkerAtProjected(p, color);
+    }
+
+    function drawSpanEndpointMarker(point, radius, cx, cy, scale, color) {
+      const p = project(toSphere(point.x, point.y, radius), scale, cx, cy);
+      drawSpanEndpointMarkerAtProjected(p, color);
+    }
+
+    function drawSpanEndpointMarkerAtProjected(p, color) {
+      if (p.z <= 0) return;
+      ctx.save();
+      ctx.fillStyle = "rgba(6,8,10,.92)";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(p.x - 7, p.y);
+      ctx.lineTo(p.x + 7, p.y);
+      ctx.moveTo(p.x, p.y - 7);
+      ctx.lineTo(p.x, p.y + 7);
+      ctx.stroke();
+      ctx.restore();
     }
 
     function drawMeasureConnector(fromX, fromY, toX, toY, color, dash) {
@@ -1692,8 +1875,8 @@
     }
 
     function drawSpanAngles(data, cx, cy, scale) {
-      drawDrillAxisAngle(data, data.middle, "サム-中指", 0, cx, cy, scale, "rgba(255,74,54,.95)");
-      drawDrillAxisAngle(data, data.ring, "サム-薬指", 1, cx, cy, scale, "rgba(255,148,64,.9)");
+      drawDrillAxisAngle(data, data.middle, "親指-中指", 0, cx, cy, scale, "rgba(255,74,54,.95)");
+      drawDrillAxisAngle(data, data.ring, "親指-薬指", 1, cx, cy, scale, "rgba(255,148,64,.9)");
     }
 
     function drawDrillAxisAngle(data, finger, label, index, cx, cy, scale, color) {
