@@ -155,6 +155,46 @@
 
     .section-wide { grid-column: 1 / -1; }
 
+    .save-panel h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .save-controls {
+      display: grid;
+      grid-template-columns: minmax(120px, 1.2fr) auto minmax(140px, 1fr) auto auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .save-controls input,
+    .save-controls select,
+    .save-controls button {
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #11161a;
+      color: var(--text);
+      padding: 5px 8px;
+      font: inherit;
+      font-size: 12px;
+    }
+
+    .save-controls button {
+      cursor: pointer;
+      background: #243039;
+    }
+
+    .save-controls button:hover { border-color: rgba(125,235,255,.5); }
+
+    .save-status {
+      min-height: 16px;
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .sheet-section {
       background:
         linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px),
@@ -894,6 +934,13 @@
                   <input id="middleVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 前後ピッチ" />
                   <div class="indicator-scale" data-range="middleVerticalAxis"></div>
                 </div>
+                <div class="pitch-axis">
+                  <span class="axis-label left">1 1/2"</span>
+                  <output id="middleDrillDepthValue" class="pitch-readout">2 1/2"</output>
+                  <span class="axis-label right">4 1/4"</span>
+                  <input id="middleDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" aria-label="中指 ドリル深さ" />
+                  <div class="indicator-scale" data-range="middleDrillDepth"></div>
+                </div>
               </div>
 
               <div class="pitch-pad" data-hole="ring">
@@ -911,6 +958,13 @@
                   <span class="axis-label right">フォワード 1"</span>
                   <input id="ringVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 前後ピッチ" />
                   <div class="indicator-scale" data-range="ringVerticalAxis"></div>
+                </div>
+                <div class="pitch-axis">
+                  <span class="axis-label left">1 1/2"</span>
+                  <output id="ringDrillDepthValue" class="pitch-readout">2 1/2"</output>
+                  <span class="axis-label right">4 1/4"</span>
+                  <input id="ringDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" aria-label="薬指 ドリル深さ" />
+                  <div class="indicator-scale" data-range="ringDrillDepth"></div>
                 </div>
               </div>
             </div>
@@ -952,10 +1006,10 @@
                 </div>
               </div>
               <div class="indicator-control">
-                <label for="drillDepth">ドリル深さ</label>
+                <label for="thumbDrillDepth">サム深さ</label>
                 <div class="indicator-wrap">
-                  <input id="drillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" />
-                  <div class="indicator-scale" data-range="drillDepth"></div>
+                  <input id="thumbDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" />
+                  <div class="indicator-scale" data-range="thumbDrillDepth"></div>
                 </div>
               </div>
             </div>
@@ -984,6 +1038,18 @@
 
       <p id="warning" class="warning section-wide"></p>
 
+      <section class="section section-wide save-panel">
+        <h3>入力データ</h3>
+        <div class="save-controls">
+          <input id="profileName" type="text" placeholder="データ名" aria-label="保存データ名" />
+          <button id="saveProfile" type="button">保存</button>
+          <select id="profileList" aria-label="保存データ一覧"></select>
+          <button id="loadProfile" type="button">読込</button>
+          <button id="deleteProfile" type="button">削除</button>
+        </div>
+        <p id="saveStatus" class="save-status"></p>
+      </section>
+
       <section class="section section-wide">
         <p class="note">スパンは 1/32 インチ刻み、ピッチは 1/16 インチ刻みです。0 ピッチは球中心方向です。左右は左がレフト、右がライト。前後は左がリバース、右がフォワードです。</p>
       </section>
@@ -1009,6 +1075,7 @@
     const canvas = document.querySelector("#scene");
     const ctx = canvas.getContext("2d");
     const inputs = new Map();
+    const STORAGE_KEY = "bowling-drill-layout-profiles-v1";
     const BALL_DIAMETER = 8.595;
     const THUMB_SOLID_LENGTH = 2 + 5 / 8;
     const FINGER_GRIP_LENGTH = 1 + 5 / 8;
@@ -1089,6 +1156,132 @@
       }
     });
     updateThumbSolidMode();
+    setupProfileStorage();
+
+    function setupProfileStorage() {
+      renderProfileList();
+      document.querySelector("#saveProfile")?.addEventListener("click", saveCurrentProfile);
+      document.querySelector("#loadProfile")?.addEventListener("click", loadSelectedProfile);
+      document.querySelector("#deleteProfile")?.addEventListener("click", deleteSelectedProfile);
+    }
+
+    function readProfiles() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function writeProfiles(profiles) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+    }
+
+    function collectCurrentProfileValues() {
+      const ranges = {};
+      inputs.forEach((range, id) => {
+        ranges[id] = range.value;
+      });
+      const selects = {};
+      document.querySelectorAll("select").forEach((select) => {
+        selects[select.id] = select.value;
+      });
+      return {
+        version: 1,
+        savedAt: new Date().toISOString(),
+        ranges,
+        selects
+      };
+    }
+
+    function saveCurrentProfile() {
+      const nameField = document.querySelector("#profileName");
+      const name = (nameField?.value || "").trim() || `layout-${new Date().toLocaleString("ja-JP")}`;
+      const profiles = readProfiles();
+      profiles[name] = collectCurrentProfileValues();
+      writeProfiles(profiles);
+      renderProfileList(name);
+      showSaveStatus(`保存しました: ${name}`);
+    }
+
+    function loadSelectedProfile() {
+      const name = document.querySelector("#profileList")?.value;
+      if (!name) return showSaveStatus("読み込むデータを選択してください");
+      const profile = readProfiles()[name];
+      if (!profile) return showSaveStatus("保存データが見つかりません");
+      applyProfileValues(profile);
+      const nameField = document.querySelector("#profileName");
+      if (nameField) nameField.value = name;
+      showSaveStatus(`読み込みました: ${name}`);
+    }
+
+    function deleteSelectedProfile() {
+      const list = document.querySelector("#profileList");
+      const name = list?.value;
+      if (!name) return showSaveStatus("削除するデータを選択してください");
+      const profiles = readProfiles();
+      delete profiles[name];
+      writeProfiles(profiles);
+      renderProfileList();
+      showSaveStatus(`削除しました: ${name}`);
+    }
+
+    function renderProfileList(selectedName = "") {
+      const list = document.querySelector("#profileList");
+      if (!list) return;
+      const profiles = readProfiles();
+      const names = Object.keys(profiles).sort((a, b) => {
+        return String(profiles[b].savedAt || "").localeCompare(String(profiles[a].savedAt || ""));
+      });
+      list.innerHTML = names.length
+        ? names.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")
+        : `<option value="">保存データなし</option>`;
+      if (selectedName && profiles[selectedName]) list.value = selectedName;
+    }
+
+    function applyProfileValues(profile) {
+      const selects = profile.selects || {};
+      ["handedness", "thumbSolidMode", "thumbSolid", "middleGripType", "ringGripType", "middleGripOuter", "ringGripOuter"].forEach((id) => {
+        setSelectValue(id, selects[id]);
+      });
+      updateAllFingerGripControls();
+      ["middleGripId", "ringGripId", "middleBareDiameter", "ringBareDiameter"].forEach((id) => {
+        setSelectValue(id, selects[id]);
+      });
+      document.querySelector("#measureDiagram").dataset.hand = selectValue("handedness");
+      const ranges = profile.ranges || {};
+      Object.entries(ranges).forEach(([id, raw]) => {
+        const range = inputs.get(id);
+        if (!range) return;
+        range.value = clamp(snapToStep(raw, range.step), Number(range.min), Number(range.max));
+        setValueOutput(range, document.querySelector(`#${id}Value`));
+      });
+      updateThumbSolidMode();
+      renderGripWallOutputs(layout());
+      draw();
+    }
+
+    function setSelectValue(id, rawValue) {
+      const select = document.querySelector(`#${id}`);
+      if (!select || rawValue == null) return;
+      const option = Array.from(select.options).find((item) => item.value === String(rawValue));
+      if (option) select.value = option.value;
+    }
+
+    function showSaveStatus(message) {
+      const status = document.querySelector("#saveStatus");
+      if (status) status.textContent = message;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
 
     function value(id) {
       return Number(inputs.get(id).value);
@@ -1287,7 +1480,9 @@
       const thumbRadius = thumbSize.innerRadius;
       const middleRadius = middleSize.outerRadius;
       const ringRadius = ringSize.outerRadius;
-      const drillDepth = value("drillDepth");
+      const thumbDrillDepth = value("thumbDrillDepth");
+      const middleDrillDepth = value("middleDrillDepth");
+      const ringDrillDepth = value("ringDrillDepth");
       const leftHanded = isLeftHanded();
       const middleX = leftHanded ? bridge / 2 + middleRadius : -(bridge / 2 + middleRadius);
       const ringX = leftHanded ? -(bridge / 2 + ringRadius) : bridge / 2 + ringRadius;
@@ -1310,6 +1505,7 @@
           insertLength: thumbSize.length,
           spanReference: thumbSize.spanReference,
           usesBare: false,
+          drillDepth: thumbDrillDepth,
           color: "#f1c75f",
           lateral: pitchAxisValue("thumbLateralAxis"),
           vertical: pitchAxisValue("thumbVerticalAxis"),
@@ -1328,6 +1524,7 @@
           gripType: middleSize.type,
           spanReference: middleSize.spanReference,
           usesBare: middleSize.usesBare,
+          drillDepth: middleDrillDepth,
           color: "#69b8ff",
           lateral: pitchAxisValue("middleLateralAxis"),
           vertical: -pitchAxisValue("middleVerticalAxis"),
@@ -1346,6 +1543,7 @@
           gripType: ringSize.type,
           spanReference: ringSize.spanReference,
           usesBare: ringSize.usesBare,
+          drillDepth: ringDrillDepth,
           color: "#f179a5",
           lateral: pitchAxisValue("ringLateralAxis"),
           vertical: -pitchAxisValue("ringVerticalAxis"),
@@ -1354,8 +1552,13 @@
         bridge,
         middleSpan,
         ringSpan,
-        drillDepth
+        drillDepth: Math.max(thumbDrillDepth, middleDrillDepth, ringDrillDepth)
       };
+      for (let i = 0; i < 4; i++) {
+        solveFingerBridgePosition(data);
+        solveFingerSpanPosition(data, data.middle, middleSpan);
+        solveFingerSpanPosition(data, data.ring, ringSpan);
+      }
       data.holes = [data.thumb, data.middle, data.ring];
       return data;
     }
@@ -1376,7 +1579,7 @@
           innerRadius: clampedInnerDiameter / 2,
           outerRadius: outerDiameter / 2,
           label: useSolid ? "サムソリッド" : "サム素掘り",
-          length: useSolid ? THUMB_SOLID_LENGTH : value("drillDepth"),
+          length: useSolid ? THUMB_SOLID_LENGTH : value("thumbDrillDepth"),
           spanReference: {
             label: useSolid ? "サムソリッド内径端点" : "サム内径端点",
             depth: 0,
@@ -1393,7 +1596,7 @@
           outerRadius: bareDiameter / 2,
           label: type === "none" ? "素掘り" : "板ゴム",
           type,
-          length: value("drillDepth"),
+          length: value(`${hole}DrillDepth`),
           spanReference: fingerSpanReference(type),
           usesBare: true
         };
@@ -1490,12 +1693,12 @@
       renderZoom();
 
       drawBall(cx, cy, radius, scale);
-      drawGuideLines(data, cx, cy, scale);
       drawSpanAngles(data, cx, cy, scale);
       data.holes.forEach((hole) => drawTrajectory(hole, data, cx, cy, scale));
       drawHole(data.thumb, data, cx, cy, scale);
       drawHole(data.middle, data, cx, cy, scale);
       drawHole(data.ring, data, cx, cy, scale);
+      drawGuideLines(data, cx, cy, scale);
       drawSpanDistanceAnnotations(data, cx, cy, scale);
       drawGripCenter(data.gripCenter, radius, cx, cy, scale);
       drawCollisionMarkers(collisions, cx, cy, scale);
@@ -1610,11 +1813,33 @@
     function drawGuideLines(data, cx, cy, scale) {
       const r = data.ballRadius;
       const spanY = Math.max(2.6, data.middleSpan / 2 + value("thumbDiameter") / 2 + 0.6);
-      strokeLayoutLine([{ x: -1.8, y: 0 }, { x: 1.8, y: 0 }], r, cx, cy, scale, "rgba(255,255,255,.72)", 1.2);
-      strokeLayoutLine([{ x: 0, y: -spanY }, { x: 0, y: spanY }], r, cx, cy, scale, "rgba(255,255,255,.72)", 1.2);
-      strokeLayoutLine([{ x: -1.2, y: data.thumb.edgeY }, { x: 1.2, y: data.thumb.edgeY }], r, cx, cy, scale, "rgba(241,199,95,.72)", 1);
-      strokeLayoutLine([{ x: -1.2, y: data.middle.edgeY }, { x: 1.2, y: data.middle.edgeY }], r, cx, cy, scale, "rgba(105,184,255,.72)", 1);
-      strokeLayoutLine([{ x: -1.2, y: data.ring.edgeY }, { x: 1.2, y: data.ring.edgeY }], r, cx, cy, scale, "rgba(241,121,165,.72)", 1);
+      const thumbEndpoint = openingBoundaryPoint(data.thumb, thumbSpanEndpoint(data.thumb), data.thumb.innerRadius, data);
+      const middleEndpoint = exactSpanEndpoints(data.thumb, data.middle, data).b;
+      const ringEndpoint = exactSpanEndpoints(data.thumb, data.ring, data).b;
+      strokeLayoutLine([{ x: -1.8, y: 0 }, { x: 1.8, y: 0 }], r, cx, cy, scale, "rgba(255,255,255,.92)", 1.35);
+      strokeLayoutLine([{ x: 0, y: -spanY }, { x: 0, y: spanY }], r, cx, cy, scale, "rgba(255,255,255,.92)", 1.35);
+      drawEndpointGuideLine(data.thumb, thumbEndpoint, data.thumb.innerRadius, r, "rgba(241,199,95,.96)", cx, cy, scale);
+      drawEndpointGuideLine(data.middle, middleEndpoint, drilledOpeningRadius(data.middle), r, "rgba(105,184,255,.96)", cx, cy, scale);
+      drawEndpointGuideLine(data.ring, ringEndpoint, drilledOpeningRadius(data.ring), r, "rgba(241,121,165,.96)", cx, cy, scale);
+    }
+
+    function drawEndpointGuideLine(hole, endpoint, openingRadius, radius, color, cx, cy, scale) {
+      const points = surfaceTangentGuidePoints(endpoint, radius, { x: 1, y: 0, z: 0 }, openingRadius);
+      strokeProjected(points, cx, cy, scale, color, 1.35);
+    }
+
+    function surfaceTangentGuidePoints(endpoint, radius, tangentDirection, halfLength) {
+      const normal = normalize(endpoint);
+      let tangent = sub(tangentDirection, scalePoint(normal, dot(tangentDirection, normal)));
+      if (Math.hypot(tangent.x, tangent.y, tangent.z) < 1e-6) tangent = { x: 0, y: 1, z: 0 };
+      tangent = normalize(tangent);
+      const points = [];
+      for (let i = 0; i <= 64; i++) {
+        const s = -halfLength + (halfLength * 2 * i) / 64;
+        const angle = s / radius;
+        points.push(addScaled(scalePoint(normal, Math.cos(angle) * radius), tangent, Math.sin(angle) * radius));
+      }
+      return points;
     }
 
     function strokeLayoutLine(points, radius, cx, cy, scale, color, width) {
@@ -1637,55 +1862,51 @@
     }
 
     function drawFingerSpanDistance(data, finger, selectedSpan, index, cx, cy, scale) {
-      const holeEdge = {
+      const layoutEdge = {
         a: thumbSpanEndpoint(data.thumb),
         b: fingerHoleOuterSpanEndpoint(finger)
       };
-      const line = trimSpanStart(holeEdge, 0.055);
+      const exactEdge = exactSpanEndpoints(data.thumb, finger, data);
       const side = index === 0 ? -1 : 1;
       const labelX = side * 0.95;
-      drawSurfaceMeasureLine(
-        line.a,
-        line.b,
-        data.ballRadius,
+      drawExactSpanMeasureLine(
+        exactEdge.a,
+        exactEdge.b,
+        layoutEdge,
         cx,
         cy,
         scale,
         "rgba(255,255,255,.96)",
         2.4,
-        [],
         `スパン ${formatInch(selectedSpan)}`,
-        0.5,
         labelX,
-        0,
         side
       );
-      drawSpanEndpointMarker(holeEdge.b, data.ballRadius, cx, cy, scale, finger.color);
+      drawSpanEndpointMarkerAtProjected(project(exactEdge.a, scale, cx, cy), data.thumb.color);
+      drawSpanEndpointMarkerAtProjected(project(exactEdge.b, scale, cx, cy), finger.color);
     }
 
     function drawBridgeDistanceAnnotation(data, cx, cy, scale) {
       const left = data.middle.x <= data.ring.x ? data.middle : data.ring;
       const right = data.middle.x <= data.ring.x ? data.ring : data.middle;
-      const leftRing = projectedOpeningRing(left, left.outerRadius, data, cx, cy, scale);
-      const rightRing = projectedOpeningRing(right, right.outerRadius, data, cx, cy, scale);
-      if (!leftRing.length || !rightRing.length) return;
-
-      const leftContact = leftRing.reduce((best, point) => point.x > best.x ? point : best, leftRing[0]);
-      const rightContact = rightRing.reduce((best, point) => point.x < best.x ? point : best, rightRing[0]);
-      const allY = leftRing.concat(rightRing).map((point) => point.y);
-      const tangentTop = Math.min(...allY) - 8;
-      const tangentBottom = Math.max(...allY) + 8;
-      const labelY = tangentTop - 30;
       const color = "rgba(125,235,255,.96)";
+      const leftTangentX = -data.bridge / 2;
+      const rightTangentX = data.bridge / 2;
+      const tangentTop = Math.min(left.y - drilledOpeningRadius(left), right.y - drilledOpeningRadius(right)) - 0.12;
+      const tangentBottom = Math.max(left.y + drilledOpeningRadius(left), right.y + drilledOpeningRadius(right)) + 0.12;
+      const leftContact = bridgeContactPoint(left, "right", data);
+      const rightContact = bridgeContactPoint(right, "left", data);
+      const leftProjected = project(leftContact, scale, cx, cy);
+      const rightProjected = project(rightContact, scale, cx, cy);
 
-      drawScreenLine(leftContact.x, tangentTop, leftContact.x, tangentBottom, color, 2.4);
-      drawScreenLine(rightContact.x, tangentTop, rightContact.x, tangentBottom, color, 2.4);
-      drawScreenLine(leftContact.x, labelY, rightContact.x, labelY, color, 2.1);
-      drawScreenLine(leftContact.x, labelY - 6, leftContact.x, labelY + 6, color, 1.7);
-      drawScreenLine(rightContact.x, labelY - 6, rightContact.x, labelY + 6, color, 1.7);
-      drawMeasureLabel(`ブリッジ ${formatInch(data.bridge)}`, (leftContact.x + rightContact.x) / 2, labelY - 14, color, 0);
-      drawSpanEndpointMarkerAtProjected(leftContact, left.color);
-      drawSpanEndpointMarkerAtProjected(rightContact, right.color);
+      strokeLayoutLine([{ x: leftTangentX, y: tangentTop }, { x: leftTangentX, y: tangentBottom }], data.ballRadius, cx, cy, scale, color, 2.2);
+      strokeLayoutLine([{ x: rightTangentX, y: tangentTop }, { x: rightTangentX, y: tangentBottom }], data.ballRadius, cx, cy, scale, color, 2.2);
+      strokeProjected([leftContact, rightContact], cx, cy, scale, color, 2.6);
+      drawScreenLine(leftProjected.x, leftProjected.y - 6, leftProjected.x, leftProjected.y + 6, color, 1.7);
+      drawScreenLine(rightProjected.x, rightProjected.y - 6, rightProjected.x, rightProjected.y + 6, color, 1.7);
+      drawMeasureLabel(`ブリッジ ${formatInch(data.bridge)}`, (leftProjected.x + rightProjected.x) / 2, (leftProjected.y + rightProjected.y) / 2 - 18, color, 0);
+      drawSpanEndpointMarkerAtProjected(leftProjected, left.color);
+      drawSpanEndpointMarkerAtProjected(rightProjected, right.color);
     }
 
     function fingerReferenceDistance(selectedSpan, finger) {
@@ -1708,6 +1929,112 @@
 
     function fingerHoleOuterSpanEndpoint(finger) {
       return { x: finger.x, y: finger.edgeY };
+    }
+
+    function drilledOpeningRadius(hole) {
+      return hole.outerRadius || hole.radius;
+    }
+
+    function exactSpanEndpoints(thumb, finger, data) {
+      const thumbLayout = thumbSpanEndpoint(thumb);
+      const fingerLayout = fingerHoleOuterSpanEndpoint(finger);
+      return {
+        a: openingBoundaryPoint(thumb, thumbLayout, thumb.innerRadius, data),
+        b: openingBoundaryPoint(finger, fingerLayout, drilledOpeningRadius(finger), data)
+      };
+    }
+
+    function solveFingerBridgePosition(data) {
+      const left = data.middle.x <= data.ring.x ? data.middle : data.ring;
+      const right = data.middle.x <= data.ring.x ? data.ring : data.middle;
+      solveHoleInnerBridgeEdgeX(left, -data.bridge / 2, "right", data);
+      solveHoleInnerBridgeEdgeX(right, data.bridge / 2, "left", data);
+    }
+
+    function solveHoleInnerBridgeEdgeX(hole, targetX, side, data) {
+      const radius = drilledOpeningRadius(hole);
+      const yLimit = Math.max(0, data.ballRadius * data.ballRadius - hole.y * hole.y);
+      const limit = Math.max(0.01, Math.sqrt(yLimit) - radius - 0.04);
+      let low = -limit;
+      let high = limit;
+      const originalX = hole.x;
+      const edgeAt = (x) => {
+        hole.x = x;
+        return bridgeContactPoint(hole, side, data).x;
+      };
+      let lowEdge = edgeAt(low);
+      let highEdge = edgeAt(high);
+      if (lowEdge > highEdge) {
+        [low, high] = [high, low];
+        [lowEdge, highEdge] = [highEdge, lowEdge];
+      }
+      if (targetX < lowEdge - 1e-4 || targetX > highEdge + 1e-4) {
+        hole.x = originalX;
+        return;
+      }
+      for (let i = 0; i < 28; i++) {
+        const mid = (low + high) / 2;
+        const midEdge = edgeAt(mid);
+        if (midEdge < targetX) low = mid;
+        else high = mid;
+      }
+      hole.x = (low + high) / 2;
+    }
+
+    function bridgeContactPoint(hole, side, data) {
+      const points = openingBoundaryPoints(hole, drilledOpeningRadius(hole), data, 256);
+      if (!points.length) return toSphere(hole.x, hole.y, data.ballRadius);
+      return points.reduce((best, point) => {
+        return side === "right"
+          ? point.x > best.x ? point : best
+          : point.x < best.x ? point : best;
+      }, points[0]);
+    }
+
+    function solveFingerSpanPosition(data, finger, targetSpan) {
+      const radius = drilledOpeningRadius(finger);
+      const minEdgeY = data.thumb.edgeY + 0.15;
+      const maxEdgeY = Math.sqrt(Math.max(0, data.ballRadius * data.ballRadius - finger.x * finger.x)) - radius - 0.05;
+      let low = Math.min(finger.edgeY, minEdgeY);
+      let high = Math.max(finger.edgeY, maxEdgeY);
+      low = clamp(low, -maxEdgeY, maxEdgeY);
+      high = clamp(high, low + 0.01, maxEdgeY);
+
+      const originalEdgeY = finger.edgeY;
+      const originalY = finger.y;
+      const distanceAt = (edgeY) => {
+        applyFingerEdgeY(finger, edgeY);
+        const endpoints = exactSpanEndpoints(data.thumb, finger, data);
+        return spanEndpointDistance(endpoints.a, endpoints.b);
+      };
+
+      let lowDistance = distanceAt(low);
+      let highDistance = distanceAt(high);
+      if (lowDistance > highDistance) {
+        [low, high] = [high, low];
+        [lowDistance, highDistance] = [highDistance, lowDistance];
+      }
+      if (targetSpan < lowDistance - 1e-4 || targetSpan > highDistance + 1e-4) {
+        finger.edgeY = originalEdgeY;
+        finger.y = originalY;
+        return;
+      }
+      for (let i = 0; i < 28; i++) {
+        const mid = (low + high) / 2;
+        const midDistance = distanceAt(mid);
+        if (midDistance < targetSpan) low = mid;
+        else high = mid;
+      }
+      applyFingerEdgeY(finger, (low + high) / 2);
+    }
+
+    function applyFingerEdgeY(finger, edgeY) {
+      finger.edgeY = edgeY;
+      finger.y = edgeY + drilledOpeningRadius(finger);
+    }
+
+    function spanEndpointDistance(a, b) {
+      return distance(a, b);
     }
 
     function spanEndpoints(thumb, finger, fingerRadius) {
@@ -1739,13 +2066,8 @@
     }
 
     function projectedOpeningRing(hole, openingRadius, data, cx, cy, scale) {
-      const segment = drillSegment(hole, data);
-      const basis = drillBasis(segment.axis);
       const points = [];
-      for (let i = 0; i < 128; i++) {
-        const angle = i / 128 * Math.PI * 2;
-        const radial = addScaled(scalePoint(basis.u, Math.cos(angle)), basis.v, Math.sin(angle));
-        const point = addScaled(segment.start, radial, openingRadius);
+      for (const point of openingBoundaryPoints(hole, openingRadius, data, 128)) {
         const projected = project(point, scale, cx, cy);
         if (projected.z > 0) points.push(projected);
       }
@@ -1790,16 +2112,29 @@
       if (label && p.z > 0) drawMeasureLabel(label, p.x, p.y, color, labelSide);
     }
 
+    function drawExactSpanMeasureLine(a, b, layoutEdge, cx, cy, scale, color, width, label, labelXOffset = 0, labelSide = 0) {
+      const points = [];
+      for (let i = 0; i <= 48; i++) points.push(lerpPoint(a, b, i / 48));
+      strokeProjected(points, cx, cy, scale, color, width);
+
+      const mid = lerpPoint(a, b, 0.5);
+      const layoutMid = toSphere(
+        (layoutEdge.a.x + layoutEdge.b.x) / 2 + labelXOffset,
+        (layoutEdge.a.y + layoutEdge.b.y) / 2,
+        Math.hypot(mid.x, mid.y, mid.z)
+      );
+      const p = project(layoutMid, scale, cx, cy);
+      const anchor = project(mid, scale, cx, cy);
+      if (label && p.z > 0 && anchor.z > 0) drawMeasureConnector(anchor.x, anchor.y, p.x, p.y, color, []);
+      if (label && p.z > 0) drawMeasureLabel(label, p.x, p.y, color, labelSide);
+    }
+
     function openingBoundaryPoint(hole, layoutPoint, openingRadius, data) {
       const target = toSphere(layoutPoint.x, layoutPoint.y, data.ballRadius);
-      const segment = drillSegment(hole, data);
-      const basis = drillBasis(segment.axis);
-      let best = segment.start;
+      const points = openingBoundaryPoints(hole, openingRadius, data);
+      let best = points[0] || target;
       let bestDistance = Infinity;
-      for (let i = 0; i < 128; i++) {
-        const angle = i / 128 * Math.PI * 2;
-        const radial = addScaled(scalePoint(basis.u, Math.cos(angle)), basis.v, Math.sin(angle));
-        const point = addScaled(segment.start, radial, openingRadius);
+      for (const point of points) {
         const d = distance(point, target);
         if (d < bestDistance) {
           bestDistance = d;
@@ -1999,30 +2334,56 @@
       ctx.closePath();
     }
 
-    function drillSegment(hole, data) {
+    function drillSegment(hole, data, radiusOverride = null) {
       const start = toSphere(hole.x, hole.y, data.ballRadius);
       const inward = normalize({ x: -start.x, y: -start.y, z: -start.z });
       const right = normalize(cross(inward, { x: 0, y: 1, z: 0 }));
       const forward = normalize(cross(right, inward));
+      const drillDepth = hole.drillDepth ?? data.drillDepth;
       const pitchEnd = {
-        x: start.x + inward.x * data.drillDepth + right.x * hole.lateral + forward.x * hole.vertical,
-        y: start.y + inward.y * data.drillDepth + right.y * hole.lateral + forward.y * hole.vertical,
-        z: start.z + inward.z * data.drillDepth + right.z * hole.lateral + forward.z * hole.vertical
+        x: start.x + inward.x * drillDepth + right.x * hole.lateral + forward.x * hole.vertical,
+        y: start.y + inward.y * drillDepth + right.y * hole.lateral + forward.y * hole.vertical,
+        z: start.z + inward.z * drillDepth + right.z * hole.lateral + forward.z * hole.vertical
       };
       const axis = normalize(sub(pitchEnd, start));
-      const pointLength = Math.min(Math.max(hole.radius * 0.72, 0.22), data.drillDepth * 0.35);
-      const cylinderLength = Math.max(0, data.drillDepth - pointLength);
+      const radius = radiusOverride ?? hole.radius;
+      const pointLength = Math.min(Math.max(radius * 0.72, 0.22), drillDepth * 0.35);
+      const cylinderLength = Math.max(0, drillDepth - pointLength);
       const cylinderEnd = addScaled(start, axis, cylinderLength);
-      const tip = addScaled(start, axis, data.drillDepth);
-      return { start, cylinderEnd, tip, axis, radius: hole.radius, pointLength, cylinderLength, hole };
+      const tip = addScaled(start, axis, drillDepth);
+      return { start, cylinderEnd, tip, axis, radius, pointLength, cylinderLength, hole };
     }
 
     function drawTrajectory(hole, data, cx, cy, scale) {
-      const segment = drillSegment(hole, data);
+      const segment = drillSegment(hole, data, drilledOpeningRadius(hole));
       const axis = [];
       for (let i = 0; i <= 48; i++) axis.push(lerpPoint(segment.start, segment.tip, i / 48));
       strokeProjected(axis, cx, cy, scale, "rgba(255,255,255,.78)", 1.2);
       drawDrillHoleMesh(segment, cx, cy, scale);
+    }
+
+    function openingBoundaryPoints(hole, openingRadius, data, sides = 192) {
+      const segment = drillSegment(hole, data, openingRadius);
+      const basis = drillBasis(segment.axis);
+      const points = [];
+      for (let i = 0; i < sides; i++) {
+        const angle = i / sides * Math.PI * 2;
+        const radial = addScaled(scalePoint(basis.u, Math.cos(angle)), basis.v, Math.sin(angle));
+        const roots = sphereCylinderRoots(segment.start, segment.axis, radial, openingRadius, data.ballRadius);
+        const t = roots.reduce((best, root) => Math.abs(root) < Math.abs(best) ? root : best, roots[0] ?? 0);
+        points.push(addScaled(addScaled(segment.start, segment.axis, t), radial, openingRadius));
+      }
+      return points;
+    }
+
+    function sphereCylinderRoots(start, axis, radial, openingRadius, ballRadius) {
+      const ringBase = addScaled(start, radial, openingRadius);
+      const b = 2 * dot(axis, ringBase);
+      const c = dot(ringBase, ringBase) - ballRadius * ballRadius;
+      const disc = b * b - 4 * c;
+      if (disc < -1e-8) return [];
+      const rootDisc = Math.sqrt(Math.max(0, disc));
+      return [(-b - rootDisc) / 2, (-b + rootDisc) / 2].sort((a, b) => a - b);
     }
 
     function drawDrillHoleMesh(segment, cx, cy, scale) {
@@ -2335,10 +2696,9 @@
     }
 
     function drawHole(hole, data, cx, cy, scale) {
-      const segment = drillSegment(hole, data);
-      const outerSegment = { ...segment, radius: hole.outerRadius || hole.radius };
-      const mesh = buildDrillMesh(outerSegment, 48);
-      const edge = mesh.startRing;
+      const openingRadius = drilledOpeningRadius(hole);
+      const segment = drillSegment(hole, data, openingRadius);
+      const edge = openingBoundaryPoints(hole, openingRadius, data, 192);
       ctx.save();
       ctx.beginPath();
       let started = false;
@@ -2353,7 +2713,7 @@
       }
       ctx.closePath();
       const center = project(segment.start, scale, cx, cy);
-      const openingGradient = ctx.createRadialGradient(center.x, center.y, 1, center.x, center.y, Math.max(4, (hole.outerRadius || hole.radius) * scale));
+      const openingGradient = ctx.createRadialGradient(center.x, center.y, 1, center.x, center.y, Math.max(4, openingRadius * scale));
       openingGradient.addColorStop(0, "rgba(0,0,0,0.96)");
       openingGradient.addColorStop(0.72, "rgba(8,11,14,0.9)");
       openingGradient.addColorStop(1, "rgba(205,215,220,0.32)");
@@ -2375,9 +2735,8 @@
     }
 
     function drawInnerOpening(segment, innerRadius, cx, cy, scale, color) {
-      const innerSegment = { ...segment, radius: innerRadius };
-      const innerMesh = buildDrillMesh(innerSegment, 48);
-      const projected = innerMesh.startRing.map((point) => project(point, scale, cx, cy));
+      const projected = openingBoundaryPoints(segment.hole, innerRadius, { ballRadius: Math.hypot(segment.start.x, segment.start.y, segment.start.z), drillDepth: segment.cylinderLength + segment.pointLength }, 192)
+        .map((point) => project(point, scale, cx, cy));
       if (projected.every((point) => point.z <= 0)) return;
       ctx.save();
       ctx.beginPath();
@@ -2419,7 +2778,7 @@
     }
 
     function setZoom(nextZoom) {
-      state.zoom = clamp(nextZoom, 0.45, 2.6);
+      state.zoom = clamp(nextZoom, 0.45, 4.2);
       draw();
     }
 
