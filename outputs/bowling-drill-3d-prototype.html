@@ -34,7 +34,7 @@
 
     .app {
       display: grid;
-      grid-template-columns: minmax(420px, 46vw) minmax(0, 1fr);
+      grid-template-columns: minmax(440px, 56vw) minmax(0, 1fr);
       grid-template-rows: minmax(300px, 42vh) minmax(0, 1fr);
       grid-template-areas:
         "controls measure"
@@ -135,6 +135,7 @@
 
     aside {
       grid-area: controls;
+      container-type: inline-size;
       min-height: 0;
       height: 100%;
       padding: 0;
@@ -683,6 +684,130 @@
       z-index: 3;
     }
 
+    .depth-control {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 96px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .depth-range-source {
+      display: none !important;
+    }
+
+    .depth-gauge {
+      position: relative;
+      width: 82px;
+      height: 190px;
+      justify-self: center;
+      border: 1px solid rgba(151, 214, 255, .28);
+      border-radius: 10px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,0)),
+        rgba(9, 20, 27, .82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      cursor: pointer;
+      touch-action: none;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .depth-gauge::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: var(--fill, 0%);
+      background: linear-gradient(180deg, rgba(91,196,255,.38), rgba(91,196,255,.08));
+      transition: height .08s ease;
+    }
+
+    .depth-gauge:hover {
+      border-color: rgba(125, 235, 255, .58);
+    }
+
+    .depth-gauge:focus-visible {
+      outline: 2px solid rgba(91, 196, 255, .72);
+      outline-offset: 2px;
+    }
+
+    .depth-gauge-value,
+    .depth-gauge-min,
+    .depth-gauge-max {
+      position: absolute;
+      z-index: 1;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      text-shadow: 0 1px 5px rgba(0,0,0,.64);
+    }
+
+    .depth-gauge-value {
+      top: 50%;
+      min-width: 58px;
+      padding: 3px 7px;
+      border: 1px solid rgba(89,201,167,.65);
+      border-radius: 999px;
+      background: rgba(12, 17, 19, .94);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+      transform: translate(-50%, -50%);
+    }
+
+    .depth-gauge-min,
+    .depth-gauge-max {
+      color: rgba(238, 243, 245, .78);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .depth-gauge-min { top: 7px; }
+    .depth-gauge-max { bottom: 7px; }
+
+    .depth-gauge-tick {
+      position: absolute;
+      z-index: 1;
+      left: 12px;
+      width: 14px;
+      height: 1px;
+      background: rgba(238,243,245,.28);
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+
+    .depth-gauge-tick.tick-8 {
+      width: 17px;
+      background: rgba(238,243,245,.38);
+    }
+
+    .depth-gauge-tick.tick-4 {
+      width: 25px;
+      height: 2px;
+      background: rgba(238,243,245,.58);
+    }
+
+    .depth-gauge-tick.tick-2 {
+      width: 34px;
+      height: 2px;
+      background: rgba(238,243,245,.82);
+    }
+
+    .depth-gauge-current {
+      position: absolute;
+      z-index: 2;
+      left: 8px;
+      right: 8px;
+      top: var(--current, 0%);
+      height: 2px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 2px rgba(15,17,20,.88), 0 0 10px rgba(89,201,167,.64);
+      transform: translateY(-50%);
+    }
+
     .material-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -766,6 +891,41 @@
       line-height: 1.2;
     }
 
+    .pitch-depth-layout {
+      display: grid;
+      grid-template-columns: 76px minmax(190px, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pitch-depth-layout.depth-right {
+      grid-template-columns: minmax(190px, 1fr) 76px;
+    }
+
+    .pitch-depth-layout .pitch-cross {
+      width: 100%;
+      margin-block: 0;
+    }
+
+    .depth-panel {
+      display: grid;
+      gap: 5px;
+      justify-items: center;
+      min-width: 0;
+    }
+
+    .depth-panel-label {
+      color: rgba(238, 243, 245, .82);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .depth-panel .depth-gauge {
+      width: 68px;
+      height: 184px;
+    }
+
     .pitch-axis {
       display: grid;
       grid-template-columns: 42px minmax(0, 1fr) 42px;
@@ -794,28 +954,39 @@
       margin: -1px 8px 0;
     }
 
+    .pitch-axis.depth-range-source {
+      display: none !important;
+    }
+
     .pitch-axis.pitch-source {
       display: none;
     }
 
     .pitch-cross {
-      --cross-size: 178px;
-      --arm-thickness: 42px;
+      --cross-size: clamp(188px, 100%, 270px);
+      --center-size: clamp(48px, 23%, 62px);
+      --track-fill: rgba(91, 196, 255, .36);
+      --track-glow: rgba(91, 196, 255, .18);
       position: relative;
       width: min(100%, var(--cross-size));
-      aspect-ratio: 1;
-      margin: 2px auto 4px;
+      min-width: 0;
+      margin: 4px auto 8px;
       display: grid;
-      grid-template: 1fr var(--arm-thickness) 1fr / 1fr var(--arm-thickness) 1fr;
-      gap: 5px;
+      grid-template:
+        minmax(62px, 1fr) var(--center-size) minmax(62px, 1fr)
+        / minmax(68px, 1fr) var(--center-size) minmax(68px, 1fr);
+      gap: 7px;
     }
 
     .pitch-cross-arm,
     .pitch-cross-center {
-      border: 1px solid rgba(151, 214, 255, .22);
-      background: rgba(10, 24, 31, .72);
+      border: 1px solid rgba(151, 214, 255, .28);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,0)),
+        rgba(9, 20, 27, .82);
       color: var(--text);
       font: inherit;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
     }
 
     .pitch-cross-arm {
@@ -824,23 +995,42 @@
       place-items: center;
       min-width: 0;
       min-height: 0;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       touch-action: none;
       overflow: hidden;
+      user-select: none;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s ease;
     }
 
     .pitch-cross-arm::before {
       content: "";
       position: absolute;
       inset: 0;
-      opacity: 0;
-      background: linear-gradient(90deg, rgba(91, 196, 255, .34), rgba(91, 196, 255, .06));
+      opacity: .95;
+      background: linear-gradient(90deg, var(--track-fill), var(--track-glow));
       transform-origin: center;
-      transition: opacity .12s ease;
+      transition: transform .08s ease;
     }
 
-    .pitch-cross-arm.is-active::before { opacity: 1; }
+    .pitch-cross-arm::after {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      opacity: .38;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, transparent calc(25% - .5px), rgba(238,243,245,.55) calc(25% - .5px), rgba(238,243,245,.55) calc(25% + .5px), transparent calc(25% + .5px)),
+        linear-gradient(90deg, transparent calc(50% - .5px), rgba(238,243,245,.82) calc(50% - .5px), rgba(238,243,245,.82) calc(50% + .5px), transparent calc(50% + .5px)),
+        linear-gradient(90deg, transparent calc(75% - .5px), rgba(238,243,245,.55) calc(75% - .5px), rgba(238,243,245,.55) calc(75% + .5px), transparent calc(75% + .5px));
+    }
+
+    .pitch-cross-arm:hover {
+      border-color: rgba(125, 235, 255, .58);
+      background-color: rgba(13, 32, 43, .92);
+    }
+
+    .pitch-cross-arm:active { transform: scale(.985); }
     .pitch-cross-arm:focus-visible {
       outline: 2px solid rgba(91, 196, 255, .72);
       outline-offset: 2px;
@@ -857,6 +1047,14 @@
       background: linear-gradient(180deg, rgba(91, 196, 255, .34), rgba(91, 196, 255, .06));
     }
 
+    .pitch-cross-arm.top::after,
+    .pitch-cross-arm.bottom::after {
+      background:
+        linear-gradient(180deg, transparent calc(25% - .5px), rgba(238,243,245,.55) calc(25% - .5px), rgba(238,243,245,.55) calc(25% + .5px), transparent calc(25% + .5px)),
+        linear-gradient(180deg, transparent calc(50% - .5px), rgba(238,243,245,.82) calc(50% - .5px), rgba(238,243,245,.82) calc(50% + .5px), transparent calc(50% + .5px)),
+        linear-gradient(180deg, transparent calc(75% - .5px), rgba(238,243,245,.55) calc(75% - .5px), rgba(238,243,245,.55) calc(75% + .5px), transparent calc(75% + .5px));
+    }
+
     .pitch-cross-arm.top::before { transform: scaleY(var(--fill, 0)); transform-origin: bottom; }
     .pitch-cross-arm.bottom::before { transform: scaleY(var(--fill, 0)); transform-origin: top; }
     .pitch-cross-arm.left::before { transform: scaleX(var(--fill, 0)); transform-origin: right; }
@@ -870,30 +1068,45 @@
     }
 
     .pitch-cross-arm span {
-      font-size: 10px;
-      color: var(--muted);
+      font-size: clamp(10px, 3.5cqw, 11px);
+      color: rgba(238, 243, 245, .82);
+      font-weight: 700;
       line-height: 1.1;
       writing-mode: horizontal-tb;
+      text-shadow: 0 1px 4px rgba(0,0,0,.55);
     }
 
     .pitch-cross-arm strong {
-      font-size: 12px;
+      min-height: 15px;
+      font-size: clamp(11px, 4cqw, 13px);
       line-height: 1.1;
       white-space: nowrap;
+      text-shadow: 0 1px 5px rgba(0,0,0,.64);
     }
 
     .pitch-cross-arm.top,
     .pitch-cross-arm.bottom {
       grid-template-rows: auto auto;
-      padding: 4px 2px;
+      align-content: center;
+      gap: 4px;
+      min-height: clamp(56px, 27cqw, 74px);
+      padding: 7px 4px;
     }
 
     .pitch-cross-arm.left,
     .pitch-cross-arm.right {
-      grid-template-columns: auto auto;
-      gap: 5px;
-      padding: 2px 6px;
+      grid-template-rows: auto auto;
+      align-content: center;
+      gap: 4px;
+      min-height: var(--center-size);
+      padding: 5px 8px;
     }
+
+    .pitch-cross-arm.left span,
+    .pitch-cross-arm.right span { order: 1; }
+
+    .pitch-cross-arm.left strong,
+    .pitch-cross-arm.right strong { order: 2; }
 
     .pitch-cross-center {
       border-radius: 50%;
@@ -904,10 +1117,23 @@
       padding: 0;
       min-width: 0;
       min-height: 0;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(125,235,255,.16), transparent 58%),
+        rgba(8, 15, 20, .92);
+      border-color: rgba(151, 214, 255, .34);
+      transition: border-color .12s ease, transform .12s ease;
+    }
+
+    .pitch-cross-center:hover {
+      border-color: rgba(125, 235, 255, .62);
+    }
+
+    .pitch-cross-center:active {
+      transform: scale(.96);
     }
 
     .pitch-cross-center span {
-      font-size: 12px;
+      font-size: clamp(12px, 4cqw, 13px);
       font-weight: 800;
     }
 
@@ -1041,6 +1267,47 @@
       }
       .sheet-two-column { grid-template-columns: 1fr; }
       .pitch-grid { grid-template-columns: 1fr; }
+    }
+
+    @container (max-width: 620px) {
+      .sheet-two-column { grid-template-columns: 1fr; }
+    }
+
+    @container (max-width: 460px) {
+      .material-grid { grid-template-columns: 1fr; }
+      .depth-control { grid-template-columns: 1fr; }
+      .depth-gauge {
+        width: min(100%, 220px);
+        height: 150px;
+      }
+    }
+
+    @container (max-width: 380px) {
+      .pitch-depth-layout,
+      .pitch-depth-layout.depth-right {
+        grid-template-columns: 1fr;
+      }
+      .pitch-depth-layout.depth-left .depth-panel { order: 2; }
+      .pitch-depth-layout.depth-left .pitch-cross { order: 1; }
+      .pitch-depth-layout.depth-right .depth-panel { order: 2; }
+      .pitch-depth-layout.depth-right .pitch-cross { order: 1; }
+      .depth-panel .depth-gauge {
+        width: min(100%, 220px);
+        height: 136px;
+      }
+    }
+
+    @container (max-width: 300px) {
+      .pitch-cross {
+        gap: 5px;
+        grid-template:
+          minmax(56px, 1fr) 46px minmax(56px, 1fr)
+          / minmax(58px, 1fr) 46px minmax(58px, 1fr);
+      }
+      .pitch-cross-arm.left,
+      .pitch-cross-arm.right {
+        padding-inline: 5px;
+      }
     }
   </style>
 </head>
@@ -1236,12 +1503,23 @@
                 </div>
                 <div class="pitch-pad" data-hole="middle">
                   <h3>中指ピッチ</h3>
-                  <div class="pitch-cross" data-pitch-cross="middle">
-                    <button class="pitch-cross-arm top" type="button" data-pitch-range="middleVerticalAxis" data-pitch-direction="-1"><span>リバース</span><strong></strong></button>
-                    <button class="pitch-cross-arm right" type="button" data-pitch-range="middleLateralAxis" data-pitch-direction="1"><span>右</span><strong></strong></button>
-                    <button class="pitch-cross-arm bottom" type="button" data-pitch-range="middleVerticalAxis" data-pitch-direction="1"><span>フォワード</span><strong></strong></button>
-                    <button class="pitch-cross-arm left" type="button" data-pitch-range="middleLateralAxis" data-pitch-direction="-1"><strong></strong><span>左</span></button>
-                    <button class="pitch-cross-center" type="button" data-pitch-reset="middle"><span>0</span></button>
+                  <div class="pitch-depth-layout depth-left">
+                    <div class="depth-panel">
+                      <span class="depth-panel-label">深さ</span>
+                      <button id="middleDrillDepthGauge" class="depth-gauge" type="button" data-depth-range="middleDrillDepth" aria-label="中指ドリル深さ">
+                        <span class="depth-gauge-min">0"</span>
+                        <span id="middleDrillDepthGaugeValue" class="depth-gauge-value">1 1/2"</span>
+                        <span class="depth-gauge-current"></span>
+                        <span class="depth-gauge-max">3 1/2"</span>
+                      </button>
+                    </div>
+                    <div class="pitch-cross" data-pitch-cross="middle">
+                      <button class="pitch-cross-arm top" type="button" data-pitch-range="middleVerticalAxis" data-pitch-direction="-1"><span>リバース</span><strong></strong></button>
+                      <button class="pitch-cross-arm right" type="button" data-pitch-range="middleLateralAxis" data-pitch-direction="1"><span>右</span><strong></strong></button>
+                      <button class="pitch-cross-arm bottom" type="button" data-pitch-range="middleVerticalAxis" data-pitch-direction="1"><span>フォワード</span><strong></strong></button>
+                      <button class="pitch-cross-arm left" type="button" data-pitch-range="middleLateralAxis" data-pitch-direction="-1"><strong></strong><span>左</span></button>
+                      <button class="pitch-cross-center" type="button" data-pitch-reset="middle"><span>0</span></button>
+                    </div>
                   </div>
                   <div class="pitch-axis pitch-source">
                     <span class="axis-label left">左 1"</span>
@@ -1257,11 +1535,11 @@
                     <input id="middleVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 前後ピッチ" />
                     <div class="indicator-scale" data-range="middleVerticalAxis"></div>
                   </div>
-                  <div class="pitch-axis">
-                    <span class="axis-label left">1 1/2"</span>
-                    <output id="middleDrillDepthValue" class="pitch-readout">2 1/2"</output>
-                    <span class="axis-label right">4 1/4"</span>
-                    <input id="middleDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" aria-label="中指 ドリル深さ" />
+                  <div class="pitch-axis depth-range-source">
+                    <span class="axis-label left">0"</span>
+                    <output id="middleDrillDepthValue" class="pitch-readout">1 1/2"</output>
+                    <span class="axis-label right">3 1/2"</span>
+                    <input id="middleDrillDepth" type="range" min="0" max="3.5" step="0.0625" value="1.5" aria-label="中指 ドリル深さ" />
                     <div class="indicator-scale" data-range="middleDrillDepth"></div>
                   </div>
                 </div>
@@ -1318,12 +1596,23 @@
                 </div>
                 <div class="pitch-pad" data-hole="ring">
                   <h3>薬指ピッチ</h3>
-                  <div class="pitch-cross" data-pitch-cross="ring">
-                    <button class="pitch-cross-arm top" type="button" data-pitch-range="ringVerticalAxis" data-pitch-direction="-1"><span>リバース</span><strong></strong></button>
-                    <button class="pitch-cross-arm right" type="button" data-pitch-range="ringLateralAxis" data-pitch-direction="1"><span>右</span><strong></strong></button>
-                    <button class="pitch-cross-arm bottom" type="button" data-pitch-range="ringVerticalAxis" data-pitch-direction="1"><span>フォワード</span><strong></strong></button>
-                    <button class="pitch-cross-arm left" type="button" data-pitch-range="ringLateralAxis" data-pitch-direction="-1"><strong></strong><span>左</span></button>
-                    <button class="pitch-cross-center" type="button" data-pitch-reset="ring"><span>0</span></button>
+                  <div class="pitch-depth-layout depth-right">
+                    <div class="pitch-cross" data-pitch-cross="ring">
+                      <button class="pitch-cross-arm top" type="button" data-pitch-range="ringVerticalAxis" data-pitch-direction="-1"><span>リバース</span><strong></strong></button>
+                      <button class="pitch-cross-arm right" type="button" data-pitch-range="ringLateralAxis" data-pitch-direction="1"><span>右</span><strong></strong></button>
+                      <button class="pitch-cross-arm bottom" type="button" data-pitch-range="ringVerticalAxis" data-pitch-direction="1"><span>フォワード</span><strong></strong></button>
+                      <button class="pitch-cross-arm left" type="button" data-pitch-range="ringLateralAxis" data-pitch-direction="-1"><strong></strong><span>左</span></button>
+                      <button class="pitch-cross-center" type="button" data-pitch-reset="ring"><span>0</span></button>
+                    </div>
+                    <div class="depth-panel">
+                      <span class="depth-panel-label">深さ</span>
+                      <button id="ringDrillDepthGauge" class="depth-gauge" type="button" data-depth-range="ringDrillDepth" aria-label="薬指ドリル深さ">
+                        <span class="depth-gauge-min">0"</span>
+                        <span id="ringDrillDepthGaugeValue" class="depth-gauge-value">1 1/2"</span>
+                        <span class="depth-gauge-current"></span>
+                        <span class="depth-gauge-max">3 1/2"</span>
+                      </button>
+                    </div>
                   </div>
                   <div class="pitch-axis pitch-source">
                     <span class="axis-label left">左 1"</span>
@@ -1339,11 +1628,11 @@
                     <input id="ringVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 前後ピッチ" />
                     <div class="indicator-scale" data-range="ringVerticalAxis"></div>
                   </div>
-                  <div class="pitch-axis">
-                    <span class="axis-label left">1 1/2"</span>
-                    <output id="ringDrillDepthValue" class="pitch-readout">2 1/2"</output>
-                    <span class="axis-label right">4 1/4"</span>
-                    <input id="ringDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" aria-label="薬指 ドリル深さ" />
+                  <div class="pitch-axis depth-range-source">
+                    <span class="axis-label left">0"</span>
+                    <output id="ringDrillDepthValue" class="pitch-readout">1 1/2"</output>
+                    <span class="axis-label right">3 1/2"</span>
+                    <input id="ringDrillDepth" type="range" min="0" max="3.5" step="0.0625" value="1.5" aria-label="薬指 ドリル深さ" />
                     <div class="indicator-scale" data-range="ringDrillDepth"></div>
                   </div>
                 </div>
@@ -1387,23 +1676,27 @@
                   <output id="thumbSolidWall" class="pitch-readout">1/8"</output>
                 </div>
               </div>
-              <div class="indicator-control">
-                <label for="thumbDrillDepth">サム深さ</label>
-                <div class="indicator-wrap">
-                  <input id="thumbDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" />
-                  <div class="indicator-scale" data-range="thumbDrillDepth"></div>
-                </div>
-              </div>
             </div>
             <div class="pitch-grid single">
               <div class="pitch-pad" data-hole="thumb">
                 <h3>サムピッチ</h3>
-                <div class="pitch-cross" data-pitch-cross="thumb">
-                  <button class="pitch-cross-arm top" type="button" data-pitch-range="thumbVerticalAxis" data-pitch-direction="1"><span>フォワード</span><strong></strong></button>
-                  <button class="pitch-cross-arm right" type="button" data-pitch-range="thumbLateralAxis" data-pitch-direction="1"><span>右</span><strong></strong></button>
-                  <button class="pitch-cross-arm bottom" type="button" data-pitch-range="thumbVerticalAxis" data-pitch-direction="-1"><span>リバース</span><strong></strong></button>
-                  <button class="pitch-cross-arm left" type="button" data-pitch-range="thumbLateralAxis" data-pitch-direction="-1"><strong></strong><span>左</span></button>
-                  <button class="pitch-cross-center" type="button" data-pitch-reset="thumb"><span>0</span></button>
+                <div class="pitch-depth-layout depth-right">
+                  <div class="pitch-cross" data-pitch-cross="thumb">
+                    <button class="pitch-cross-arm top" type="button" data-pitch-range="thumbVerticalAxis" data-pitch-direction="1"><span>フォワード</span><strong></strong></button>
+                    <button class="pitch-cross-arm right" type="button" data-pitch-range="thumbLateralAxis" data-pitch-direction="1"><span>右</span><strong></strong></button>
+                    <button class="pitch-cross-arm bottom" type="button" data-pitch-range="thumbVerticalAxis" data-pitch-direction="-1"><span>リバース</span><strong></strong></button>
+                    <button class="pitch-cross-arm left" type="button" data-pitch-range="thumbLateralAxis" data-pitch-direction="-1"><strong></strong><span>左</span></button>
+                    <button class="pitch-cross-center" type="button" data-pitch-reset="thumb"><span>0</span></button>
+                  </div>
+                  <div class="depth-panel">
+                    <span class="depth-panel-label">深さ</span>
+                    <button id="thumbDrillDepthGauge" class="depth-gauge" type="button" data-depth-range="thumbDrillDepth" aria-label="サム深さ">
+                      <span class="depth-gauge-min">0"</span>
+                      <span id="thumbDrillDepthGaugeValue" class="depth-gauge-value">1 1/2"</span>
+                      <span class="depth-gauge-current"></span>
+                      <span class="depth-gauge-max">3 1/2"</span>
+                    </button>
+                  </div>
                 </div>
                 <div class="pitch-axis pitch-source">
                   <span class="axis-label left">左 1"</span>
@@ -1418,6 +1711,13 @@
                   <span class="axis-label right">フォワード 1"</span>
                   <input id="thumbVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="サム 前後ピッチ" />
                   <div class="indicator-scale" data-range="thumbVerticalAxis"></div>
+                </div>
+                <div class="pitch-axis depth-range-source">
+                  <span class="axis-label left">0"</span>
+                  <output id="thumbDrillDepthValue" class="pitch-readout">1 1/2"</output>
+                  <span class="axis-label right">3 1/2"</span>
+                  <input id="thumbDrillDepth" type="range" min="0" max="3.5" step="0.0625" value="1.5" aria-label="サム深さ" />
+                  <div class="indicator-scale" data-range="thumbDrillDepth"></div>
                 </div>
               </div>
             </div>
@@ -1529,6 +1829,8 @@
     document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
     setupPitchCrossControls();
     updateAllPitchCrossControls();
+    setupDepthGauges();
+    updateAllDepthGauges();
 
     document.querySelector("#handedness").addEventListener("change", (event) => {
       document.querySelector("#measureDiagram").dataset.hand = event.target.value;
@@ -2039,6 +2341,112 @@
       label.style.left = `${clamp(safePercent, 12, 88)}%`;
       label.textContent = range.id.endsWith("Axis") ? pitchAxisLabel(range.id, value) : formatInch(value);
       updatePitchCrossForRange(range);
+      updateDepthGaugeForRange(range);
+    }
+
+    function setupDepthGauges() {
+      document.querySelectorAll(".depth-gauge").forEach((gauge) => {
+        const applyPointer = (event) => {
+          event.preventDefault();
+          setDepthFromPointer(gauge, event);
+        };
+        gauge.addEventListener("pointerdown", (event) => {
+          gauge.setPointerCapture?.(event.pointerId);
+          gauge.dataset.dragging = "true";
+          applyPointer(event);
+        });
+        gauge.addEventListener("pointermove", (event) => {
+          if (gauge.dataset.dragging === "true") applyPointer(event);
+        });
+        gauge.addEventListener("pointerup", (event) => {
+          gauge.releasePointerCapture?.(event.pointerId);
+          delete gauge.dataset.dragging;
+        });
+        gauge.addEventListener("pointercancel", () => {
+          delete gauge.dataset.dragging;
+        });
+        gauge.addEventListener("keydown", (event) => {
+          if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
+          event.preventDefault();
+          nudgeDepthGauge(gauge, event.key);
+        });
+      });
+    }
+
+    function setDepthFromPointer(gauge, event) {
+      const range = document.querySelector(`#${gauge.dataset.depthRange}`);
+      if (!range) return;
+      const rect = gauge.getBoundingClientRect();
+      const ratio = clamp((event.clientY - rect.top) / rect.height, 0, 1);
+      const min = Number(range.min);
+      const max = Number(range.max);
+      setRangeValue(range, min + ratio * (max - min));
+    }
+
+    function nudgeDepthGauge(gauge, key) {
+      const range = document.querySelector(`#${gauge.dataset.depthRange}`);
+      if (!range) return;
+      const step = Number(range.step) || 1 / 64;
+      const min = Number(range.min);
+      const max = Number(range.max);
+      let next = Number(range.value) || min;
+      if (key === "Home") next = min;
+      else if (key === "End") next = max;
+      else if (key === "ArrowUp") next += step;
+      else next -= step;
+      setRangeValue(range, next);
+    }
+
+    function setRangeValue(range, rawValue, shouldDraw = true) {
+      const value = clamp(snapToStep(rawValue, range.step), Number(range.min), Number(range.max));
+      range.value = value;
+      setValueOutput(range, document.querySelector(`#${range.id}Value`));
+      if (shouldDraw) draw();
+    }
+
+    function updateAllDepthGauges() {
+      document.querySelectorAll(".depth-gauge").forEach((gauge) => {
+        const range = document.querySelector(`#${gauge.dataset.depthRange}`);
+        if (range) updateDepthGaugeForRange(range);
+      });
+    }
+
+    function updateDepthGaugeForRange(range) {
+      const gauge = document.querySelector(`.depth-gauge[data-depth-range="${range.id}"]`);
+      if (!gauge) return;
+      const min = Number(range.min);
+      const max = Number(range.max);
+      const value = clamp(Number(range.value), min, max);
+      const percent = clamp((value - min) / (max - min) * 100, 0, 100);
+      gauge.style.setProperty("--fill", `${percent}%`);
+      gauge.style.setProperty("--current", `${percent}%`);
+      renderDepthGaugeTicks(gauge, min, max);
+      const valueEl = gauge.querySelector(".depth-gauge-value");
+      const minEl = gauge.querySelector(".depth-gauge-min");
+      const maxEl = gauge.querySelector(".depth-gauge-max");
+      if (valueEl) valueEl.textContent = formatInch(value);
+      if (minEl) minEl.textContent = formatInch(min);
+      if (maxEl) maxEl.textContent = formatInch(max);
+    }
+
+  function renderDepthGaugeTicks(gauge, min, max) {
+    if (gauge.dataset.ticksRendered === "true") return;
+    gauge.querySelectorAll(".depth-gauge-tick").forEach((tick) => tick.remove());
+    const tickUnit = 1 / 8;
+    const first = Math.ceil(min / tickUnit) * tickUnit;
+    for (let raw = first; raw <= max + 1e-8; raw += tickUnit) {
+      const value = Math.round(raw * 64) / 64;
+      const percent = clamp((value - min) / (max - min) * 100, 0, 100);
+      const units = Math.round(Math.abs(value) * 16);
+      let kind = "tick-8";
+      if (units % 8 === 0) kind = "tick-2";
+      else if (units % 4 === 0) kind = "tick-4";
+      const tick = document.createElement("i");
+      tick.className = `depth-gauge-tick ${kind}`;
+      tick.style.top = `${percent}%`;
+      gauge.appendChild(tick);
+      }
+      gauge.dataset.ticksRendered = "true";
     }
 
     function setupPitchCrossControls() {
@@ -2113,10 +2521,7 @@
     }
 
     function setPitchRangeValue(range, rawValue, shouldDraw = true) {
-      const value = clamp(snapToStep(rawValue, range.step), Number(range.min), Number(range.max));
-      range.value = value;
-      setValueOutput(range, document.querySelector(`#${range.id}Value`));
-      if (shouldDraw) draw();
+      setRangeValue(range, rawValue, shouldDraw);
     }
 
     function pitchDirectionLimit(range, direction) {
