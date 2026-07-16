@@ -35,9 +35,9 @@
     .app {
       display: grid;
       grid-template-columns: minmax(420px, 46vw) minmax(0, 1fr);
-      grid-template-rows: auto minmax(0, 1fr);
+      grid-template-rows: minmax(300px, 42vh) minmax(0, 1fr);
       grid-template-areas:
-        "measure measure"
+        "controls measure"
         "controls viewer";
       gap: 12px;
       padding: 12px;
@@ -135,15 +135,20 @@
 
     aside {
       grid-area: controls;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-content: start;
-      gap: 10px;
       min-height: 0;
       height: 100%;
       padding: 0;
       overflow: auto;
       background: var(--panel);
+    }
+
+    aside > * + * { margin-top: 10px; }
+
+    .data-section {
+      min-height: 0;
+      background:
+        linear-gradient(135deg, rgba(89,201,167,.10), transparent 42%),
+        var(--panel-2);
     }
 
     .section {
@@ -155,22 +160,30 @@
 
     .section-wide { grid-column: 1 / -1; }
 
-    .save-panel h3 {
-      margin: 0 0 8px;
-      font-size: 13px;
-      color: var(--text);
-    }
+    .save-panel h2 { margin-bottom: 10px; }
 
     .save-controls {
       display: grid;
-      grid-template-columns: minmax(120px, 1.2fr) auto minmax(140px, 1fr) auto auto;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
       align-items: center;
     }
 
+    .save-field {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .save-field.wide { grid-column: 1 / -1; }
+    .save-field.name-field { grid-column: span 2; }
+    .save-field.hand-field { grid-column: span 2; }
+
     .save-controls input,
     .save-controls select,
+    .save-controls textarea,
     .save-controls button {
+      width: 100%;
       min-height: 32px;
       border: 1px solid var(--line);
       border-radius: 6px;
@@ -186,13 +199,140 @@
       background: #243039;
     }
 
+    .save-actions {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .profile-start-actions {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    .profile-editor {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .profile-editor.is-hidden,
+    .profile-save-area.is-hidden { display: none; }
+
+    .thumb-use-field.is-hidden,
+    body[data-thumb-enabled="false"] .thumb-dependent,
+    .measure-diagram[data-thumb-enabled="false"] .thumb-dependent {
+      display: none !important;
+    }
+
+    body[data-thumb-enabled="true"] .no-thumb-dependent {
+      display: none !important;
+    }
+
+    .saved-profile-box {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+      align-items: end;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .saved-profile-box .save-field { gap: 5px; }
+
+    .save-controls > .saved-profile-box:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .profile-empty-note {
+      grid-column: 1 / -1;
+      min-height: 15px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .profile-search-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 64px;
+      gap: 6px;
+    }
+
+    .profile-results {
+      display: grid;
+      gap: 6px;
+      max-height: 190px;
+      overflow: auto;
+    }
+
+    .profile-result-item {
+      width: 100%;
+      min-height: 34px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 6px;
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding: 7px 8px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .profile-result-item:hover,
+    .profile-result-item.is-selected {
+      border-color: rgba(125,235,255,.55);
+      background: rgba(125,235,255,.10);
+    }
+
+    .profile-result-item.is-create {
+      border-color: rgba(89,201,167,.38);
+      background: rgba(89,201,167,.10);
+    }
+
+    .profile-list-field {
+      display: none;
+    }
+
     .save-controls button:hover { border-color: rgba(125,235,255,.5); }
+
+    .save-controls button.danger-action {
+      border-color: rgba(255, 98, 98, .7);
+      background: linear-gradient(180deg, rgba(128, 33, 33, .95), rgba(88, 22, 22, .95));
+      color: #fff3f3;
+      font-weight: 800;
+    }
+
+    .save-controls button.danger-action:hover {
+      border-color: rgba(255, 142, 142, .95);
+      background: linear-gradient(180deg, rgba(164, 43, 43, .98), rgba(110, 26, 26, .98));
+    }
 
     .save-status {
       min-height: 16px;
       margin: 6px 0 0;
       color: var(--muted);
       font-size: 12px;
+    }
+
+    .save-status.is-active {
+      color: #d8fff4;
+      font-weight: 700;
+    }
+
+    .save-result {
+      grid-column: 1 / -1;
+      min-height: 20px;
+      padding: 6px 8px;
+      border: 1px solid rgba(89,201,167,.28);
+      border-radius: 6px;
+      background: rgba(89,201,167,.08);
     }
 
     .sheet-section {
@@ -206,19 +346,20 @@
     .measure-section {
       grid-area: measure;
       display: grid;
-      grid-template-columns: 170px minmax(0, 1fr);
-      gap: 8px 12px;
-      align-items: start;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 8px;
       min-height: 0;
+      overflow: hidden;
     }
 
     .measure-section h2 { margin-bottom: 0; }
-    .measure-section .measure-toolbar { grid-column: 1; }
-    .measure-section .measure-diagram { grid-column: 2; grid-row: 1 / span 2; }
 
     .measure-diagram {
       position: relative;
-      width: min(100%, 460px);
+      justify-self: center;
+      width: auto;
+      height: 100%;
+      max-width: 100%;
       min-height: 0;
       margin-inline: auto;
       aspect-ratio: 1100 / 760;
@@ -248,26 +389,6 @@
 
     .measure-diagram svg g:nth-child(2) {
       stroke: rgba(125, 235, 255, .72);
-    }
-
-    .measure-toolbar {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 138px;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .measure-toolbar select {
-      width: 100%;
-      min-height: 30px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #11161a;
-      color: var(--text);
-      padding: 4px 6px;
-      font: inherit;
-      font-size: 12px;
     }
 
     .measure-diagram .sheet-input {
@@ -392,7 +513,7 @@
     .sheet-control-groups {
       display: grid;
       gap: 10px;
-      margin-top: 12px;
+      margin-top: 0;
     }
 
     .sheet-card {
@@ -431,16 +552,40 @@
       border-top: 1px solid rgba(255,255,255,.08);
     }
 
+    .control-group-note {
+      margin: -2px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
     .sheet-two-column {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
 
+    .finger-column {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .finger-column h4 {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
     .indicator-control {
       display: grid;
-      grid-template-columns: 118px minmax(0, 1fr);
-      gap: 10px;
+      grid-template-columns: 1fr;
+      gap: 5px;
       align-items: start;
       padding-top: 8px;
       border-top: 1px solid rgba(255,255,255,.08);
@@ -460,7 +605,9 @@
 
     .indicator-wrap input[type="range"] {
       width: 100%;
+      min-height: 28px;
       margin: 0;
+      cursor: pointer;
     }
 
     .indicator-wrap select {
@@ -477,32 +624,63 @@
 
     .indicator-scale {
       position: relative;
-      height: 21px;
-      margin: 0 8px;
+      height: 38px;
+      margin: 2px 10px 0;
+      border-top: 1px solid rgba(238,243,245,.18);
     }
 
     .indicator-tick {
       position: absolute;
-      bottom: 8px;
+      top: 0;
       width: 1px;
       background: rgba(238,243,245,.55);
       transform: translateX(-50%);
     }
 
-    .indicator-tick.tick-16 { height: 5px; opacity: .5; }
-    .indicator-tick.tick-32 { height: 3px; opacity: .38; }
-    .indicator-tick.tick-8 { height: 8px; opacity: .62; }
-    .indicator-tick.tick-4 { height: 12px; opacity: .78; }
-    .indicator-tick.tick-2 { height: 17px; opacity: .95; }
+    .indicator-tick.tick-16 { height: 9px; opacity: .5; }
+    .indicator-tick.tick-32 { height: 5px; opacity: .32; }
+    .indicator-tick.tick-8 { height: 13px; opacity: .62; }
+    .indicator-tick.tick-4 { height: 18px; opacity: .78; width: 2px; }
+    .indicator-tick.tick-2 { height: 24px; opacity: .95; width: 2px; }
 
     .indicator-tick-label {
       position: absolute;
-      top: 14px;
+      top: 25px;
       color: var(--muted);
       font-size: 9px;
       line-height: 1;
       transform: translateX(-50%);
       white-space: nowrap;
+    }
+
+    .indicator-current {
+      position: absolute;
+      top: -4px;
+      height: 30px;
+      width: 3px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 2px rgba(15,17,20,.9), 0 0 10px rgba(89,201,167,.65);
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    .indicator-current-label {
+      position: absolute;
+      top: 16px;
+      min-width: 46px;
+      padding: 2px 6px;
+      border: 1px solid rgba(89,201,167,.65);
+      border-radius: 999px;
+      background: rgba(12, 17, 19, .95);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.1;
+      text-align: center;
+      white-space: nowrap;
+      transform: translateX(-50%);
+      z-index: 3;
     }
 
     .material-grid {
@@ -564,7 +742,7 @@
 
     .pitch-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 8px;
     }
 
@@ -614,6 +792,123 @@
     .pitch-axis .indicator-scale {
       grid-column: 1 / -1;
       margin: -1px 8px 0;
+    }
+
+    .pitch-axis.pitch-source {
+      display: none;
+    }
+
+    .pitch-cross {
+      --cross-size: 178px;
+      --arm-thickness: 42px;
+      position: relative;
+      width: min(100%, var(--cross-size));
+      aspect-ratio: 1;
+      margin: 2px auto 4px;
+      display: grid;
+      grid-template: 1fr var(--arm-thickness) 1fr / 1fr var(--arm-thickness) 1fr;
+      gap: 5px;
+    }
+
+    .pitch-cross-arm,
+    .pitch-cross-center {
+      border: 1px solid rgba(151, 214, 255, .22);
+      background: rgba(10, 24, 31, .72);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .pitch-cross-arm {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      min-height: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      touch-action: none;
+      overflow: hidden;
+    }
+
+    .pitch-cross-arm::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      background: linear-gradient(90deg, rgba(91, 196, 255, .34), rgba(91, 196, 255, .06));
+      transform-origin: center;
+      transition: opacity .12s ease;
+    }
+
+    .pitch-cross-arm.is-active::before { opacity: 1; }
+    .pitch-cross-arm:focus-visible {
+      outline: 2px solid rgba(91, 196, 255, .72);
+      outline-offset: 2px;
+    }
+
+    .pitch-cross-arm.top { grid-area: 1 / 2; }
+    .pitch-cross-arm.right { grid-area: 2 / 3; }
+    .pitch-cross-arm.bottom { grid-area: 3 / 2; }
+    .pitch-cross-arm.left { grid-area: 2 / 1; }
+    .pitch-cross-center { grid-area: 2 / 2; }
+
+    .pitch-cross-arm.top::before,
+    .pitch-cross-arm.bottom::before {
+      background: linear-gradient(180deg, rgba(91, 196, 255, .34), rgba(91, 196, 255, .06));
+    }
+
+    .pitch-cross-arm.top::before { transform: scaleY(var(--fill, 0)); transform-origin: bottom; }
+    .pitch-cross-arm.bottom::before { transform: scaleY(var(--fill, 0)); transform-origin: top; }
+    .pitch-cross-arm.left::before { transform: scaleX(var(--fill, 0)); transform-origin: right; }
+    .pitch-cross-arm.right::before { transform: scaleX(var(--fill, 0)); transform-origin: left; }
+
+    .pitch-cross-arm span,
+    .pitch-cross-arm strong,
+    .pitch-cross-center span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .pitch-cross-arm span {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.1;
+      writing-mode: horizontal-tb;
+    }
+
+    .pitch-cross-arm strong {
+      font-size: 12px;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .pitch-cross-arm.top,
+    .pitch-cross-arm.bottom {
+      grid-template-rows: auto auto;
+      padding: 4px 2px;
+    }
+
+    .pitch-cross-arm.left,
+    .pitch-cross-arm.right {
+      grid-template-columns: auto auto;
+      gap: 5px;
+      padding: 2px 6px;
+    }
+
+    .pitch-cross-center {
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      padding: 0;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .pitch-cross-center span {
+      font-size: 12px;
+      font-weight: 800;
     }
 
     .pitch-readout {
@@ -670,6 +965,18 @@
       font-size: 12px;
     }
 
+    .save-controls textarea {
+      min-height: 72px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .data-section input[type="text"],
+    .data-section select,
+    .data-section button {
+      width: 100%;
+    }
+
     .warning {
       display: none;
       margin: 0;
@@ -718,9 +1025,9 @@
         grid-template-columns: 1fr;
         grid-template-rows: auto 62vh auto;
         grid-template-areas:
+          "controls"
           "measure"
-          "viewer"
-          "controls";
+          "viewer";
         height: auto;
         min-height: 100vh;
         overflow: visible;
@@ -741,33 +1048,26 @@
   <main class="app">
     <section class="section sheet-section measure-section">
       <h2>メジャーシート</h2>
-      <div class="measure-toolbar">
-        <label for="handedness">利き手</label>
-        <select id="handedness">
-          <option value="right" selected>右投げ</option>
-          <option value="left">左投げ</option>
-        </select>
-      </div>
       <div id="measureDiagram" class="measure-diagram" data-hand="right">
           <svg viewBox="0 0 1100 760" aria-hidden="true">
             <g fill="none" stroke="#0b0d0f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="430" cy="220" r="62"></circle>
               <circle cx="670" cy="220" r="62"></circle>
-              <circle cx="550" cy="560" r="62"></circle>
+              <circle class="thumb-dependent" cx="550" cy="560" r="62"></circle>
               <line x1="495" y1="220" x2="605" y2="220"></line>
-              <line x1="433" y1="285" x2="520" y2="498"></line>
-              <line x1="667" y1="285" x2="580" y2="498"></line>
+              <line class="thumb-dependent" x1="433" y1="285" x2="520" y2="498"></line>
+              <line class="thumb-dependent" x1="667" y1="285" x2="580" y2="498"></line>
               <path d="M390 10 H358 V76 H390 M470 10 H502 V76 H470"></path>
               <path d="M630 10 H598 V76 H630 M710 10 H742 V76 H710"></path>
               <path d="M510 100 H478 V142 H510 M590 100 H622 V142 H590"></path>
               <path d="M240 332 H206 V396 H240 M320 332 H354 V396 H320"></path>
               <path d="M780 332 H746 V396 H780 M860 332 H894 V396 H860"></path>
-              <path d="M510 680 H478 V738 H510 M590 680 H622 V738 H590"></path>
+              <path class="thumb-dependent" d="M510 680 H478 V738 H510 M590 680 H622 V738 H590"></path>
             </g>
             <g fill="none" stroke="#0b0d0f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
               <path d="M185 176 L185 264 M140 220 L230 220"></path>
               <path d="M932.5 176 L932.5 264 M890 220 L975 220"></path>
-              <path d="M850 512 L850 604 M805 558 L895 558"></path>
+              <path class="thumb-dependent" d="M850 512 L850 604 M805 558 L895 558"></path>
             </g>
           </svg>
           <span class="pitch-token left left-cross-left" data-cross="left" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
@@ -778,43 +1078,93 @@
           <span class="pitch-token right right-cross-right" data-cross="right" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
           <span class="pitch-token top right-cross-top" data-cross="right" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
           <span class="pitch-token bottom right-cross-bottom" data-cross="right" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
-          <span class="pitch-token left thumb-cross-left" data-hole="thumb" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
-          <span class="pitch-token right thumb-cross-right" data-hole="thumb" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
-          <span class="pitch-token top thumb-cross-top" data-hole="thumb" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
-          <span class="pitch-token bottom thumb-cross-bottom" data-hole="thumb" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
+          <span class="pitch-token left thumb-cross-left thumb-dependent" data-hole="thumb" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
+          <span class="pitch-token right thumb-cross-right thumb-dependent" data-hole="thumb" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
+          <span class="pitch-token top thumb-cross-top thumb-dependent" data-hole="thumb" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
+          <span class="pitch-token bottom thumb-cross-bottom thumb-dependent" data-hole="thumb" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
           <div id="middleGripIdValue" class="sheet-input grip field-middle-grip" contenteditable="true" role="textbox" aria-label="中指グリップ内径">25/32</div>
           <div id="ringGripIdValue" class="sheet-input grip field-ring-grip" contenteditable="true" role="textbox" aria-label="薬指グリップ内径">3/4</div>
           <div id="middleDiameterValue" class="sheet-input small hole-size field-middle-hole" contenteditable="true" role="textbox" aria-label="中指ホールサイズ">25/32</div>
           <div id="ringDiameterValue" class="sheet-input small hole-size field-ring-hole" contenteditable="true" role="textbox" aria-label="薬指ホールサイズ">3/4</div>
           <div id="bridgeValue" class="sheet-input small field-bridge" contenteditable="true" role="textbox" aria-label="ブリッジ">1/4</div>
-          <div id="middleSpanValue" class="sheet-input wide field-main-span" contenteditable="true" role="textbox" aria-label="メインスパン">4</div>
-          <div id="ringSpanOffsetValue" class="sheet-input wide field-offset-span" contenteditable="true" role="textbox" aria-label="スパン差分">-1/8</div>
-          <div id="thumbDiameterValue" class="sheet-input small hole-size field-thumb-hole" contenteditable="true" role="textbox" aria-label="サム内径">1</div>
-          <div id="thumbSolidValue" class="sheet-input grip field-thumb-solid" contenteditable="true" role="textbox" aria-label="サムソリッド外径">1 1/4</div>
+          <div id="middleSpanValue" class="sheet-input wide field-main-span thumb-dependent" contenteditable="true" role="textbox" aria-label="メインスパン">4</div>
+          <div id="ringSpanOffsetValue" class="sheet-input wide field-offset-span thumb-dependent" contenteditable="true" role="textbox" aria-label="スパン差分">-1/8</div>
+          <div id="thumbDiameterValue" class="sheet-input small hole-size field-thumb-hole thumb-dependent" contenteditable="true" role="textbox" aria-label="サム内径">1</div>
+          <div id="thumbSolidValue" class="sheet-input grip field-thumb-solid thumb-dependent" contenteditable="true" role="textbox" aria-label="サムソリッド外径">1 1/4</div>
       </div>
     </section>
 
     <aside>
-      <section class="section">
-        <h2>ボール</h2>
-        <p class="fixed-spec">
-          <strong>直径 8.595"</strong>
-          規定範囲: 周 26.704" - 27.002"、直径 8.500" - 8.595"。この試作では最大径で固定しています。
-        </p>
+      <section class="section save-panel data-section">
+        <div class="save-controls">
+          <div class="saved-profile-box">
+            <div class="save-field">
+              <label for="profileSearch">保存データ検索</label>
+              <div class="profile-search-row">
+                <input id="profileSearch" type="text" placeholder="名前・利き手・投球タイプで検索" aria-label="保存データ検索" />
+                <button id="clearProfileSearch" type="button">クリア</button>
+              </div>
+            <div id="profileResults" class="profile-results" role="listbox" aria-label="保存データ検索結果"></div>
+            <div class="save-field profile-list-field" aria-hidden="true">
+              <label for="profileList">保存データ</label>
+              <select id="profileList" aria-label="保存データ一覧"></select>
+            </div>
+            </div>
+            <div id="profileEmptyNote" class="profile-empty-note"></div>
+          </div>
+          <div class="profile-start-actions">
+            <button id="newProfile" type="button">新規作成</button>
+            <button id="deleteProfile" class="danger-action" type="button">削除</button>
+          </div>
+          <div id="profileEditor" class="profile-editor is-hidden">
+            <div class="save-field name-field">
+              <label for="familyName">苗字</label>
+              <input id="familyName" type="text" placeholder="例: 山田" aria-label="苗字" />
+            </div>
+            <div class="save-field name-field">
+              <label for="givenName">氏名</label>
+              <input id="givenName" type="text" placeholder="例: 太郎" aria-label="氏名" />
+            </div>
+            <div class="save-field hand-field">
+              <label for="handedness">利き手</label>
+              <select id="handedness">
+                <option value="right" selected>右投げ</option>
+                <option value="left">左投げ</option>
+              </select>
+            </div>
+            <div class="save-field hand-field">
+              <label for="bowlingStyle">投球タイプ</label>
+              <select id="bowlingStyle">
+                <option value="oneHand" selected>片手</option>
+                <option value="twoHand">両手</option>
+                <option value="thumbless">サムレス</option>
+              </select>
+            </div>
+            <div id="twoHandThumbUseField" class="save-field hand-field thumb-use-field is-hidden">
+              <label for="twoHandThumbUse">両手サム</label>
+              <select id="twoHandThumbUse">
+                <option value="yes" selected>使用する</option>
+                <option value="no">使用しない</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <p id="saveStatus" class="save-status"></p>
       </section>
 
       <div class="sheet-control-groups section-wide">
           <section class="sheet-card">
             <h3>スパン / ブリッジ</h3>
+            <p class="control-group-note">親指内径端点からフィンガーホール端点までの距離と、左右フィンガー間のブリッジを操作します。</p>
             <div class="measure-indicators">
-              <div class="indicator-control">
+              <div class="indicator-control thumb-dependent">
                 <label for="middleSpan">メインスパン</label>
                 <div class="indicator-wrap">
                   <input id="middleSpan" type="range" min="2.5" max="5.5" step="0.03125" value="4" />
                   <div class="indicator-scale" data-range="middleSpan"></div>
                 </div>
               </div>
-              <div class="indicator-control">
+              <div class="indicator-control thumb-dependent">
                 <label for="ringSpanOffset">スパン +/-</label>
                 <div class="indicator-wrap">
                   <input id="ringSpanOffset" type="range" min="-0.5" max="0.5" step="0.03125" value="-0.125" />
@@ -833,145 +1183,177 @@
 
           <section class="sheet-card">
             <h3>フィンガーホール</h3>
-            <div class="material-grid">
-              <div class="material-field">
-                <label for="middleGripType">中指グリップ</label>
-                <select id="middleGripType">
-                  <option value="none">使用なし</option>
-                  <option value="semi">セミグリップ</option>
-                  <option value="tip">チップグリップ</option>
-                  <option value="oval" selected>オーバルグリップ</option>
-                  <option value="powerOval">パワーオーバルグリップ</option>
-                  <option value="rubberSheet">板ゴム</option>
-                </select>
-              </div>
-              <div class="material-field">
-                <label for="ringGripType">薬指グリップ</label>
-                <select id="ringGripType">
-                  <option value="none">使用なし</option>
-                  <option value="semi">セミグリップ</option>
-                  <option value="tip">チップグリップ</option>
-                  <option value="oval" selected>オーバルグリップ</option>
-                  <option value="powerOval">パワーオーバルグリップ</option>
-                  <option value="rubberSheet">板ゴム</option>
-                </select>
-              </div>
-              <div class="material-field">
-                <label for="middleGripOuter">中指グリップ外径</label>
-                <select id="middleGripOuter">
-                  <option value="0.875">7/8"</option>
-                  <option value="0.96875" selected>31/32"</option>
-                  <option value="0.984375">63/64"</option>
-                  <option value="1.03125">1 1/32"</option>
-                </select>
-              </div>
-              <div class="material-field">
-                <label for="ringGripOuter">薬指グリップ外径</label>
-                <select id="ringGripOuter">
-                  <option value="0.875">7/8"</option>
-                  <option value="0.96875" selected>31/32"</option>
-                  <option value="0.984375">63/64"</option>
-                  <option value="1.03125">1 1/32"</option>
-                </select>
-              </div>
-            </div>
+            <p class="control-group-note">中指・薬指のグリップ形式、外径、内径、素掘り径、ピッチ、深さを左右別に設定します。</p>
             <div class="sheet-two-column">
-              <div class="measure-indicators">
-                <div class="indicator-control">
-                  <label for="middleGripId">中指グリップ内径</label>
-                  <div class="indicator-wrap">
-                    <select id="middleGripId"></select>
+              <div class="finger-column">
+                <h4>中指側</h4>
+                <div class="material-field">
+                  <label for="middleGripType">グリップ</label>
+                  <select id="middleGripType">
+                    <option value="none">使用なし</option>
+                    <option value="semi">セミグリップ</option>
+                    <option value="tip">チップグリップ</option>
+                    <option value="oval" selected>オーバルグリップ</option>
+                    <option value="powerOval">パワーオーバルグリップ</option>
+                    <option value="rubberSheet">板ゴム</option>
+                  </select>
+                </div>
+                <div class="material-field">
+                  <label for="middleGripOuter">グリップ外径</label>
+                  <select id="middleGripOuter">
+                    <option value="0.875">7/8"</option>
+                    <option value="0.96875" selected>31/32"</option>
+                    <option value="0.984375">63/64"</option>
+                    <option value="1.03125">1 1/32"</option>
+                  </select>
+                </div>
+                <div class="measure-indicators">
+                  <div class="indicator-control">
+                    <label for="middleGripId">グリップ内径</label>
+                    <div class="indicator-wrap">
+                      <select id="middleGripId"></select>
+                    </div>
+                  </div>
+                  <div class="indicator-control">
+                    <label for="middleBareDiameter">素掘り径</label>
+                    <div class="indicator-wrap">
+                      <select id="middleBareDiameter"></select>
+                    </div>
+                  </div>
+                  <div class="indicator-control">
+                    <label for="middleGripWall">肉厚</label>
+                    <div class="indicator-wrap">
+                      <output id="middleGripWall" class="pitch-readout">0"</output>
+                    </div>
                   </div>
                 </div>
-                <div class="indicator-control">
-                  <label for="middleBareDiameter">中指 素掘り径</label>
+                <div class="indicator-control no-thumb-dependent">
+                  <label for="middleNoThumbOffset">基準線オフセット</label>
                   <div class="indicator-wrap">
-                    <select id="middleBareDiameter"></select>
+                    <input id="middleNoThumbOffset" type="range" min="-0.5" max="0.5" step="0.03125" value="0" />
+                    <div class="indicator-scale" data-range="middleNoThumbOffset"></div>
                   </div>
                 </div>
-                <div class="indicator-control">
-                  <label for="middleGripWall">中指 肉厚</label>
-                  <div class="indicator-wrap">
-                    <output id="middleGripWall" class="pitch-readout">0"</output>
+                <div class="pitch-pad" data-hole="middle">
+                  <h3>中指ピッチ</h3>
+                  <div class="pitch-cross" data-pitch-cross="middle">
+                    <button class="pitch-cross-arm top" type="button" data-pitch-range="middleVerticalAxis" data-pitch-direction="-1"><span>リバース</span><strong></strong></button>
+                    <button class="pitch-cross-arm right" type="button" data-pitch-range="middleLateralAxis" data-pitch-direction="1"><span>右</span><strong></strong></button>
+                    <button class="pitch-cross-arm bottom" type="button" data-pitch-range="middleVerticalAxis" data-pitch-direction="1"><span>フォワード</span><strong></strong></button>
+                    <button class="pitch-cross-arm left" type="button" data-pitch-range="middleLateralAxis" data-pitch-direction="-1"><strong></strong><span>左</span></button>
+                    <button class="pitch-cross-center" type="button" data-pitch-reset="middle"><span>0</span></button>
                   </div>
-                </div>
-              </div>
-              <div class="measure-indicators">
-                <div class="indicator-control">
-                  <label for="ringGripId">薬指グリップ内径</label>
-                  <div class="indicator-wrap">
-                    <select id="ringGripId"></select>
+                  <div class="pitch-axis pitch-source">
+                    <span class="axis-label left">左 1"</span>
+                    <output id="middleLateralAxisValue" class="pitch-readout">左右 0</output>
+                    <span class="axis-label right">右 1"</span>
+                    <input id="middleLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 左右ピッチ" />
+                    <div class="indicator-scale" data-range="middleLateralAxis"></div>
                   </div>
-                </div>
-                <div class="indicator-control">
-                  <label for="ringBareDiameter">薬指 素掘り径</label>
-                  <div class="indicator-wrap">
-                    <select id="ringBareDiameter"></select>
+                  <div class="pitch-axis pitch-source">
+                    <span class="axis-label left">リバース 1"</span>
+                    <output id="middleVerticalAxisValue" class="pitch-readout">前後 0</output>
+                    <span class="axis-label right">フォワード 1"</span>
+                    <input id="middleVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 前後ピッチ" />
+                    <div class="indicator-scale" data-range="middleVerticalAxis"></div>
                   </div>
-                </div>
-                <div class="indicator-control">
-                  <label for="ringGripWall">薬指 肉厚</label>
-                  <div class="indicator-wrap">
-                    <output id="ringGripWall" class="pitch-readout">0"</output>
+                  <div class="pitch-axis">
+                    <span class="axis-label left">1 1/2"</span>
+                    <output id="middleDrillDepthValue" class="pitch-readout">2 1/2"</output>
+                    <span class="axis-label right">4 1/4"</span>
+                    <input id="middleDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" aria-label="中指 ドリル深さ" />
+                    <div class="indicator-scale" data-range="middleDrillDepth"></div>
                   </div>
-                </div>
-              </div>
-            </div>
-            <div class="pitch-grid">
-              <div class="pitch-pad" data-hole="middle">
-                <h3>中指ピッチ</h3>
-                <div class="pitch-axis">
-                  <span class="axis-label left">左 1"</span>
-                  <output id="middleLateralAxisValue" class="pitch-readout">左右 0</output>
-                  <span class="axis-label right">右 1"</span>
-                  <input id="middleLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 左右ピッチ" />
-                  <div class="indicator-scale" data-range="middleLateralAxis"></div>
-                </div>
-                <div class="pitch-axis">
-                  <span class="axis-label left">リバース 1"</span>
-                  <output id="middleVerticalAxisValue" class="pitch-readout">前後 0</output>
-                  <span class="axis-label right">フォワード 1"</span>
-                  <input id="middleVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 前後ピッチ" />
-                  <div class="indicator-scale" data-range="middleVerticalAxis"></div>
-                </div>
-                <div class="pitch-axis">
-                  <span class="axis-label left">1 1/2"</span>
-                  <output id="middleDrillDepthValue" class="pitch-readout">2 1/2"</output>
-                  <span class="axis-label right">4 1/4"</span>
-                  <input id="middleDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" aria-label="中指 ドリル深さ" />
-                  <div class="indicator-scale" data-range="middleDrillDepth"></div>
                 </div>
               </div>
 
-              <div class="pitch-pad" data-hole="ring">
-                <h3>薬指ピッチ</h3>
-                <div class="pitch-axis">
-                  <span class="axis-label left">左 1"</span>
-                  <output id="ringLateralAxisValue" class="pitch-readout">左右 0</output>
-                  <span class="axis-label right">右 1"</span>
-                  <input id="ringLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 左右ピッチ" />
-                  <div class="indicator-scale" data-range="ringLateralAxis"></div>
+              <div class="finger-column">
+                <h4>薬指側</h4>
+                <div class="material-field">
+                  <label for="ringGripType">グリップ</label>
+                  <select id="ringGripType">
+                    <option value="none">使用なし</option>
+                    <option value="semi">セミグリップ</option>
+                    <option value="tip">チップグリップ</option>
+                    <option value="oval" selected>オーバルグリップ</option>
+                    <option value="powerOval">パワーオーバルグリップ</option>
+                    <option value="rubberSheet">板ゴム</option>
+                  </select>
                 </div>
-                <div class="pitch-axis">
-                  <span class="axis-label left">リバース 1"</span>
-                  <output id="ringVerticalAxisValue" class="pitch-readout">前後 0</output>
-                  <span class="axis-label right">フォワード 1"</span>
-                  <input id="ringVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 前後ピッチ" />
-                  <div class="indicator-scale" data-range="ringVerticalAxis"></div>
+                <div class="material-field">
+                  <label for="ringGripOuter">グリップ外径</label>
+                  <select id="ringGripOuter">
+                    <option value="0.875">7/8"</option>
+                    <option value="0.96875" selected>31/32"</option>
+                    <option value="0.984375">63/64"</option>
+                    <option value="1.03125">1 1/32"</option>
+                  </select>
                 </div>
-                <div class="pitch-axis">
-                  <span class="axis-label left">1 1/2"</span>
-                  <output id="ringDrillDepthValue" class="pitch-readout">2 1/2"</output>
-                  <span class="axis-label right">4 1/4"</span>
-                  <input id="ringDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" aria-label="薬指 ドリル深さ" />
-                  <div class="indicator-scale" data-range="ringDrillDepth"></div>
+                <div class="measure-indicators">
+                  <div class="indicator-control">
+                    <label for="ringGripId">グリップ内径</label>
+                    <div class="indicator-wrap">
+                      <select id="ringGripId"></select>
+                    </div>
+                  </div>
+                  <div class="indicator-control">
+                    <label for="ringBareDiameter">素掘り径</label>
+                    <div class="indicator-wrap">
+                      <select id="ringBareDiameter"></select>
+                    </div>
+                  </div>
+                  <div class="indicator-control">
+                    <label for="ringGripWall">肉厚</label>
+                    <div class="indicator-wrap">
+                      <output id="ringGripWall" class="pitch-readout">0"</output>
+                    </div>
+                  </div>
+                </div>
+                <div class="indicator-control no-thumb-dependent">
+                  <label for="ringNoThumbOffset">基準線オフセット</label>
+                  <div class="indicator-wrap">
+                    <input id="ringNoThumbOffset" type="range" min="-0.5" max="0.5" step="0.03125" value="0" />
+                    <div class="indicator-scale" data-range="ringNoThumbOffset"></div>
+                  </div>
+                </div>
+                <div class="pitch-pad" data-hole="ring">
+                  <h3>薬指ピッチ</h3>
+                  <div class="pitch-cross" data-pitch-cross="ring">
+                    <button class="pitch-cross-arm top" type="button" data-pitch-range="ringVerticalAxis" data-pitch-direction="-1"><span>リバース</span><strong></strong></button>
+                    <button class="pitch-cross-arm right" type="button" data-pitch-range="ringLateralAxis" data-pitch-direction="1"><span>右</span><strong></strong></button>
+                    <button class="pitch-cross-arm bottom" type="button" data-pitch-range="ringVerticalAxis" data-pitch-direction="1"><span>フォワード</span><strong></strong></button>
+                    <button class="pitch-cross-arm left" type="button" data-pitch-range="ringLateralAxis" data-pitch-direction="-1"><strong></strong><span>左</span></button>
+                    <button class="pitch-cross-center" type="button" data-pitch-reset="ring"><span>0</span></button>
+                  </div>
+                  <div class="pitch-axis pitch-source">
+                    <span class="axis-label left">左 1"</span>
+                    <output id="ringLateralAxisValue" class="pitch-readout">左右 0</output>
+                    <span class="axis-label right">右 1"</span>
+                    <input id="ringLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 左右ピッチ" />
+                    <div class="indicator-scale" data-range="ringLateralAxis"></div>
+                  </div>
+                  <div class="pitch-axis pitch-source">
+                    <span class="axis-label left">リバース 1"</span>
+                    <output id="ringVerticalAxisValue" class="pitch-readout">前後 0</output>
+                    <span class="axis-label right">フォワード 1"</span>
+                    <input id="ringVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 前後ピッチ" />
+                    <div class="indicator-scale" data-range="ringVerticalAxis"></div>
+                  </div>
+                  <div class="pitch-axis">
+                    <span class="axis-label left">1 1/2"</span>
+                    <output id="ringDrillDepthValue" class="pitch-readout">2 1/2"</output>
+                    <span class="axis-label right">4 1/4"</span>
+                    <input id="ringDrillDepth" type="range" min="1.5" max="4.25" step="0.015625" value="2.5" aria-label="薬指 ドリル深さ" />
+                    <div class="indicator-scale" data-range="ringDrillDepth"></div>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section class="sheet-card">
+          <section id="thumbSettingsSection" class="sheet-card thumb-dependent">
             <h3>サムホール</h3>
+            <p class="control-group-note">サム内径、サムソリッド外径、サムピッチ、サム深さを設定します。</p>
             <div class="material-grid">
               <div class="material-field">
                 <label for="thumbSolidMode">サムソリッド</label>
@@ -1016,14 +1398,21 @@
             <div class="pitch-grid single">
               <div class="pitch-pad" data-hole="thumb">
                 <h3>サムピッチ</h3>
-                <div class="pitch-axis">
+                <div class="pitch-cross" data-pitch-cross="thumb">
+                  <button class="pitch-cross-arm top" type="button" data-pitch-range="thumbVerticalAxis" data-pitch-direction="1"><span>フォワード</span><strong></strong></button>
+                  <button class="pitch-cross-arm right" type="button" data-pitch-range="thumbLateralAxis" data-pitch-direction="1"><span>右</span><strong></strong></button>
+                  <button class="pitch-cross-arm bottom" type="button" data-pitch-range="thumbVerticalAxis" data-pitch-direction="-1"><span>リバース</span><strong></strong></button>
+                  <button class="pitch-cross-arm left" type="button" data-pitch-range="thumbLateralAxis" data-pitch-direction="-1"><strong></strong><span>左</span></button>
+                  <button class="pitch-cross-center" type="button" data-pitch-reset="thumb"><span>0</span></button>
+                </div>
+                <div class="pitch-axis pitch-source">
                   <span class="axis-label left">左 1"</span>
                   <output id="thumbLateralAxisValue" class="pitch-readout">左右 0</output>
                   <span class="axis-label right">右 1"</span>
                   <input id="thumbLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="サム 左右ピッチ" />
                   <div class="indicator-scale" data-range="thumbLateralAxis"></div>
                 </div>
-                <div class="pitch-axis">
+                <div class="pitch-axis pitch-source">
                   <span class="axis-label left">リバース 1"</span>
                   <output id="thumbVerticalAxisValue" class="pitch-readout">前後 0</output>
                   <span class="axis-label right">フォワード 1"</span>
@@ -1033,25 +1422,25 @@
               </div>
             </div>
           </section>
-        </div>
       </div>
 
       <p id="warning" class="warning section-wide"></p>
 
-      <section class="section section-wide save-panel">
-        <h3>入力データ</h3>
+      <section id="profileSaveArea" class="section section-wide profile-save-area is-hidden">
         <div class="save-controls">
-          <input id="profileName" type="text" placeholder="データ名" aria-label="保存データ名" />
-          <button id="saveProfile" type="button">保存</button>
-          <select id="profileList" aria-label="保存データ一覧"></select>
-          <button id="loadProfile" type="button">読込</button>
-          <button id="deleteProfile" type="button">削除</button>
+          <div class="save-field wide">
+            <label for="changeSummary">変更内容</label>
+            <textarea id="changeSummary" placeholder="例: 中指スパンを 1/32 短くした / サムピッチを調整した"></textarea>
+          </div>
+          <div class="save-field wide">
+            <label for="changeReason">理由</label>
+            <textarea id="changeReason" placeholder="例: 親指の抜けを改善するため / 実測値に合わせるため"></textarea>
+          </div>
+          <div class="save-actions">
+            <button id="saveProfile" type="button">保存</button>
+          </div>
+          <p id="saveResult" class="save-status save-result"></p>
         </div>
-        <p id="saveStatus" class="save-status"></p>
-      </section>
-
-      <section class="section section-wide">
-        <p class="note">スパンは 1/32 インチ刻み、ピッチは 1/16 インチ刻みです。0 ピッチは球中心方向です。左右は左がレフト、右がライト。前後は左がリバース、右がフォワードです。</p>
       </section>
     </aside>
 
@@ -1063,7 +1452,7 @@
       </div>
       <div class="legend">
         <span><i class="dot" style="background: var(--gc)"></i>グリップセンター</span>
-        <span><i class="dot" style="background: var(--thumb)"></i>サム</span>
+        <span class="thumb-dependent"><i class="dot" style="background: var(--thumb)"></i>サム</span>
         <span><i class="dot" style="background: var(--middle)"></i>中指</span>
         <span><i class="dot" style="background: var(--ring)"></i>薬指</span>
       </div>
@@ -1138,17 +1527,22 @@
     });
 
     document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
+    setupPitchCrossControls();
+    updateAllPitchCrossControls();
 
     document.querySelector("#handedness").addEventListener("change", (event) => {
       document.querySelector("#measureDiagram").dataset.hand = event.target.value;
       draw();
     });
 
+    document.querySelector("#bowlingStyle")?.addEventListener("change", updateBowlingStyleMode);
+    document.querySelector("#twoHandThumbUse")?.addEventListener("change", updateBowlingStyleMode);
+
     updateAllFingerGripControls();
 
     document.querySelector("#thumbSolidMode").addEventListener("change", updateThumbSolidMode);
     document.querySelectorAll("select").forEach((select) => {
-      if (select.id !== "handedness" && select.id !== "thumbSolidMode") {
+      if (!["handedness", "thumbSolidMode", "profileList", "bowlingStyle", "twoHandThumbUse"].includes(select.id)) {
         select.addEventListener("change", () => {
           updateAllFingerGripControls();
           draw();
@@ -1156,13 +1550,48 @@
       }
     });
     updateThumbSolidMode();
+    updateBowlingStyleMode();
     setupProfileStorage();
 
     function setupProfileStorage() {
       renderProfileList();
+      setProfileEditorVisible(false);
+      document.querySelector("#newProfile")?.addEventListener("click", startNewProfile);
       document.querySelector("#saveProfile")?.addEventListener("click", saveCurrentProfile);
-      document.querySelector("#loadProfile")?.addEventListener("click", loadSelectedProfile);
+      document.querySelector("#profileList")?.addEventListener("change", loadSelectedProfile);
+      setupProfileSearch();
       document.querySelector("#deleteProfile")?.addEventListener("click", deleteSelectedProfile);
+    }
+
+    function setupProfileSearch() {
+      const search = document.querySelector("#profileSearch");
+      if (!search) return;
+      const refresh = () => renderProfileList(document.querySelector("#profileList")?.value || "");
+      search.addEventListener("input", refresh);
+      search.addEventListener("change", refresh);
+      search.addEventListener("keyup", refresh);
+      search.addEventListener("search", refresh);
+      document.querySelector("#clearProfileSearch")?.addEventListener("click", () => {
+        search.value = "";
+        refresh();
+        search.focus();
+      });
+      document.querySelector("#profileResults")?.addEventListener("click", (event) => {
+        const item = event.target.closest(".profile-result-item");
+        if (!item) return;
+        const name = item.dataset.profileName || "";
+        if (item.dataset.action === "create") {
+          startNewProfile();
+          return;
+        }
+        if (name) loadProfileByName(name);
+      });
+    }
+
+    function setProfileEditorVisible(visible) {
+      document.querySelector("#profileEditor")?.classList.toggle("is-hidden", !visible);
+      document.querySelector("#profileSaveArea")?.classList.toggle("is-hidden", !visible);
+      document.querySelector(".data-section")?.classList.toggle("is-editing", visible);
     }
 
     function readProfiles() {
@@ -1184,34 +1613,61 @@
       });
       const selects = {};
       document.querySelectorAll("select").forEach((select) => {
+        if (select.id === "profileList") return;
         selects[select.id] = select.value;
       });
+      const person = currentProfilePerson();
+      const existingProfile = readProfiles()[person.displayName || ""];
+      const changeEntry = buildChangeEntry(existingProfile, { person, ranges, selects });
       return {
-        version: 1,
+        version: 2,
         savedAt: new Date().toISOString(),
+        person,
+        changeLog: existingProfile?.changeLog ? [...existingProfile.changeLog, changeEntry] : [changeEntry],
         ranges,
         selects
       };
     }
 
     function saveCurrentProfile() {
-      const nameField = document.querySelector("#profileName");
-      const name = (nameField?.value || "").trim() || `layout-${new Date().toLocaleString("ja-JP")}`;
+      const person = currentProfilePerson();
+      const name = person.displayName || `layout-${new Date().toLocaleString("ja-JP")}`;
       const profiles = readProfiles();
       profiles[name] = collectCurrentProfileValues();
       writeProfiles(profiles);
       renderProfileList(name);
+      clearChangeFields();
       showSaveStatus(`保存しました: ${name}`);
+    }
+
+    function startNewProfile() {
+      document.querySelector("#profileList").value = "";
+      const search = document.querySelector("#profileSearch");
+      if (search) search.value = "";
+      clearProfileNameFields();
+      clearChangeFields();
+      resetLayoutInputsToDefaults();
+      setProfileEditorVisible(true);
+      renderProfileList();
+      showSaveStatus("新規データを作成中です。入力後に保存してください。");
     }
 
     function loadSelectedProfile() {
       const name = document.querySelector("#profileList")?.value;
       if (!name) return showSaveStatus("読み込むデータを選択してください");
+      loadProfileByName(name);
+    }
+
+    function loadProfileByName(name) {
       const profile = readProfiles()[name];
       if (!profile) return showSaveStatus("保存データが見つかりません");
+      const list = document.querySelector("#profileList");
+      if (list) list.value = name;
       applyProfileValues(profile);
-      const nameField = document.querySelector("#profileName");
-      if (nameField) nameField.value = name;
+      setProfileNameFields(profile, name);
+      clearChangeFields();
+      setProfileEditorVisible(true);
+      renderProfileList(name);
       showSaveStatus(`読み込みました: ${name}`);
     }
 
@@ -1223,6 +1679,9 @@
       delete profiles[name];
       writeProfiles(profiles);
       renderProfileList();
+      setProfileEditorVisible(false);
+      clearProfileNameFields();
+      clearChangeFields();
       showSaveStatus(`削除しました: ${name}`);
     }
 
@@ -1233,15 +1692,149 @@
       const names = Object.keys(profiles).sort((a, b) => {
         return String(profiles[b].savedAt || "").localeCompare(String(profiles[a].savedAt || ""));
       });
-      list.innerHTML = names.length
-        ? names.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")
-        : `<option value="">保存データなし</option>`;
-      if (selectedName && profiles[selectedName]) list.value = selectedName;
+      const query = normalizeSearchText(document.querySelector("#profileSearch")?.value || "");
+      const filteredNames = query
+        ? names.filter((name) => normalizeSearchText(`${name} ${profileOptionLabel(name, profiles[name])}`).includes(query))
+        : names;
+      list.innerHTML = [
+        `<option value="">選択してください</option>`,
+        ...names.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(profileOptionLabel(name, profiles[name]))}</option>`)
+      ].join("");
+      if (selectedName && names.includes(selectedName)) list.value = selectedName;
+      const hasProfiles = names.length > 0;
+      const selectedStillExists = Boolean(list.value && names.includes(list.value));
+      document.querySelector("#deleteProfile").disabled = !selectedStillExists;
+      renderProfileResults(filteredNames, profiles, query, selectedName);
+      const note = document.querySelector("#profileEmptyNote");
+      if (note) {
+        if (!hasProfiles) note.textContent = "保存済みデータはありません。検索結果がなければ新規作成できます。";
+        else if (query) note.textContent = `${names.length} 件中 ${filteredNames.length} 件を表示しています。`;
+        else note.textContent = `${names.length} 件の保存データがあります。`;
+      }
+    }
+
+    function renderProfileResults(names, profiles, query, selectedName = "") {
+      const results = document.querySelector("#profileResults");
+      if (!results) return;
+      if (!query) {
+        results.innerHTML = "";
+        return;
+      }
+      if (!names.length) {
+        results.innerHTML = `<button type="button" class="profile-result-item is-create" data-action="create">該当なし - 新規作成へ進む</button>`;
+        return;
+      }
+      results.innerHTML = names.map((name) => {
+        const selected = name === selectedName || name === document.querySelector("#profileList")?.value;
+        return `<button type="button" class="profile-result-item${selected ? " is-selected" : ""}" data-profile-name="${escapeHtml(name)}">${escapeHtml(profileOptionLabel(name, profiles[name]))}</button>`;
+      }).join("");
+    }
+
+    function normalizeSearchText(value) {
+      return String(value).toLocaleLowerCase("ja-JP").replace(/\s+/g, " ").trim();
+    }
+
+    function currentProfilePerson() {
+      const familyName = (document.querySelector("#familyName")?.value || "").trim();
+      const givenName = (document.querySelector("#givenName")?.value || "").trim();
+      return {
+        familyName,
+        givenName,
+        displayName: [familyName, givenName].filter(Boolean).join(" ").trim()
+      };
+    }
+
+    function setProfileNameFields(profile, fallbackName) {
+      const person = profile.person || {};
+      const familyName = document.querySelector("#familyName");
+      const givenName = document.querySelector("#givenName");
+      if (person.familyName || person.givenName) {
+        if (familyName) familyName.value = person.familyName || "";
+        if (givenName) givenName.value = person.givenName || "";
+        return;
+      }
+      const parts = String(fallbackName || "").trim().split(/\s+/);
+      if (familyName) familyName.value = parts.shift() || "";
+      if (givenName) givenName.value = parts.join(" ");
+    }
+
+    function clearProfileNameFields() {
+      const familyName = document.querySelector("#familyName");
+      const givenName = document.querySelector("#givenName");
+      if (familyName) familyName.value = "";
+      if (givenName) givenName.value = "";
+    }
+
+    function clearChangeFields() {
+      const summary = document.querySelector("#changeSummary");
+      const reason = document.querySelector("#changeReason");
+      if (summary) summary.value = "";
+      if (reason) reason.value = "";
+    }
+
+    function buildChangeEntry(previousProfile, nextProfile) {
+      const changes = previousProfile ? diffProfileValues(previousProfile, nextProfile) : [{ field: "profile", before: "", after: "新規作成" }];
+      return {
+        savedAt: new Date().toISOString(),
+        summary: (document.querySelector("#changeSummary")?.value || "").trim(),
+        reason: (document.querySelector("#changeReason")?.value || "").trim(),
+        changes
+      };
+    }
+
+    function diffProfileValues(previousProfile, nextProfile) {
+      const changes = [];
+      collectDiff(changes, "苗字", previousProfile.person?.familyName, nextProfile.person?.familyName);
+      collectDiff(changes, "氏名", previousProfile.person?.givenName, nextProfile.person?.givenName);
+      Object.keys(nextProfile.selects || {}).forEach((id) => {
+        collectDiff(changes, id, previousProfile.selects?.[id], nextProfile.selects?.[id]);
+      });
+      Object.keys(nextProfile.ranges || {}).forEach((id) => {
+        collectDiff(changes, id, previousProfile.ranges?.[id], nextProfile.ranges?.[id]);
+      });
+      return changes;
+    }
+
+    function collectDiff(changes, field, before, after) {
+      const beforeText = before == null ? "" : String(before);
+      const afterText = after == null ? "" : String(after);
+      if (beforeText !== afterText) changes.push({ field, before: beforeText, after: afterText });
+    }
+
+    function resetLayoutInputsToDefaults() {
+      document.querySelectorAll("select").forEach((select) => {
+        if (select.id === "profileList") return;
+        const defaultIndex = Array.from(select.options).findIndex((option) => option.defaultSelected);
+        select.selectedIndex = defaultIndex >= 0 ? defaultIndex : 0;
+      });
+      updateAllFingerGripControls();
+      inputs.forEach((range, id) => {
+        range.value = range.defaultValue || range.getAttribute("value") || range.min || "0";
+        range.value = clamp(snapToStep(range.value, range.step), Number(range.min), Number(range.max));
+        setValueOutput(range, document.querySelector(`#${id}Value`));
+      });
+      document.querySelector("#measureDiagram").dataset.hand = selectValue("handedness");
+      updateThumbSolidMode();
+      updateBowlingStyleMode();
+      renderGripWallOutputs(layout());
+      draw();
+    }
+
+    function profileOptionLabel(name, profile) {
+      const person = profile?.person || {};
+      const displayName = [person.familyName, person.givenName].filter(Boolean).join(" ").trim() || name;
+      const handed = profile?.selects?.handedness === "left" ? "左投げ" : "右投げ";
+      const styleLabel = profile?.selects?.bowlingStyle === "thumbless"
+        ? "サムレス"
+        : profile?.selects?.bowlingStyle === "twoHand"
+          ? "両手"
+          : "片手";
+      return `${displayName} / ${handed} / ${styleLabel}`;
     }
 
     function applyProfileValues(profile) {
       const selects = profile.selects || {};
-      ["handedness", "thumbSolidMode", "thumbSolid", "middleGripType", "ringGripType", "middleGripOuter", "ringGripOuter"].forEach((id) => {
+      ["handedness", "bowlingStyle", "twoHandThumbUse", "thumbSolidMode", "thumbSolid", "middleGripType", "ringGripType", "middleGripOuter", "ringGripOuter"].forEach((id) => {
         setSelectValue(id, selects[id]);
       });
       updateAllFingerGripControls();
@@ -1257,6 +1850,7 @@
         setValueOutput(range, document.querySelector(`#${id}Value`));
       });
       updateThumbSolidMode();
+      updateBowlingStyleMode();
       renderGripWallOutputs(layout());
       draw();
     }
@@ -1270,7 +1864,12 @@
 
     function showSaveStatus(message) {
       const status = document.querySelector("#saveStatus");
-      if (status) status.textContent = message;
+      const result = document.querySelector("#saveResult");
+      [status, result].forEach((target) => {
+        if (!target) return;
+        target.textContent = message;
+        target.classList.toggle("is-active", Boolean(message));
+      });
     }
 
     function escapeHtml(value) {
@@ -1304,18 +1903,47 @@
       return document.querySelector("#handedness").value === "left";
     }
 
+    function hasThumbHole() {
+      const style = selectValue("bowlingStyle") || "oneHand";
+      if (style === "thumbless") return false;
+      if (style === "twoHand") return selectValue("twoHandThumbUse") !== "no";
+      return true;
+    }
+
+    function updateBowlingStyleMode() {
+      const style = selectValue("bowlingStyle") || "oneHand";
+      const thumbUseField = document.querySelector("#twoHandThumbUseField");
+      thumbUseField?.classList.toggle("is-hidden", style !== "twoHand");
+      const enabled = hasThumbHole();
+      document.body.dataset.thumbEnabled = enabled ? "true" : "false";
+      const diagram = document.querySelector("#measureDiagram");
+      if (diagram) diagram.dataset.thumbEnabled = enabled ? "true" : "false";
+      requestAnimationFrame(refreshIndicatorScales);
+      draw();
+    }
+
+    function refreshIndicatorScales() {
+      document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
+    }
+
     function setValueOutput(range, output) {
-      if (!output) return;
+      if (!output) {
+        updateIndicatorCurrent(range);
+        return;
+      }
       if (range.id === "thumbSolid" && document.querySelector("#thumbSolidMode")?.value === "no") {
         setFieldText(output, "なし");
+        updateIndicatorCurrent(range);
         return;
       }
       if (output.tagName === "OUTPUT") {
         output.value = pitchAxisLabel(range.id, Number(range.value));
         output.textContent = output.value;
+        updateIndicatorCurrent(range);
         return;
       }
       setFieldText(output, formatInch(range.value));
+      updateIndicatorCurrent(range);
     }
 
     function getFieldText(field) {
@@ -1364,8 +1992,9 @@
       if (!range) return;
       const min = Number(range.min);
       const max = Number(range.max);
-      const useThirtySecond = Number(range.step) <= 1 / 32 && /Span/.test(range.id);
+      const useThirtySecond = Number(range.step) <= 1 / 32 && /(Span|Offset)/.test(range.id);
       const tickUnit = useThirtySecond ? 1 / 32 : 1 / 16;
+      const compact = scaleEl.clientWidth < 260;
       const first = Math.ceil(min / tickUnit) * tickUnit;
       const ticks = [];
       for (let value = first; value <= max + 1e-8; value += tickUnit) {
@@ -1377,11 +2006,143 @@
         else if (unit32 % 8 === 0) kind = "tick-4";
         else if (unit32 % 4 === 0) kind = "tick-8";
         else if (unit32 % 2 === 0) kind = "tick-16";
-        const label = kind === "tick-2" || Math.abs(rounded - min) < 1e-8 || Math.abs(rounded - max) < 1e-8;
+        const isEdge = Math.abs(rounded - min) < 1e-8 || Math.abs(rounded - max) < 1e-8;
+        const label = isEdge || (compact ? kind === "tick-2" : kind === "tick-2" || kind === "tick-4");
         ticks.push(`<i class="indicator-tick ${kind}" style="left:${percent}%"></i>`);
         if (label) ticks.push(`<span class="indicator-tick-label" style="left:${percent}%">${formatInch(rounded)}</span>`);
       }
       scaleEl.innerHTML = ticks.join("");
+      updateIndicatorCurrent(range);
+    }
+
+    function updateIndicatorCurrent(range) {
+      const scaleEl = document.querySelector(`.indicator-scale[data-range="${range.id}"]`);
+      if (!scaleEl) return;
+      const min = Number(range.min);
+      const max = Number(range.max);
+      const value = clamp(Number(range.value), min, max);
+      const percent = ((value - min) / (max - min)) * 100;
+      const safePercent = clamp(percent, 0, 100);
+      let marker = scaleEl.querySelector(".indicator-current");
+      if (!marker) {
+        marker = document.createElement("i");
+        marker.className = "indicator-current";
+        scaleEl.appendChild(marker);
+      }
+      let label = scaleEl.querySelector(".indicator-current-label");
+      if (!label) {
+        label = document.createElement("span");
+        label.className = "indicator-current-label";
+        scaleEl.appendChild(label);
+      }
+      marker.style.left = `${safePercent}%`;
+      label.style.left = `${clamp(safePercent, 12, 88)}%`;
+      label.textContent = range.id.endsWith("Axis") ? pitchAxisLabel(range.id, value) : formatInch(value);
+      updatePitchCrossForRange(range);
+    }
+
+    function setupPitchCrossControls() {
+      document.querySelectorAll(".pitch-cross-arm").forEach((button) => {
+        const applyPointer = (event) => {
+          event.preventDefault();
+          setPitchFromCrossPointer(button, event);
+        };
+        button.addEventListener("pointerdown", (event) => {
+          button.setPointerCapture?.(event.pointerId);
+          button.dataset.dragging = "true";
+          applyPointer(event);
+        });
+        button.addEventListener("pointermove", (event) => {
+          if (button.dataset.dragging === "true") applyPointer(event);
+        });
+        button.addEventListener("pointerup", (event) => {
+          button.releasePointerCapture?.(event.pointerId);
+          delete button.dataset.dragging;
+        });
+        button.addEventListener("pointercancel", () => {
+          delete button.dataset.dragging;
+        });
+        button.addEventListener("keydown", (event) => {
+          if (!["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft", "Home", "End", "Delete", "Backspace"].includes(event.key)) return;
+          event.preventDefault();
+          nudgePitchCrossArm(button, event.key);
+        });
+      });
+
+      document.querySelectorAll(".pitch-cross-center").forEach((button) => {
+        button.addEventListener("click", () => resetPitchCross(button.dataset.pitchReset));
+      });
+    }
+
+    function setPitchFromCrossPointer(button, event) {
+      const range = document.querySelector(`#${button.dataset.pitchRange}`);
+      if (!range) return;
+      const direction = Number(button.dataset.pitchDirection) || 1;
+      const rect = button.getBoundingClientRect();
+      let ratio = 0;
+      if (button.classList.contains("left")) ratio = (rect.right - event.clientX) / rect.width;
+      else if (button.classList.contains("right")) ratio = (event.clientX - rect.left) / rect.width;
+      else if (button.classList.contains("top")) ratio = (rect.bottom - event.clientY) / rect.height;
+      else ratio = (event.clientY - rect.top) / rect.height;
+      const maxMagnitude = pitchDirectionLimit(range, direction);
+      setPitchRangeValue(range, direction * clamp(ratio, 0, 1) * maxMagnitude);
+    }
+
+    function nudgePitchCrossArm(button, key) {
+      const range = document.querySelector(`#${button.dataset.pitchRange}`);
+      if (!range) return;
+      const direction = Number(button.dataset.pitchDirection) || 1;
+      const step = Number(range.step) || 1 / 16;
+      const current = Number(range.value) || 0;
+      const currentMagnitude = current * direction > 0 ? Math.abs(current) : 0;
+      const maxMagnitude = pitchDirectionLimit(range, direction);
+      let nextMagnitude = currentMagnitude;
+      if (key === "Home" || key === "Delete" || key === "Backspace") nextMagnitude = 0;
+      else if (key === "End") nextMagnitude = maxMagnitude;
+      else if (key === "ArrowUp" || key === "ArrowRight") nextMagnitude += step;
+      else nextMagnitude -= step;
+      setPitchRangeValue(range, direction * clamp(nextMagnitude, 0, maxMagnitude));
+    }
+
+    function resetPitchCross(hole) {
+      [`${hole}LateralAxis`, `${hole}VerticalAxis`].forEach((id) => {
+        const range = document.querySelector(`#${id}`);
+        if (range) setPitchRangeValue(range, 0, false);
+      });
+      draw();
+    }
+
+    function setPitchRangeValue(range, rawValue, shouldDraw = true) {
+      const value = clamp(snapToStep(rawValue, range.step), Number(range.min), Number(range.max));
+      range.value = value;
+      setValueOutput(range, document.querySelector(`#${range.id}Value`));
+      if (shouldDraw) draw();
+    }
+
+    function pitchDirectionLimit(range, direction) {
+      return direction > 0 ? Math.max(0, Number(range.max)) : Math.max(0, Math.abs(Number(range.min)));
+    }
+
+    function updateAllPitchCrossControls() {
+      document.querySelectorAll(".pitch-cross-arm").forEach((button) => {
+        const range = document.querySelector(`#${button.dataset.pitchRange}`);
+        if (range) updatePitchCrossForRange(range);
+      });
+    }
+
+    function updatePitchCrossForRange(range) {
+      if (!range?.id?.endsWith("Axis")) return;
+      const value = Number(range.value) || 0;
+      document.querySelectorAll(`.pitch-cross-arm[data-pitch-range="${range.id}"]`).forEach((button) => {
+        const direction = Number(button.dataset.pitchDirection) || 1;
+        const magnitude = value * direction > 1 / 128 ? Math.abs(value) : 0;
+        const maxMagnitude = pitchDirectionLimit(range, direction) || 1;
+        const fill = clamp(magnitude / maxMagnitude, 0, 1);
+        button.style.setProperty("--fill", fill);
+        button.classList.toggle("is-active", magnitude > 1 / 128);
+        const valueEl = button.querySelector("strong");
+        if (valueEl) valueEl.textContent = magnitude ? formatInch(magnitude) : "";
+      });
     }
 
     function updateThumbSolidMode() {
@@ -1474,26 +2235,30 @@
       const middleSpan = value("middleSpan");
       const ringSpan = middleSpan + value("ringSpanOffset");
       const bridge = value("bridge");
-      const thumbSize = holeSizing("thumb");
+      const useThumb = hasThumbHole();
+      const thumbSize = useThumb ? holeSizing("thumb") : null;
       const middleSize = holeSizing("middle");
       const ringSize = holeSizing("ring");
-      const thumbRadius = thumbSize.innerRadius;
+      const thumbRadius = thumbSize?.innerRadius || 0;
       const middleRadius = middleSize.outerRadius;
       const ringRadius = ringSize.outerRadius;
-      const thumbDrillDepth = value("thumbDrillDepth");
+      const thumbDrillDepth = useThumb ? value("thumbDrillDepth") : 0;
       const middleDrillDepth = value("middleDrillDepth");
       const ringDrillDepth = value("ringDrillDepth");
       const leftHanded = isLeftHanded();
       const middleX = leftHanded ? bridge / 2 + middleRadius : -(bridge / 2 + middleRadius);
       const ringX = leftHanded ? -(bridge / 2 + ringRadius) : bridge / 2 + ringRadius;
-      const thumbEdgeY = -middleSpan / 2;
-      const middleEdgeY = middleSpan / 2;
-      const ringEdgeY = thumbEdgeY + ringSpan;
+      const thumbEdgeY = useThumb ? -middleSpan / 2 : null;
+      const middleCenterY = useThumb ? null : value("middleNoThumbOffset");
+      const ringCenterY = useThumb ? null : value("ringNoThumbOffset");
+      const middleEdgeY = useThumb ? middleSpan / 2 : middleCenterY;
+      const ringEdgeY = useThumb ? thumbEdgeY + ringSpan : ringCenterY;
 
       const data = {
         ballRadius,
+        hasThumb: useThumb,
         gripCenter: { name: "グリップセンター", x: 0, y: 0, radius: 0.045, color: "#ffffff" },
-        thumb: {
+        thumb: useThumb ? {
           name: "サム",
           x: 0,
           y: thumbEdgeY - thumbRadius,
@@ -1510,11 +2275,11 @@
           lateral: pitchAxisValue("thumbLateralAxis"),
           vertical: pitchAxisValue("thumbVerticalAxis"),
           verticalDisplay: pitchAxisValue("thumbVerticalAxis")
-        },
+        } : null,
         middle: {
           name: "中指",
           x: middleX,
-          y: middleEdgeY + middleRadius,
+          y: useThumb ? middleEdgeY + middleRadius : middleCenterY,
           edgeY: middleEdgeY,
           radius: middleSize.innerRadius,
           innerRadius: middleSize.innerRadius,
@@ -1533,7 +2298,7 @@
         ring: {
           name: "薬指",
           x: ringX,
-          y: ringEdgeY + ringRadius,
+          y: useThumb ? ringEdgeY + ringRadius : ringCenterY,
           edgeY: ringEdgeY,
           radius: ringSize.innerRadius,
           innerRadius: ringSize.innerRadius,
@@ -1556,10 +2321,15 @@
       };
       for (let i = 0; i < 4; i++) {
         solveFingerBridgePosition(data);
-        solveFingerSpanPosition(data, data.middle, middleSpan);
-        solveFingerSpanPosition(data, data.ring, ringSpan);
+        if (data.hasThumb) {
+          solveFingerSpanPosition(data, data.middle, middleSpan);
+          solveFingerSpanPosition(data, data.ring, ringSpan);
+        } else {
+          applyFingerCenterY(data.middle, value("middleNoThumbOffset"));
+          applyFingerCenterY(data.ring, value("ringNoThumbOffset"));
+        }
       }
-      data.holes = [data.thumb, data.middle, data.ring];
+      data.holes = data.hasThumb ? [data.thumb, data.middle, data.ring] : [data.middle, data.ring];
       return data;
     }
 
@@ -1695,7 +2465,7 @@
       drawBall(cx, cy, radius, scale);
       drawSpanAngles(data, cx, cy, scale);
       data.holes.forEach((hole) => drawTrajectory(hole, data, cx, cy, scale));
-      drawHole(data.thumb, data, cx, cy, scale);
+      if (data.hasThumb) drawHole(data.thumb, data, cx, cy, scale);
       drawHole(data.middle, data, cx, cy, scale);
       drawHole(data.ring, data, cx, cy, scale);
       drawGuideLines(data, cx, cy, scale);
@@ -1720,7 +2490,7 @@
       });
       setFieldText(document.querySelector("#middleDiameterValue"), formatInch(data.middle.outerRadius * 2));
       setFieldText(document.querySelector("#ringDiameterValue"), formatInch(data.ring.outerRadius * 2));
-      setFieldText(document.querySelector("#thumbDiameterValue"), formatInch(data.thumb.innerRadius * 2));
+      if (data.hasThumb) setFieldText(document.querySelector("#thumbDiameterValue"), formatInch(data.thumb.innerRadius * 2));
       setFieldText(
         document.querySelector("#middleGripIdValue"),
         data.middle.usesBare ? data.middle.insertLabel : formatInch(data.middle.innerRadius * 2)
@@ -1729,12 +2499,14 @@
         document.querySelector("#ringGripIdValue"),
         data.ring.usesBare ? data.ring.insertLabel : formatInch(data.ring.innerRadius * 2)
       );
-      setFieldText(
-        document.querySelector("#thumbSolidValue"),
-        selectValue("thumbSolidMode") === "no" ? "なし" : formatInch(data.thumb.outerRadius * 2)
-      );
+      if (data.hasThumb) {
+        setFieldText(
+          document.querySelector("#thumbSolidValue"),
+          selectValue("thumbSolidMode") === "no" ? "なし" : formatInch(data.thumb.outerRadius * 2)
+        );
+      }
       const thumbWall = document.querySelector("#thumbSolidWall");
-      if (thumbWall) {
+      if (thumbWall && data.hasThumb) {
         const wall = Math.max(0, data.thumb.outerRadius - data.thumb.innerRadius);
         thumbWall.value = formatInch(wall);
         thumbWall.textContent = formatInch(wall);
@@ -1812,20 +2584,35 @@
 
     function drawGuideLines(data, cx, cy, scale) {
       const r = data.ballRadius;
-      const spanY = Math.max(2.6, data.middleSpan / 2 + value("thumbDiameter") / 2 + 0.6);
-      const thumbEndpoint = openingBoundaryPoint(data.thumb, thumbSpanEndpoint(data.thumb), data.thumb.innerRadius, data);
-      const middleEndpoint = exactSpanEndpoints(data.thumb, data.middle, data).b;
-      const ringEndpoint = exactSpanEndpoints(data.thumb, data.ring, data).b;
+      const spanY = Math.max(2.6, data.middleSpan / 2 + (data.hasThumb ? value("thumbDiameter") / 2 : 0) + 0.6);
+      const thumbEndpoint = data.hasThumb ? openingBoundaryPoint(data.thumb, thumbSpanEndpoint(data.thumb), data.thumb.innerRadius, data) : null;
       strokeLayoutLine([{ x: -1.8, y: 0 }, { x: 1.8, y: 0 }], r, cx, cy, scale, "rgba(255,255,255,.92)", 1.35);
       strokeLayoutLine([{ x: 0, y: -spanY }, { x: 0, y: spanY }], r, cx, cy, scale, "rgba(255,255,255,.92)", 1.35);
-      drawEndpointGuideLine(data.thumb, thumbEndpoint, data.thumb.innerRadius, r, "rgba(241,199,95,.96)", cx, cy, scale);
-      drawEndpointGuideLine(data.middle, middleEndpoint, drilledOpeningRadius(data.middle), r, "rgba(105,184,255,.96)", cx, cy, scale);
-      drawEndpointGuideLine(data.ring, ringEndpoint, drilledOpeningRadius(data.ring), r, "rgba(241,121,165,.96)", cx, cy, scale);
+      if (data.hasThumb) drawEndpointGuideLine(data.thumb, thumbEndpoint, data.thumb.innerRadius, r, "rgba(241,199,95,.96)", cx, cy, scale);
+      if (data.hasThumb) {
+        drawEndpointGuideLine(data.middle, exactSpanEndpoints(data.thumb, data.middle, data).b, drilledOpeningRadius(data.middle), r, "rgba(105,184,255,.96)", cx, cy, scale);
+        drawEndpointGuideLine(data.ring, exactSpanEndpoints(data.thumb, data.ring, data).b, drilledOpeningRadius(data.ring), r, "rgba(241,121,165,.96)", cx, cy, scale);
+      } else {
+        drawHoleCenterGuideLine(data.middle, drilledOpeningRadius(data.middle), r, "rgba(105,184,255,.96)", cx, cy, scale);
+        drawHoleCenterGuideLine(data.ring, drilledOpeningRadius(data.ring), r, "rgba(241,121,165,.96)", cx, cy, scale);
+      }
     }
 
     function drawEndpointGuideLine(hole, endpoint, openingRadius, radius, color, cx, cy, scale) {
       const points = surfaceTangentGuidePoints(endpoint, radius, { x: 1, y: 0, z: 0 }, openingRadius);
       strokeProjected(points, cx, cy, scale, color, 1.35);
+    }
+
+    function drawHoleCenterGuideLine(hole, openingRadius, radius, color, cx, cy, scale) {
+      strokeLayoutLine(
+        [{ x: hole.x - openingRadius, y: hole.y }, { x: hole.x + openingRadius, y: hole.y }],
+        radius,
+        cx,
+        cy,
+        scale,
+        color,
+        1.35
+      );
     }
 
     function surfaceTangentGuidePoints(endpoint, radius, tangentDirection, halfLength) {
@@ -1854,19 +2641,28 @@
     }
 
     function drawSpanDistanceAnnotations(data, cx, cy, scale) {
-      const thumbEndpoint = thumbSpanEndpoint(data.thumb);
-      drawFingerSpanDistance(data, data.middle, data.middleSpan, 0, cx, cy, scale);
-      drawFingerSpanDistance(data, data.ring, data.ringSpan, 1, cx, cy, scale);
+      if (data.hasThumb) {
+        drawFingerSpanDistance(data, data.middle, data.middleSpan, 0, cx, cy, scale);
+        drawFingerSpanDistance(data, data.ring, data.ringSpan, 1, cx, cy, scale);
+      }
       drawBridgeDistanceAnnotation(data, cx, cy, scale);
-      drawSpanEndpointMarkerOnOpening(data.thumb, thumbEndpoint, data.thumb.innerRadius, data, cx, cy, scale, "rgba(241,199,95,.98)");
+      if (data.hasThumb) {
+        const thumbEndpoint = thumbSpanEndpoint(data.thumb);
+        drawSpanEndpointMarkerOnOpening(data.thumb, thumbEndpoint, data.thumb.innerRadius, data, cx, cy, scale, "rgba(241,199,95,.98)");
+      }
     }
 
     function drawFingerSpanDistance(data, finger, selectedSpan, index, cx, cy, scale) {
       const layoutEdge = {
-        a: thumbSpanEndpoint(data.thumb),
+        a: data.hasThumb ? thumbSpanEndpoint(data.thumb) : { x: 0, y: 0 },
         b: fingerHoleOuterSpanEndpoint(finger)
       };
-      const exactEdge = exactSpanEndpoints(data.thumb, finger, data);
+      const exactEdge = data.hasThumb
+        ? exactSpanEndpoints(data.thumb, finger, data)
+        : {
+            a: toSphere(0, 0, data.ballRadius),
+            b: openingBoundaryPoint(finger, fingerHoleOuterSpanEndpoint(finger), drilledOpeningRadius(finger), data)
+          };
       const side = index === 0 ? -1 : 1;
       const labelX = side * 0.95;
       drawExactSpanMeasureLine(
@@ -1878,11 +2674,11 @@
         scale,
         "rgba(255,255,255,.96)",
         2.4,
-        `スパン ${formatInch(selectedSpan)}`,
+        `${data.hasThumb ? "スパン" : "GC"} ${formatInch(selectedSpan)}`,
         labelX,
         side
       );
-      drawSpanEndpointMarkerAtProjected(project(exactEdge.a, scale, cx, cy), data.thumb.color);
+      drawSpanEndpointMarkerAtProjected(project(exactEdge.a, scale, cx, cy), data.hasThumb ? data.thumb.color : data.gripCenter.color);
       drawSpanEndpointMarkerAtProjected(project(exactEdge.b, scale, cx, cy), finger.color);
     }
 
@@ -2028,9 +2824,47 @@
       applyFingerEdgeY(finger, (low + high) / 2);
     }
 
+    function solveFingerGripCenterPosition(data, finger, targetSpan) {
+      const radius = drilledOpeningRadius(finger);
+      const maxEdgeY = Math.sqrt(Math.max(0, data.ballRadius * data.ballRadius - finger.x * finger.x)) - radius - 0.05;
+      let low = clamp(0.08, -maxEdgeY, maxEdgeY);
+      let high = clamp(Math.max(finger.edgeY, low + 0.01), low + 0.01, maxEdgeY);
+      const originalEdgeY = finger.edgeY;
+      const originalY = finger.y;
+      const centerPoint = toSphere(0, 0, data.ballRadius);
+      const distanceAt = (edgeY) => {
+        applyFingerEdgeY(finger, edgeY);
+        const endpoint = openingBoundaryPoint(finger, fingerHoleOuterSpanEndpoint(finger), drilledOpeningRadius(finger), data);
+        return spanEndpointDistance(centerPoint, endpoint);
+      };
+
+      let highDistance = distanceAt(high);
+      while (highDistance < targetSpan && high < maxEdgeY - 1e-4) {
+        high = Math.min(maxEdgeY, high + 0.2);
+        highDistance = distanceAt(high);
+      }
+      if (targetSpan < distanceAt(low) - 1e-4 || targetSpan > highDistance + 1e-4) {
+        finger.edgeY = originalEdgeY;
+        finger.y = originalY;
+        return;
+      }
+      for (let i = 0; i < 28; i++) {
+        const mid = (low + high) / 2;
+        const midDistance = distanceAt(mid);
+        if (midDistance < targetSpan) low = mid;
+        else high = mid;
+      }
+      applyFingerEdgeY(finger, (low + high) / 2);
+    }
+
     function applyFingerEdgeY(finger, edgeY) {
       finger.edgeY = edgeY;
       finger.y = edgeY + drilledOpeningRadius(finger);
+    }
+
+    function applyFingerCenterY(finger, centerY) {
+      finger.y = centerY;
+      finger.edgeY = centerY;
     }
 
     function spanEndpointDistance(a, b) {
@@ -2210,6 +3044,7 @@
     }
 
     function drawSpanAngles(data, cx, cy, scale) {
+      if (!data.hasThumb) return;
       drawDrillAxisAngle(data, data.middle, "親指-中指", 0, cx, cy, scale, "rgba(255,74,54,.95)");
       drawDrillAxisAngle(data, data.ring, "親指-薬指", 1, cx, cy, scale, "rgba(255,148,64,.9)");
     }
@@ -2564,6 +3399,11 @@
       const leftHole = isLeftHanded() ? data.ring : data.middle;
       const rightHole = isLeftHanded() ? data.middle : data.ring;
       document.querySelectorAll(".pitch-token").forEach((token) => {
+        if (token.dataset.hole === "thumb" && !data.hasThumb) {
+          const valueEl = token.querySelector("strong");
+          if (valueEl) valueEl.textContent = "";
+          return;
+        }
         const hole = token.dataset.hole === "thumb"
           ? data.thumb
           : token.dataset.cross === "left"
