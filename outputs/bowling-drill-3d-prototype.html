@@ -107,6 +107,56 @@
       font-size: 13px;
     }
 
+    .grip-shape-overlay {
+      position: absolute;
+      right: 20px;
+      top: 18px;
+      display: none;
+      display: grid;
+      gap: 8px;
+      min-width: 180px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      background: rgba(6,10,12,.82);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 28px rgba(0,0,0,.28);
+      z-index: 6;
+    }
+
+    .grip-shape-item {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 9px;
+      align-items: center;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .grip-shape-symbol {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border: 2px solid rgba(255,255,255,.95);
+      border-radius: 999px;
+      background: rgba(0,0,0,.72);
+      color: #fff;
+      font-size: 16px;
+      text-shadow: 0 1px 3px rgba(0,0,0,.75);
+      box-shadow: inset 0 0 0 3px currentColor;
+    }
+
+    .grip-shape-item.middle .grip-shape-symbol { color: var(--middle); }
+    .grip-shape-item.ring .grip-shape-symbol { color: var(--ring); }
+
+    .grip-shape-text {
+      min-width: 0;
+      color: rgba(245,250,252,.95);
+    }
+
     .zoom-hud {
       position: absolute;
       right: 20px;
@@ -515,6 +565,7 @@
       display: grid;
       gap: 10px;
       margin-top: 0;
+      position: relative;
     }
 
     .sheet-card {
@@ -524,6 +575,173 @@
       border: 1px solid rgba(255,255,255,.12);
       border-radius: 8px;
       background: rgba(12, 15, 18, .35);
+      position: relative;
+      z-index: 1;
+    }
+
+    .main-span-horizontal-control,
+    .ring-span-horizontal-control,
+    .bridge-horizontal-control {
+      display: none;
+    }
+
+    .span-gauge-section {
+      display: grid;
+      grid-template-columns: minmax(92px, .8fr) minmax(170px, 1.4fr) minmax(92px, .8fr);
+      grid-template-areas: "main bridge offset";
+      gap: 14px;
+      align-items: center;
+      min-height: 360px;
+      padding: 18px 12px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      background: rgba(12, 15, 18, .28);
+      position: relative;
+      z-index: 1;
+    }
+
+    .span-gauge-section[data-hand="left"] {
+      grid-template-areas: "offset bridge main";
+    }
+
+    .main-span-gauge-control { grid-area: main; }
+    .bridge-gauge-control { grid-area: bridge; }
+    .offset-span-gauge-control { grid-area: offset; }
+
+    .span-gauge-control {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      min-width: 0;
+    }
+
+    .span-gauge-control h3 {
+      margin: 0;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .span-vertical-gauge,
+    .span-horizontal-gauge {
+      position: relative;
+      border: 1px solid rgba(151, 214, 255, .28);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,0)), rgba(9, 20, 27, .82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      cursor: pointer;
+      touch-action: none;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .span-vertical-gauge {
+      width: 88px;
+      height: 288px;
+    }
+
+    .span-horizontal-gauge {
+      width: min(100%, 240px);
+      height: 96px;
+    }
+
+    .span-gauge-track {
+      position: absolute;
+      inset: 18px;
+      border-radius: 999px;
+      background: rgba(238,243,245,.16);
+    }
+
+    .span-vertical-gauge .span-gauge-track {
+      left: 50%;
+      right: auto;
+      width: 3px;
+      transform: translateX(-50%);
+    }
+
+    .span-horizontal-gauge .span-gauge-track {
+      top: 50%;
+      bottom: auto;
+      height: 3px;
+      transform: translateY(-50%);
+    }
+
+    .span-gauge-current {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(10,14,16,.9), 0 0 10px rgba(89,201,167,.65);
+      transform: translate(-50%, -50%);
+      z-index: 3;
+    }
+
+    .span-gauge-value {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      min-width: 54px;
+      padding: 3px 7px;
+      border: 1px solid rgba(89,201,167,.65);
+      border-radius: 999px;
+      background: rgba(12, 17, 19, .95);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.1;
+      text-align: center;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .span-gauge-min,
+    .span-gauge-max {
+      position: absolute;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .span-vertical-gauge .span-gauge-min { left: 8px; bottom: 10px; }
+    .span-vertical-gauge .span-gauge-max { left: 8px; top: 10px; }
+    .span-horizontal-gauge .span-gauge-min { left: 10px; bottom: 10px; }
+    .span-horizontal-gauge .span-gauge-max { right: 10px; bottom: 10px; }
+
+    .span-gauge-tick {
+      position: absolute;
+      background: rgba(238,243,245,.52);
+      pointer-events: none;
+    }
+
+    .span-vertical-gauge .span-gauge-tick {
+      left: 50%;
+      width: 13px;
+      height: 1px;
+      transform: translate(-50%, -50%);
+    }
+
+    .span-horizontal-gauge .span-gauge-tick {
+      top: 50%;
+      width: 1px;
+      height: 13px;
+      transform: translate(-50%, -50%);
+    }
+
+    .span-gauge-tick.major {
+      background: rgba(238,243,245,.86);
+    }
+
+    .span-vertical-gauge .span-gauge-tick.major { width: 22px; height: 2px; }
+    .span-horizontal-gauge .span-gauge-tick.major { width: 2px; height: 22px; }
+
+    #thumbSettingsSection {
+      margin-top: 0;
     }
 
     .sheet-card h3 {
@@ -824,6 +1042,101 @@
     .material-field select {
       width: 100%;
       min-height: 30px;
+    }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      border: 1px solid rgba(151, 214, 255, .28);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, transparent calc(100% - 18px), rgba(151,214,255,.3) calc(100% - 17px), transparent calc(100% - 16px)),
+        linear-gradient(45deg, transparent calc(100% - 18px), rgba(151,214,255,.3) calc(100% - 17px), transparent calc(100% - 16px)),
+        linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,0)),
+        rgba(9, 20, 27, .82);
+      background-position: right 12px center, right 6px center, 0 0, 0 0;
+      background-size: 8px 8px, 8px 8px, auto, auto;
+      background-repeat: no-repeat;
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      min-height: 36px;
+      padding: 7px 34px 7px 10px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    select:focus-visible {
+      outline: 2px solid rgba(89,201,167,.65);
+      outline-offset: 2px;
+      border-color: rgba(89,201,167,.78);
+    }
+
+    select:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .material-field select,
+    .indicator-wrap select,
+    .mini-field select {
+      width: 100%;
+    }
+
+    .grip-preview-card {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid rgba(151, 214, 255, .2);
+      border-radius: 8px;
+      background: rgba(6, 12, 15, .55);
+    }
+
+    .grip-preview-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: rgba(238,243,245,.88);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .grip-preview-head strong {
+      color: var(--accent);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .grip-shape-preview {
+      display: block;
+      width: 100%;
+      height: 150px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 46%, rgba(255,255,255,.07), transparent 42%), rgba(2, 7, 9, .82);
+    }
+
+    .grip-shape-preview .outer { fill: rgba(255,255,255,.12); stroke: rgba(235,242,245,.78); stroke-width: 4; }
+    .grip-shape-preview .inner { fill: rgba(0,0,0,.86); stroke: rgba(255,255,255,.96); stroke-width: 5; }
+    .grip-shape-preview .accent { fill: rgba(89,201,167,.72); stroke: rgba(255,255,255,.95); stroke-width: 3; }
+    .grip-shape-preview .guide { stroke: rgba(89,201,167,.96); stroke-width: 5; stroke-linecap: round; fill: none; }
+    .grip-shape-preview text { fill: rgba(238,243,245,.9); font: 700 11px Segoe UI, system-ui, sans-serif; }
+
+    .size-gauge-control .span-horizontal-gauge {
+      width: 100%;
+      max-width: none;
+      height: 86px;
+    }
+
+    .size-gauge-control .indicator-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .size-gauge-control input[type="range"] {
+      display: none;
     }
 
     .control-row {
@@ -1355,7 +1668,7 @@
           <div id="ringDiameterValue" class="sheet-input small hole-size field-ring-hole" contenteditable="true" role="textbox" aria-label="薬指ホールサイズ">3/4</div>
           <div id="bridgeValue" class="sheet-input small field-bridge" contenteditable="true" role="textbox" aria-label="ブリッジ">1/4</div>
           <div id="middleSpanValue" class="sheet-input wide field-main-span thumb-dependent" contenteditable="true" role="textbox" aria-label="メインスパン">4</div>
-          <div id="ringSpanOffsetValue" class="sheet-input wide field-offset-span thumb-dependent" contenteditable="true" role="textbox" aria-label="スパン差分">-1/8</div>
+          <div id="ringSpanOffsetValue" class="sheet-input wide field-offset-span thumb-dependent" contenteditable="true" role="textbox" aria-label="スパン差分">0</div>
           <div id="thumbDiameterValue" class="sheet-input small hole-size field-thumb-hole thumb-dependent" contenteditable="true" role="textbox" aria-label="サム内径">1</div>
           <div id="thumbSolidValue" class="sheet-input grip field-thumb-solid thumb-dependent" contenteditable="true" role="textbox" aria-label="サムソリッド外径">1 1/4</div>
       </div>
@@ -1420,33 +1733,11 @@
       </section>
 
       <div class="sheet-control-groups section-wide">
-          <section class="sheet-card">
-            <h3>スパン / ブリッジ</h3>
-            <p class="control-group-note">親指内径端点からフィンガーホール端点までの距離と、左右フィンガー間のブリッジを操作します。</p>
-            <div class="measure-indicators">
-              <div class="indicator-control thumb-dependent">
-                <label for="middleSpan">メインスパン</label>
-                <div class="indicator-wrap">
-                  <input id="middleSpan" type="range" min="2.5" max="5.5" step="0.03125" value="4" />
-                  <div class="indicator-scale" data-range="middleSpan"></div>
-                </div>
-              </div>
-              <div class="indicator-control thumb-dependent">
-                <label for="ringSpanOffset">スパン +/-</label>
-                <div class="indicator-wrap">
-                  <input id="ringSpanOffset" type="range" min="-0.5" max="0.5" step="0.03125" value="-0.125" />
-                  <div class="indicator-scale" data-range="ringSpanOffset"></div>
-                </div>
-              </div>
-              <div class="indicator-control">
-                <label for="bridge">ブリッジ</label>
-                <div class="indicator-wrap">
-                  <input id="bridge" type="range" min="0.1875" max="0.5" step="0.015625" value="0.25" />
-                  <div class="indicator-scale" data-range="bridge"></div>
-                </div>
-              </div>
-            </div>
-          </section>
+          <div class="sheet-hidden-controls" aria-hidden="true">
+            <input id="middleSpan" type="range" min="2.5" max="5.5" step="0.03125" value="4" />
+            <input id="ringSpanOffset" type="range" min="-0.5" max="0.5" step="0.03125" value="0" />
+            <input id="bridge" type="range" min="0.1875" max="0.5" step="0.015625" value="0.25" />
+          </div>
 
           <section class="sheet-card">
             <h3>フィンガーホール</h3>
@@ -1458,15 +1749,24 @@
                   <label for="middleGripType">グリップ</label>
                   <select id="middleGripType">
                     <option value="none">使用なし</option>
-                    <option value="semi">セミグリップ</option>
-                    <option value="tip">チップグリップ</option>
-                    <option value="oval" selected>オーバルグリップ</option>
-                    <option value="powerOval">パワーオーバルグリップ</option>
+                    <option value="semi">Semi-Super Bump</option>
+                    <option value="tip">チップグリップ / Power Lift</option>
+                    <option value="oval" selected>Perfect Oval</option>
+                    <option value="powerOval">Power Oval</option>
+                    <option value="powerNub">Power Nub</option>
                     <option value="rubberSheet">板ゴム</option>
                   </select>
                 </div>
+                <div class="grip-preview-card" data-preview-hole="middle">
+                  <div class="grip-preview-head">
+                    <span>中指グリップ形状</span>
+                    <strong id="middleGripPreviewName">-</strong>
+                  </div>
+                  <svg id="middleGripPreview" class="grip-shape-preview" viewBox="0 0 220 150" role="img" aria-label="中指グリップ形状プレビュー"></svg>
+                </div>
                 <div class="material-field">
                   <label for="middleGripOuter">グリップ外径</label>
+
                   <select id="middleGripOuter">
                     <option value="0.875">7/8"</option>
                     <option value="0.96875" selected>31/32"</option>
@@ -1551,15 +1851,24 @@
                   <label for="ringGripType">グリップ</label>
                   <select id="ringGripType">
                     <option value="none">使用なし</option>
-                    <option value="semi">セミグリップ</option>
-                    <option value="tip">チップグリップ</option>
-                    <option value="oval" selected>オーバルグリップ</option>
-                    <option value="powerOval">パワーオーバルグリップ</option>
+                    <option value="semi">Semi-Super Bump</option>
+                    <option value="tip">チップグリップ / Power Lift</option>
+                    <option value="oval" selected>Perfect Oval</option>
+                    <option value="powerOval">Power Oval</option>
+                    <option value="powerNub">Power Nub</option>
                     <option value="rubberSheet">板ゴム</option>
                   </select>
                 </div>
+                <div class="grip-preview-card" data-preview-hole="ring">
+                  <div class="grip-preview-head">
+                    <span>薬指グリップ形状</span>
+                    <strong id="ringGripPreviewName">-</strong>
+                  </div>
+                  <svg id="ringGripPreview" class="grip-shape-preview" viewBox="0 0 220 150" role="img" aria-label="薬指グリップ形状プレビュー"></svg>
+                </div>
                 <div class="material-field">
                   <label for="ringGripOuter">グリップ外径</label>
+
                   <select id="ringGripOuter">
                     <option value="0.875">7/8"</option>
                     <option value="0.96875" selected>31/32"</option>
@@ -1640,43 +1949,42 @@
             </div>
           </section>
 
+          <section id="spanGaugeSection" class="span-gauge-section thumb-dependent" data-hand="right">
+            <div class="span-gauge-control main-span-gauge-control" data-role="main">
+              <h3>メインスパン</h3>
+              <button id="mainSpanGauge" class="span-vertical-gauge" type="button" data-span-range="middleSpan" aria-label="メインスパン">
+                <span class="span-gauge-min"></span>
+                <span class="span-gauge-track"></span>
+                <span class="span-gauge-current"></span>
+                <span class="span-gauge-value"></span>
+                <span class="span-gauge-max"></span>
+              </button>
+            </div>
+            <div class="span-gauge-control bridge-gauge-control" data-role="bridge">
+              <h3>ブリッジ</h3>
+              <button id="bridgeGauge" class="span-horizontal-gauge" type="button" data-span-range="bridge" aria-label="ブリッジ">
+                <span class="span-gauge-min"></span>
+                <span class="span-gauge-track"></span>
+                <span class="span-gauge-current"></span>
+                <span class="span-gauge-value"></span>
+                <span class="span-gauge-max"></span>
+              </button>
+            </div>
+            <div class="span-gauge-control offset-span-gauge-control" data-role="offset">
+              <h3>薬指 +/-</h3>
+              <button id="offsetSpanGauge" class="span-vertical-gauge" type="button" data-span-range="ringSpanOffset" aria-label="薬指スパンプラスマイナス">
+                <span class="span-gauge-min"></span>
+                <span class="span-gauge-track"></span>
+                <span class="span-gauge-current"></span>
+                <span class="span-gauge-value"></span>
+                <span class="span-gauge-max"></span>
+              </button>
+            </div>
+          </section>
+
           <section id="thumbSettingsSection" class="sheet-card thumb-dependent">
             <h3>サムホール</h3>
             <p class="control-group-note">サム内径、サムソリッド外径、サムピッチ、サム深さを設定します。</p>
-            <div class="material-grid">
-              <div class="material-field">
-                <label for="thumbSolidMode">サムソリッド</label>
-                <select id="thumbSolidMode">
-                  <option value="yes" selected>使用する</option>
-                  <option value="no">使用しない</option>
-                </select>
-              </div>
-            </div>
-            <div class="measure-indicators">
-              <div class="indicator-control">
-                <label for="thumbDiameter">サム内径</label>
-                <div class="indicator-wrap">
-                  <input id="thumbDiameter" type="range" min="0.5" max="1.25" step="0.015625" value="1" />
-                  <div class="indicator-scale" data-range="thumbDiameter"></div>
-                </div>
-              </div>
-              <div class="indicator-control">
-                <label for="thumbSolid">サムソリッド外径</label>
-                <div class="indicator-wrap">
-                  <select id="thumbSolid">
-                    <option value="1.125">1 1/8"</option>
-                    <option value="1.25" selected>1 1/4"</option>
-                    <option value="1.375">1 3/8"</option>
-                  </select>
-                </div>
-              </div>
-              <div class="indicator-control">
-                <label for="thumbSolidWall">サムソリッド肉厚</label>
-                <div class="indicator-wrap">
-                  <output id="thumbSolidWall" class="pitch-readout">1/8"</output>
-                </div>
-              </div>
-            </div>
             <div class="pitch-grid single">
               <div class="pitch-pad" data-hole="thumb">
                 <h3>サムピッチ</h3>
@@ -1720,6 +2028,46 @@
                   <div class="indicator-scale" data-range="thumbDrillDepth"></div>
                 </div>
               </div>
+            <div class="material-grid">
+              <div class="material-field">
+                <label for="thumbSolidMode">サムソリッド</label>
+                <select id="thumbSolidMode">
+                  <option value="yes" selected>使用する</option>
+                  <option value="no">使用しない</option>
+                </select>
+              </div>
+            </div>
+            <div class="measure-indicators">
+              <div class="indicator-control size-gauge-control">
+                <label for="thumbDiameter">サム内径</label>
+                <div class="indicator-wrap">
+                  <input id="thumbDiameter" type="range" min="0.5" max="1.25" step="0.015625" value="1" />
+                  <button id="thumbDiameterGauge" class="span-horizontal-gauge" type="button" data-span-range="thumbDiameter" aria-label="サム内径">
+                    <span class="span-gauge-min"></span>
+                    <span class="span-gauge-track"></span>
+                    <span class="span-gauge-current"></span>
+                    <span class="span-gauge-value"></span>
+                    <span class="span-gauge-max"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="indicator-control">
+                <label for="thumbSolid">サムソリッド外径</label>
+                <div class="indicator-wrap">
+                  <select id="thumbSolid">
+                    <option value="1.125">1 1/8"</option>
+                    <option value="1.25" selected>1 1/4"</option>
+                    <option value="1.375">1 3/8"</option>
+                  </select>
+                </div>
+              </div>
+              <div class="indicator-control">
+                <label for="thumbSolidWall">サムソリッド肉厚</label>
+                <div class="indicator-wrap">
+                  <output id="thumbSolidWall" class="pitch-readout">1/8"</output>
+                </div>
+              </div>
+            </div>
             </div>
           </section>
       </div>
@@ -1750,6 +2098,16 @@
         <h1>グリップセンター ドリルレイアウト</h1>
         <p>仮のグリップセンターを基準に、水平線と垂線、端点間スパン、ブリッジから三穴の位置を描画します。</p>
       </div>
+      <div id="gripShapeOverlay" class="grip-shape-overlay" aria-label="フィンガーグリップ形状">
+        <div class="grip-shape-item middle">
+          <span class="grip-shape-symbol">-</span>
+          <span class="grip-shape-text">中指 -</span>
+        </div>
+        <div class="grip-shape-item ring">
+          <span class="grip-shape-symbol">-</span>
+          <span class="grip-shape-text">薬指 -</span>
+        </div>
+      </div>
       <div class="legend">
         <span><i class="dot" style="background: var(--gc)"></i>グリップセンター</span>
         <span class="thumb-dependent"><i class="dot" style="background: var(--thumb)"></i>サム</span>
@@ -1771,6 +2129,16 @@
     const TIP_FLAT_THICKNESS = 1 / 16;
     const SEMI_BUMP_DEPTH = 1 / 16;
     const SEMI_BUMP_THICKNESS = 1 / 16;
+    const GRIP_SHAPE_PRESETS = {
+      none: { kind: "bare", label: "素掘り" },
+      rubberSheet: { kind: "rubberSheet", label: "板ゴム", linerThickness: 1 / 64 },
+      oval: { kind: "oval", label: "Perfect Oval", ovalX: 0.82, ovalY: 0.54 },
+      powerOval: { kind: "powerOval", label: "Power Oval", ovalX: 0.82, ovalY: 0.54, forwardPitch: 1 / 8 },
+      tip: { kind: "powerLift", label: "Power Lift 1/4", lift: 1 / 4, flatThickness: TIP_FLAT_THICKNESS },
+      powerLift: { kind: "powerLift", label: "Power Lift 1/4", lift: 1 / 4, flatThickness: TIP_FLAT_THICKNESS },
+      semi: { kind: "semiBump", label: "Semi-Super Bump", bumpDepth: SEMI_BUMP_DEPTH, bumpThickness: SEMI_BUMP_THICKNESS },
+      powerNub: { kind: "powerNub", label: "Power Nub", nubRows: 3 }
+    };
     const DRILL_BIT_SIZES = range64(32, 80);
     const GRIP_INNER_BY_OUTER = {
       "0.875": range64(34, 49),
@@ -1831,9 +2199,11 @@
     updateAllPitchCrossControls();
     setupDepthGauges();
     updateAllDepthGauges();
+    setupSpanInputControls();
 
     document.querySelector("#handedness").addEventListener("change", (event) => {
       document.querySelector("#measureDiagram").dataset.hand = event.target.value;
+      updateSpanInputControls();
       draw();
     });
 
@@ -1841,12 +2211,14 @@
     document.querySelector("#twoHandThumbUse")?.addEventListener("change", updateBowlingStyleMode);
 
     updateAllFingerGripControls();
+    updateAllGripShapePreviews();
 
     document.querySelector("#thumbSolidMode").addEventListener("change", updateThumbSolidMode);
     document.querySelectorAll("select").forEach((select) => {
       if (!["handedness", "thumbSolidMode", "profileList", "bowlingStyle", "twoHandThumbUse"].includes(select.id)) {
         select.addEventListener("change", () => {
           updateAllFingerGripControls();
+          updateAllGripShapePreviews();
           draw();
         });
       }
@@ -2221,11 +2593,137 @@
       const diagram = document.querySelector("#measureDiagram");
       if (diagram) diagram.dataset.thumbEnabled = enabled ? "true" : "false";
       requestAnimationFrame(refreshIndicatorScales);
+      requestAnimationFrame(updateSpanInputControls);
       draw();
     }
 
     function refreshIndicatorScales() {
       document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
+    }
+
+    function setupSpanInputControls() {
+      updateSpanInputControls();
+      document.querySelectorAll(".span-vertical-gauge, .span-horizontal-gauge").forEach((gauge) => {
+        const applyPointer = (event) => {
+          event.preventDefault();
+          setSpanGaugeFromPointer(gauge, event);
+        };
+        gauge.addEventListener("pointerdown", (event) => {
+          gauge.setPointerCapture?.(event.pointerId);
+          gauge.dataset.dragging = "true";
+          applyPointer(event);
+        });
+        gauge.addEventListener("pointermove", (event) => {
+          if (gauge.dataset.dragging === "true") applyPointer(event);
+        });
+        gauge.addEventListener("pointerup", (event) => {
+          gauge.releasePointerCapture?.(event.pointerId);
+          delete gauge.dataset.dragging;
+        });
+        gauge.addEventListener("pointercancel", () => {
+          delete gauge.dataset.dragging;
+        });
+        gauge.addEventListener("keydown", (event) => {
+          if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+          event.preventDefault();
+          nudgeSpanGauge(gauge, event.key);
+        });
+      });
+    }
+
+    function updateSpanInputControls() {
+      const section = document.querySelector("#spanGaugeSection");
+      if (section) section.dataset.hand = selectValue("handedness") || "right";
+      document.querySelectorAll(".span-vertical-gauge, .span-horizontal-gauge").forEach((gauge) => {
+        const range = document.querySelector("#" + gauge.dataset.spanRange);
+        if (range) updateSpanGaugeForRange(range);
+      });
+    }
+
+    function setSpanGaugeFromPointer(gauge, event) {
+      const range = document.querySelector("#" + gauge.dataset.spanRange);
+      if (!range) return;
+      const rect = gauge.getBoundingClientRect();
+      const min = Number(range.min);
+      const max = Number(range.max);
+      let ratio;
+      if (gauge.classList.contains("span-vertical-gauge")) {
+        ratio = 1 - clamp((event.clientY - rect.top) / rect.height, 0, 1);
+      } else {
+        ratio = clamp((event.clientX - rect.left) / rect.width, 0, 1);
+      }
+      setRangeValue(range, min + ratio * (max - min));
+    }
+
+    function nudgeSpanGauge(gauge, key) {
+      const range = document.querySelector("#" + gauge.dataset.spanRange);
+      if (!range) return;
+      const step = Number(range.step) || 1 / 32;
+      const min = Number(range.min);
+      const max = Number(range.max);
+      let next = Number(range.value) || min;
+      if (key === "Home") next = min;
+      else if (key === "End") next = max;
+      else if (key === "ArrowUp" || key === "ArrowRight") next += step;
+      else next -= step;
+      setRangeValue(range, next);
+    }
+
+    function updateSpanGaugeForRange(range) {
+      const gauge = document.querySelector("[data-span-range=\"" + range.id + "\"]");
+      if (!gauge) return;
+      const min = Number(range.min);
+      const max = Number(range.max);
+      const value = clamp(Number(range.value), min, max);
+      const percent = clamp((value - min) / (max - min) * 100, 0, 100);
+      const displayPercent = gauge.classList.contains("span-vertical-gauge") ? 100 - percent : percent;
+      renderSpanGaugeTicks(gauge, min, max, range);
+      const current = gauge.querySelector(".span-gauge-current");
+      const valueEl = gauge.querySelector(".span-gauge-value");
+      const minEl = gauge.querySelector(".span-gauge-min");
+      const maxEl = gauge.querySelector(".span-gauge-max");
+      if (gauge.classList.contains("span-vertical-gauge")) {
+        if (current) {
+          current.style.left = "50%";
+          current.style.top = displayPercent + "%";
+        }
+        if (valueEl) {
+          valueEl.style.left = "50%";
+          valueEl.style.top = clamp(displayPercent, 14, 86) + "%";
+        }
+      } else {
+        if (current) {
+          current.style.left = percent + "%";
+          current.style.top = "50%";
+        }
+        if (valueEl) {
+          valueEl.style.left = clamp(percent, 14, 86) + "%";
+          valueEl.style.top = "50%";
+        }
+      }
+      if (valueEl) valueEl.textContent = formatInch(value);
+      if (minEl) minEl.textContent = formatInch(min);
+      if (maxEl) maxEl.textContent = formatInch(max);
+    }
+
+    function renderSpanGaugeTicks(gauge, min, max, range) {
+      const key = range.id + ":" + min + ":" + max + ":" + range.step;
+      if (gauge.dataset.ticksKey === key) return;
+      gauge.querySelectorAll(".span-gauge-tick").forEach((tick) => tick.remove());
+      const tickUnit = range.id === "bridge" || range.id === "thumbDiameter" ? 1 / 16 : 0.25;
+      const first = Math.ceil(min / tickUnit) * tickUnit;
+      for (let raw = first; raw <= max + 1e-8; raw += tickUnit) {
+        const value = Math.round(raw * 64) / 64;
+        const percent = clamp((value - min) / (max - min) * 100, 0, 100);
+        const tick = document.createElement("i");
+        const tickBase = range.id === "bridge" || range.id === "thumbDiameter" ? 16 : 4;
+        const units = Math.round(Math.abs(value) * tickBase);
+        tick.className = "span-gauge-tick " + (units % 2 === 0 ? "major" : "");
+        if (gauge.classList.contains("span-vertical-gauge")) tick.style.top = (100 - percent) + "%";
+        else tick.style.left = percent + "%";
+        gauge.appendChild(tick);
+      }
+      gauge.dataset.ticksKey = key;
     }
 
     function setValueOutput(range, output) {
@@ -2273,6 +2771,42 @@
 
     function updateAllFingerGripControls() {
       ["middle", "ring"].forEach(updateFingerGripControls);
+    }
+
+    function updateAllGripShapePreviews() {
+      ["middle", "ring"].forEach(renderGripShapePreview);
+    }
+
+    function renderGripShapePreview(hole) {
+      const svg = document.querySelector("#" + hole + "GripPreview");
+      const name = document.querySelector("#" + hole + "GripPreviewName");
+      if (!svg) return;
+      const type = selectValue(hole + "GripType") || "none";
+      const label = gripTypeLabel(type);
+      if (name) name.textContent = label;
+      svg.innerHTML = gripShapePreviewSvg(type, label);
+    }
+
+    function gripShapePreviewSvg(type, label) {
+      const outer = '<circle class="outer" cx="110" cy="74" r="62"></circle>';
+      const circle = '<circle class="inner" cx="110" cy="74" r="42"></circle>';
+      const caption = '<text x="110" y="140" text-anchor="middle">' + escapeHtml(label) + '</text>';
+      if (type === "none") return outer + circle + '<text x="110" y="78" text-anchor="middle">素掘り</text>' + caption;
+      if (type === "rubberSheet") return outer + circle + '<circle class="guide" cx="110" cy="74" r="34"></circle>' + caption;
+      if (type === "oval") return outer + circle + '<path class="guide" d="M76 100 Q110 116 144 100"></path><text x="110" y="113" text-anchor="middle">下側オーバル</text>' + caption;
+      if (type === "powerOval") return outer + circle + '<path class="guide" d="M74 96 Q110 120 146 96"></path><path class="guide" d="M84 107 L136 107"></path><text x="110" y="122" text-anchor="middle">下側 +1/8</text>' + caption;
+      if (type === "tip" || type === "powerLift") return outer + circle + '<path class="accent" d="M72 101 L148 101 L137 116 L83 116 Z"></path><path class="guide" d="M76 101 L144 101"></path><text x="110" y="113" text-anchor="middle">flat</text>' + caption;
+      if (type === "semi") return outer + circle + '<ellipse class="accent" cx="110" cy="103" rx="34" ry="12"></ellipse><text x="110" y="107" text-anchor="middle">bump</text>' + caption;
+      if (type === "powerNub") {
+        let dots = "";
+        for (const y of [94, 106]) for (const x of [86, 102, 118, 134]) dots += '<circle class="accent" cx="' + x + '" cy="' + y + '" r="4"></circle>';
+        return outer + circle + dots + '<text x="110" y="119" text-anchor="middle">nub</text>' + caption;
+      }
+      return outer + circle + caption;
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch] || ch));
     }
 
     function updateFingerGripControls(hole) {
@@ -2340,6 +2874,7 @@
       marker.style.left = `${safePercent}%`;
       label.style.left = `${clamp(safePercent, 12, 88)}%`;
       label.textContent = range.id.endsWith("Axis") ? pitchAxisLabel(range.id, value) : formatInch(value);
+      if (["middleSpan", "ringSpanOffset", "bridge"].includes(range.id)) updateSpanGaugeForRange(range);
       updatePitchCrossForRange(range);
       updateDepthGaugeForRange(range);
     }
@@ -2401,6 +2936,7 @@
       const value = clamp(snapToStep(rawValue, range.step), Number(range.min), Number(range.max));
       range.value = value;
       setValueOutput(range, document.querySelector(`#${range.id}Value`));
+      if (document.querySelector(`[data-span-range="${range.id}"]`)) updateSpanGaugeForRange(range);
       if (shouldDraw) draw();
     }
 
@@ -2773,6 +3309,7 @@
           type,
           length: value(`${hole}DrillDepth`),
           spanReference: fingerSpanReference(type),
+          shapePreset: gripShapePreset(type),
           usesBare: true
         };
       }
@@ -2787,12 +3324,13 @@
         type,
         length: FINGER_GRIP_LENGTH,
         spanReference: fingerSpanReference(type),
+        shapePreset: gripShapePreset(type),
         usesBare: false
       };
     }
 
     function fingerSpanReference(type) {
-      if (type === "tip") {
+      if (type === "tip" || type === "powerLift") {
         return {
           label: "チップ フラットゾーン",
           depth: FINGER_GRIP_LENGTH,
@@ -2806,6 +3344,20 @@
           radialOffset: SEMI_BUMP_THICKNESS / 2
         };
       }
+      if (type === "powerOval") {
+        return {
+          label: "Power Oval 基準",
+          depth: 0,
+          radialOffset: 1 / 16
+        };
+      }
+      if (type === "powerNub") {
+        return {
+          label: "Power Nub 突起面",
+          depth: 0,
+          radialOffset: 1 / 32
+        };
+      }
       return {
         label: "フィンガー内径端点",
         depth: 0,
@@ -2813,13 +3365,19 @@
       };
     }
 
+    function gripShapePreset(type) {
+      return GRIP_SHAPE_PRESETS[type] || GRIP_SHAPE_PRESETS.oval;
+    }
+
     function gripTypeLabel(type) {
       return {
         none: "素掘り",
-        semi: "セミグリップ",
-        tip: "チップグリップ",
-        oval: "オーバルグリップ",
-        powerOval: "パワーオーバル",
+        semi: "Semi-Super Bump",
+        tip: "Power Lift",
+        powerLift: "Power Lift",
+        oval: "Perfect Oval",
+        powerOval: "Power Oval",
+        powerNub: "Power Nub",
         rubberSheet: "板ゴム"
       }[type] || "グリップ";
     }
@@ -2880,6 +3438,91 @@
       renderSheetPitchTokens(data);
       renderGripWallOutputs(data);
       renderWarning(collisions);
+    }
+
+    function renderGripShapeOverlay(data) {
+      const overlay = document.querySelector("#gripShapeOverlay");
+      if (!overlay) return;
+      [
+        ["middle", data.middle, "中指"],
+        ["ring", data.ring, "薬指"]
+      ].forEach(([id, hole, label]) => {
+        const item = overlay.querySelector("." + id);
+        if (!item || !hole) return;
+        const preset = hole.shapePreset || { kind: "bare", label: gripTypeLabel(hole.type) };
+        const symbol = item.querySelector(".grip-shape-symbol");
+        const text = item.querySelector(".grip-shape-text");
+        if (symbol) symbol.textContent = gripShapeSymbol(preset.kind);
+        if (text) text.textContent = label + " " + (preset.label || gripTypeLabel(hole.type));
+      });
+    }
+
+    function drawGripShapeBadges(data, cx, cy, scale) {
+      [data.middle, data.ring].forEach((hole, index) => {
+        if (!hole?.shapePreset) return;
+        const segment = drillSegment(hole, data, drilledOpeningRadius(hole));
+        const center = project(segment.start, scale, cx, cy);
+        const radius = Math.max(20, drilledOpeningRadius(hole) * scale * 0.58);
+        const symbol = gripShapeSymbol(hole.shapePreset.kind);
+        const label = hole.shapePreset.label || gripTypeLabel(hole.type);
+        ctx.save();
+        ctx.lineWidth = Math.max(2.4, radius * 0.08);
+        ctx.strokeStyle = "rgba(255,255,255,.96)";
+        ctx.fillStyle = hexToRgba(hole.color, 0.26);
+        ctx.beginPath();
+        ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.strokeStyle = hexToRgba(hole.color, 1);
+        ctx.lineWidth = Math.max(2.2, radius * 0.07);
+        ctx.beginPath();
+        ctx.arc(center.x, center.y, radius * 0.72, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(255,255,255,.98)";
+        ctx.strokeStyle = "rgba(0,0,0,.75)";
+        ctx.lineWidth = 3;
+        ctx.font = Math.max(16, Math.min(24, radius * 0.5)) + "px Segoe UI, system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.strokeText(symbol, center.x, center.y);
+        ctx.fillText(symbol, center.x, center.y);
+        const side = index === 0 ? -1 : 1;
+        const labelX = center.x + side * Math.max(72, radius * 1.5);
+        const labelY = center.y - Math.max(46, radius * 1.18);
+        drawMeasureConnector(center.x + side * radius * 0.75, center.y - radius * 0.45, labelX, labelY, hexToRgba(hole.color, 0.95), [4, 4]);
+        drawGripShapeBadgeLabel(hole.name + " " + label, labelX, labelY, hole.color, side);
+        ctx.restore();
+      });
+    }
+
+    function gripShapeSymbol(kind) {
+      return {
+        oval: "O",
+        powerOval: "PO",
+        powerLift: "L",
+        semiBump: "B",
+        powerNub: "N",
+        rubberSheet: "R",
+        bare: "-"
+      }[kind] || "G";
+    }
+
+    function drawGripShapeBadgeLabel(text, x, y, color, side) {
+      ctx.save();
+      ctx.font = "12px Segoe UI, system-ui, sans-serif";
+      const width = ctx.measureText(text).width + 12;
+      const boxX = side < 0 ? x - width : x;
+      ctx.fillStyle = "rgba(4,8,10,.88)";
+      ctx.strokeStyle = hexToRgba(color, 0.72);
+      ctx.lineWidth = 1;
+      roundRect(boxX, y - 11, width, 22, 6);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "rgba(245,250,252,.98)";
+      ctx.textAlign = side < 0 ? "right" : "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, side < 0 ? boxX + width - 6 : boxX + 6, y);
+      ctx.restore();
     }
 
     function renderGripWallOutputs(data) {
@@ -3216,8 +3859,7 @@
         [lowDistance, highDistance] = [highDistance, lowDistance];
       }
       if (targetSpan < lowDistance - 1e-4 || targetSpan > highDistance + 1e-4) {
-        finger.edgeY = originalEdgeY;
-        finger.y = originalY;
+        applyFingerEdgeY(finger, targetSpan < lowDistance ? low : high);
         return;
       }
       for (let i = 0; i < 28; i++) {
@@ -3971,6 +4613,7 @@
       if (hole.innerRadius && hole.innerRadius < hole.outerRadius - 1 / 128) {
         drawInnerOpening(segment, hole.innerRadius, cx, cy, scale, hole.color);
       }
+      drawShapedFingerOpening(hole, segment, cx, cy, scale);
 
       ctx.fillStyle = "rgba(255,255,255,.42)";
       ctx.beginPath();
@@ -3995,9 +4638,281 @@
       innerGradient.addColorStop(0, "rgba(0,0,0,0.98)");
       innerGradient.addColorStop(1, "rgba(12,16,19,0.9)");
       ctx.fillStyle = innerGradient;
-      ctx.strokeStyle = hexToRgba(color, 0.95);
+      ctx.strokeStyle = "rgba(255,255,255,.95)";
       ctx.lineWidth = 2;
       ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawShapedFingerOpening(hole, segment, cx, cy, scale) {
+      if (!hole.shapePreset || hole.name === "サム") return;
+      const preset = hole.shapePreset;
+      const center = project(segment.start, scale, cx, cy);
+      const r = Math.max(18, hole.innerRadius * scale * 1.08);
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.shadowColor = "rgba(0,0,0,.78)";
+      ctx.shadowBlur = 7;
+      ctx.lineWidth = Math.max(3.4, r * 0.11);
+      ctx.strokeStyle = "rgba(255,255,255,.98)";
+      ctx.fillStyle = "rgba(0,0,0,.76)";
+      if (preset.kind === "oval" || preset.kind === "powerOval") drawModeledOvalOpening(center, r, preset, hole.color);
+      else if (preset.kind === "powerLift") drawModeledPowerLiftOpening(center, r, hole.color);
+      else if (preset.kind === "semiBump") drawModeledSemiBumpOpening(center, r, hole.color);
+      else if (preset.kind === "powerNub") drawModeledPowerNubOpening(center, r, hole.color);
+      else if (preset.kind === "rubberSheet") drawModeledRubberSheetOpening(center, r, hole.color);
+      ctx.restore();
+    }
+
+    function drawModeledCircularBase(center, r) {
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, r * 0.92, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    function drawModeledOvalOpening(center, r, preset, color) {
+      drawModeledCircularBase(center, r);
+      ctx.save();
+      ctx.strokeStyle = hexToRgba(color, 1);
+      ctx.lineWidth = Math.max(3, r * 0.1);
+      ctx.beginPath();
+      ctx.moveTo(center.x - r * 0.72, center.y + r * 0.42);
+      ctx.quadraticCurveTo(center.x, center.y + r * 0.78, center.x + r * 0.72, center.y + r * 0.42);
+      ctx.stroke();
+      if (preset.kind === "powerOval") {
+        ctx.beginPath();
+        ctx.moveTo(center.x - r * 0.5, center.y + r * 0.56);
+        ctx.lineTo(center.x + r * 0.5, center.y + r * 0.56);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawModeledPowerLiftOpening(center, r, color) {
+      drawModeledCircularBase(center, r);
+      ctx.save();
+      ctx.fillStyle = hexToRgba(color, 0.82);
+      ctx.strokeStyle = "rgba(255,255,255,.98)";
+      ctx.lineWidth = Math.max(2.8, r * 0.09);
+      ctx.beginPath();
+      ctx.moveTo(center.x - r * 0.72, center.y + r * 0.48);
+      ctx.lineTo(center.x + r * 0.72, center.y + r * 0.48);
+      ctx.lineTo(center.x + r * 0.5, center.y + r * 0.76);
+      ctx.lineTo(center.x - r * 0.5, center.y + r * 0.76);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawModeledSemiBumpOpening(center, r, color) {
+      drawModeledCircularBase(center, r);
+      ctx.save();
+      ctx.fillStyle = hexToRgba(color, 0.86);
+      ctx.strokeStyle = "rgba(255,255,255,.98)";
+      ctx.lineWidth = Math.max(2.6, r * 0.08);
+      ctx.beginPath();
+      ctx.ellipse(center.x, center.y + r * 0.52, r * 0.48, r * 0.18, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawModeledPowerNubOpening(center, r, color) {
+      drawModeledCircularBase(center, r);
+      ctx.save();
+      ctx.fillStyle = hexToRgba(color, 1);
+      for (const y of [0.4, 0.58]) {
+        for (const x of [-0.45, -0.2, 0.05, 0.3, 0.55]) {
+          if (Math.hypot(x, y) > 0.82) continue;
+          ctx.beginPath();
+          ctx.arc(center.x + x * r, center.y + y * r, Math.max(2.8, r * 0.075), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawModeledRubberSheetOpening(center, r, color) {
+      drawModeledCircularBase(center, r);
+      ctx.save();
+      ctx.strokeStyle = hexToRgba(color, 1);
+      ctx.lineWidth = Math.max(4, r * 0.13);
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, r * 0.76, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawFingerInsertShape(hole, segment, cx, cy, scale) {
+      if (!hole.shapePreset) return;
+      const preset = hole.shapePreset;
+      const center = project(segment.start, scale, cx, cy);
+      const radius = Math.max(18, drilledOpeningRadius(hole) * scale * 0.62);
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = hexToRgba(hole.color, 1);
+      ctx.fillStyle = hexToRgba(hole.color, 0.3);
+      ctx.lineWidth = Math.max(2.2, radius * 0.08);
+      drawInsertShapeBackdrop(center, radius, hole.color);
+      if (preset.kind === "rubberSheet") {
+        drawInsertRing(center, radius * 0.88, radius * 0.98, hole.color);
+      } else if (preset.kind === "oval" || preset.kind === "powerOval") {
+        drawInsertOval(center, radius, preset, hole.color);
+        if (preset.kind === "powerOval") drawInsertPowerBias(center, radius, hole.color, "1/8");
+      } else if (preset.kind === "powerLift") {
+        drawInsertPowerLift(center, radius, hole.color);
+      } else if (preset.kind === "semiBump") {
+        drawInsertSemiBump(center, radius, hole.color);
+      } else if (preset.kind === "powerNub") {
+        drawInsertPowerNubs(center, radius, hole.color);
+      }
+      drawInsertShapeLabel(center, radius, preset.label || gripTypeLabel(hole.type), hole.color);
+      drawInsertCenterGlyph(center, radius, preset, hole.color);
+      ctx.restore();
+    }
+
+    function drawInsertShapeBackdrop(center, radius, color) {
+      ctx.save();
+      ctx.fillStyle = "rgba(2,5,7,.68)";
+      ctx.strokeStyle = "rgba(255,255,255,.72)";
+      ctx.lineWidth = Math.max(1.5, radius * 0.055);
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, radius * 1.04, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle = hexToRgba(color, 0.96);
+      ctx.lineWidth = Math.max(1.4, radius * 0.045);
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, radius * 0.92, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawInsertCenterGlyph(center, radius, preset, color) {
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,.96)";
+      ctx.strokeStyle = hexToRgba(color, 1);
+      ctx.lineWidth = Math.max(2, radius * 0.07);
+      const mark = { oval: "O", powerOval: "PO", powerLift: "L", semiBump: "B", powerNub: "N", rubberSheet: "R" }[preset.kind] || "G";
+      ctx.font = Math.max(12, Math.min(18, radius * 0.34)) + "px Segoe UI, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.strokeText(mark, center.x, center.y);
+      ctx.fillText(mark, center.x, center.y);
+      ctx.restore();
+    }
+
+    function drawInsertShapeLabel(center, radius, label, color) {
+      if (!label) return;
+      ctx.save();
+      const text = label.replace("Semi-Super ", "S-").replace("Perfect ", "").replace("Power ", "P-");
+      ctx.font = Math.max(9, Math.min(12, radius * 0.2)) + "px Segoe UI, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const width = ctx.measureText(text).width + 8;
+      const x = center.x;
+      const y = center.y + radius * 1.18;
+      ctx.fillStyle = "rgba(5,8,10,.86)";
+      ctx.strokeStyle = hexToRgba(color, 0.72);
+      ctx.lineWidth = 1;
+      roundRect(x - width / 2, y - 8, width, 16, 4);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "rgba(245,250,252,.96)";
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+
+    function drawInsertOval(center, radius, preset, color) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(center.x, center.y, radius * (preset.ovalX || 0.82), radius * (preset.ovalY || 0.54), 0, 0, Math.PI * 2);
+      ctx.fillStyle = hexToRgba(color, 0.28);
+      ctx.strokeStyle = "rgba(255,255,255,.95)";
+      ctx.lineWidth = Math.max(2.2, radius * 0.09);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawInsertPowerBias(center, radius, color, label) {
+      ctx.save();
+      const y = center.y - radius * 0.34;
+      ctx.strokeStyle = "rgba(255,255,255,.95)";
+      ctx.lineWidth = 1.7;
+      ctx.beginPath();
+      ctx.moveTo(center.x - radius * 0.36, y);
+      ctx.quadraticCurveTo(center.x, y - radius * 0.18, center.x + radius * 0.36, y);
+      ctx.stroke();
+      ctx.fillStyle = hexToRgba(color, 0.95);
+      ctx.font = "9px Segoe UI, system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillText(label, center.x, y - radius * 0.08);
+      ctx.restore();
+    }
+
+    function drawInsertPowerLift(center, radius, color) {
+      ctx.save();
+      ctx.fillStyle = hexToRgba(color, 0.38);
+      ctx.strokeStyle = "rgba(255,255,255,.95)";
+      ctx.lineWidth = 1.8;
+      const flatY = center.y + radius * 0.36;
+      ctx.beginPath();
+      ctx.moveTo(center.x - radius * 0.58, flatY);
+      ctx.lineTo(center.x + radius * 0.58, flatY);
+      ctx.lineTo(center.x + radius * 0.42, center.y + radius * 0.08);
+      ctx.lineTo(center.x - radius * 0.42, center.y + radius * 0.08);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawInsertSemiBump(center, radius, color) {
+      ctx.save();
+      ctx.fillStyle = hexToRgba(color, 0.4);
+      ctx.strokeStyle = "rgba(255,255,255,.95)";
+      ctx.lineWidth = 1.8;
+      const bumpY = center.y - radius * 0.42;
+      ctx.beginPath();
+      ctx.moveTo(center.x - radius * 0.5, bumpY + radius * 0.16);
+      ctx.quadraticCurveTo(center.x, bumpY - radius * 0.24, center.x + radius * 0.5, bumpY + radius * 0.16);
+      ctx.quadraticCurveTo(center.x, bumpY + radius * 0.3, center.x - radius * 0.5, bumpY + radius * 0.16);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawInsertPowerNubs(center, radius, color) {
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,.96)";
+      const rows = [-0.28, 0, 0.28];
+      for (const row of rows) {
+        for (let i = -2; i <= 2; i++) {
+          const x = center.x + i * radius * 0.2;
+          const y = center.y + row * radius;
+          if (Math.hypot(x - center.x, y - center.y) > radius * 0.62) continue;
+          ctx.beginPath();
+          ctx.arc(x, y, Math.max(2.6, radius * 0.085), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawInsertRing(center, innerRadius, outerRadius, color) {
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,.95)";
+      ctx.lineWidth = Math.max(3.2, outerRadius - innerRadius);
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, (innerRadius + outerRadius) / 2, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     }
