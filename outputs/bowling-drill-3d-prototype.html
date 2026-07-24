@@ -219,6 +219,67 @@
 
     .save-panel h2 { margin-bottom: 10px; }
 
+    .dual-layout-panel {
+      background:
+        linear-gradient(135deg, rgba(241,199,95,.09), transparent 44%),
+        var(--panel-2);
+    }
+
+    .dual-layout-panel h2 {
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+
+    .dual-layout-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      align-items: end;
+    }
+
+    .dual-layout-field {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .dual-layout-field.wide { grid-column: span 2; }
+
+    .dual-layout-field select,
+    .dual-layout-field input[type="range"] {
+      width: 100%;
+    }
+
+    .dual-layout-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #11161a;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .dual-layout-field output {
+      color: var(--text);
+      font-weight: 800;
+      justify-self: end;
+    }
+
+    .dual-layout-readout {
+      grid-column: 1 / -1;
+      margin: 0;
+      padding-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
     .save-controls {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1727,6 +1788,52 @@
         <p id="saveStatus" class="save-status"></p>
       </section>
 
+      <section class="section section-wide dual-layout-panel">
+        <h2>Dual Angle レイアウト</h2>
+        <div class="dual-layout-grid">
+          <label class="dual-layout-field wide">
+            <span>算出GC</span>
+            <span class="dual-layout-toggle"><input id="useDualAngleLayout" type="checkbox" checked /> 表面レイアウトを表示</span>
+          </label>
+          <label class="dual-layout-field">
+            <span>コア</span>
+            <select id="layoutCoreType">
+              <option value="morph" selected>非対称 / MB</option>
+              <option value="symmetric">対称 / vMB</option>
+            </select>
+          </label>
+          <label class="dual-layout-field">
+            <span>ドリル角 <output id="layoutDrillAngleValue">45°</output></span>
+            <input id="layoutDrillAngle" type="range" min="-120" max="120" step="1" value="45" />
+          </label>
+          <label class="dual-layout-field">
+            <span>PIN-PAP <output id="layoutPinPapValue">4 1/2"</output></span>
+            <input id="layoutPinPap" type="range" min="0" max="6.5" step="0.0625" value="4.5" />
+          </label>
+          <label class="dual-layout-field">
+            <span>VAL角 <output id="layoutValAngleValue">45°</output></span>
+            <input id="layoutValAngle" type="range" min="-120" max="120" step="1" value="45" />
+          </label>
+          <label class="dual-layout-field">
+            <span>PAP左右 <output id="layoutPapRightValue">5"</output></span>
+            <input id="layoutPapRight" type="range" min="-7" max="7" step="0.0625" value="5" />
+          </label>
+          <label class="dual-layout-field">
+            <span>PAP上下 <output id="layoutPapUpValue">0"</output></span>
+            <input id="layoutPapUp" type="range" min="-3" max="3" step="0.0625" value="0" />
+          </label>
+          <label class="dual-layout-field">
+            <span>偏心X <output id="layoutEccXValue">1/2"</output></span>
+            <input id="layoutEccX" type="range" min="-1.5" max="1.5" step="0.0625" value="0.5" />
+          </label>
+          <label class="dual-layout-field">
+            <span>偏心Y <output id="layoutEccYValue">1/4"</output></span>
+            <input id="layoutEccY" type="range" min="-1.5" max="1.5" step="0.0625" value="0.25" />
+          </label>
+          <p id="dualLayoutReadout" class="dual-layout-readout">Dual Angleガイドは未表示です。</p>
+        </div>
+      </section>
+
       <div class="sheet-control-groups section-wide">
           <div class="sheet-hidden-controls" aria-hidden="true">
             <input id="middleSpan" type="range" min="2.5" max="5.5" step="0.03125" value="4" />
@@ -2091,7 +2198,7 @@
       <canvas id="scene" aria-label="grip center drill layout preview"></canvas>
       <div class="title">
         <h1>グリップセンター ドリルレイアウト</h1>
-        <p>仮のグリップセンターを基準に、水平線と垂線、端点間スパン、ブリッジから三穴の位置を描画します。</p>
+        <p>手入力またはDual Angleで算出したグリップセンターを基準に、三穴位置、端点間スパン、ブリッジ、表面レイアウトを描画します。</p>
       </div>
       <div id="gripShapeOverlay" class="grip-shape-overlay" aria-label="フィンガーグリップ形状">
         <div class="grip-shape-item middle">
@@ -2108,6 +2215,8 @@
         <span class="thumb-dependent"><i class="dot" style="background: var(--thumb)"></i>サム</span>
         <span><i class="dot" style="background: var(--middle)"></i>中指</span>
         <span><i class="dot" style="background: var(--ring)"></i>薬指</span>
+        <span><i class="dot" style="background: #ff6b4a"></i>PIN</span>
+        <span><i class="dot" style="background: #ffd166"></i>CG/MB/PAP</span>
       </div>
       <div class="zoom-hud">ズーム <output id="zoomValue">100%</output></div>
     </section>
@@ -2146,16 +2255,31 @@
       middle: 25 / 32,
       ring: 3 / 4
     };
+    const DUAL_LAYOUT_COLORS = {
+      pin: "#ff6b4a",
+      cg: "#ffd166",
+      mb: "#b893ff",
+      pap: "#67e8f9",
+      gripCenter: "#fff07a",
+      drill: "rgba(255, 107, 74, .96)",
+      val: "rgba(103, 232, 249, .92)",
+      reverse: "rgba(255, 240, 122, .92)",
+      pinMb: "rgba(184, 147, 255, .74)"
+    };
+    const FIXED_PIN_DIRECTION = { x: 1.15, y: 0.82, z: 3.2 };
     const state = {
-      yaw: -0.35,
-      pitch: 0.12,
+      yaw: 0.26358718708911943,
+      pitch: 0.7021046853775719,
+      roll: 1.7747815304975176,
       zoom: 1,
       dragging: false,
       lastX: 0,
       lastY: 0,
       pointers: new Map(),
       pinchDistance: 0,
-      pinchZoom: 1
+      pinchZoom: 1,
+      layoutOrigin: null,
+      layoutBasis: null
     };
 
     document.querySelectorAll("input[type='range']").forEach((range) => {
@@ -2201,6 +2325,7 @@
       updateSpanInputControls();
       draw();
     });
+    document.querySelector("#useDualAngleLayout")?.addEventListener("change", draw);
 
     document.querySelector("#bowlingStyle")?.addEventListener("change", updateBowlingStyleMode);
     document.querySelector("#twoHandThumbUse")?.addEventListener("change", updateBowlingStyleMode);
@@ -2285,16 +2410,21 @@
         if (select.id === "profileList") return;
         selects[select.id] = select.value;
       });
+      const checks = {};
+      document.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
+        checks[checkbox.id] = checkbox.checked;
+      });
       const person = currentProfilePerson();
       const existingProfile = readProfiles()[person.displayName || ""];
-      const changeEntry = buildChangeEntry(existingProfile, { person, ranges, selects });
+      const changeEntry = buildChangeEntry(existingProfile, { person, ranges, selects, checks });
       return {
         version: 2,
         savedAt: new Date().toISOString(),
         person,
         changeLog: existingProfile?.changeLog ? [...existingProfile.changeLog, changeEntry] : [changeEntry],
         ranges,
-        selects
+        selects,
+        checks
       };
     }
 
@@ -2476,6 +2606,9 @@
         const defaultIndex = Array.from(select.options).findIndex((option) => option.defaultSelected);
         select.selectedIndex = defaultIndex >= 0 ? defaultIndex : 0;
       });
+      document.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
+        checkbox.checked = checkbox.defaultChecked;
+      });
       updateAllFingerGripControls();
       inputs.forEach((range, id) => {
         range.value = range.defaultValue || range.getAttribute("value") || range.min || "0";
@@ -2503,8 +2636,13 @@
 
     function applyProfileValues(profile) {
       const selects = profile.selects || {};
-      ["handedness", "bowlingStyle", "twoHandThumbUse", "thumbSolidMode", "thumbSolid", "middleGripType", "ringGripType", "middleGripOuter", "ringGripOuter"].forEach((id) => {
+      ["handedness", "bowlingStyle", "twoHandThumbUse", "thumbSolidMode", "thumbSolid", "middleGripType", "ringGripType", "middleGripOuter", "ringGripOuter", "layoutCoreType"].forEach((id) => {
         setSelectValue(id, selects[id]);
+      });
+      const checks = profile.checks || {};
+      Object.entries(checks).forEach(([id, checked]) => {
+        const checkbox = document.querySelector(`#${id}`);
+        if (checkbox?.type === "checkbox") checkbox.checked = Boolean(checked);
       });
       updateAllFingerGripControls();
       ["middleGripId", "ringGripId", "middleBareDiameter", "ringBareDiameter"].forEach((id) => {
@@ -2732,7 +2870,9 @@
         return;
       }
       if (output.tagName === "OUTPUT") {
-        output.value = pitchAxisLabel(range.id, Number(range.value));
+        output.value = range.id.startsWith("layout")
+          ? dualLayoutValueLabel(range.id, Number(range.value))
+          : pitchAxisLabel(range.id, Number(range.value));
         output.textContent = output.value;
         updateIndicatorCurrent(range);
         return;
@@ -3108,6 +3248,21 @@
       return `${number > 0 ? "フォワード" : "リバース"} ${formatInch(Math.abs(number))}`;
     }
 
+    function dualLayoutValueLabel(id, number) {
+      if (id === "layoutDrillAngle" || id === "layoutValAngle") {
+        return `${number > 0 ? "+" : ""}${Math.round(number)}°`;
+      }
+      if (id === "layoutPapRight") {
+        if (Math.abs(number) < 1 / 128) return "左右 0";
+        return `${number > 0 ? "右" : "左"} ${formatInch(Math.abs(number))}`;
+      }
+      if (id === "layoutPapUp") {
+        if (Math.abs(number) < 1 / 128) return "上下 0";
+        return `${number > 0 ? "上" : "下"} ${formatInch(Math.abs(number))}`;
+      }
+      return formatInch(number);
+    }
+
     function snap64(number) {
       return Math.round(Number(number) * 64) / 64;
     }
@@ -3265,6 +3420,10 @@
           applyFingerCenterY(data.ring, value("ringNoThumbOffset"));
         }
       }
+      data.dualLayout = calculateDualAngleLayout(data.ballRadius);
+      data.usesDualAngleLayout = dualAngleLayoutEnabled();
+      data.gripCenter.surfacePoint = data.usesDualAngleLayout ? data.dualLayout.gripCenter : null;
+      data.gripCenter.color = data.usesDualAngleLayout ? DUAL_LAYOUT_COLORS.gripCenter : "#ffffff";
       data.holes = data.hasThumb ? [data.thumb, data.middle, data.ring] : [data.middle, data.ring];
       return data;
     }
@@ -3378,8 +3537,27 @@
     }
 
     function toSphere(x, y, radius) {
+      if (state.layoutOrigin) return pointFromSurfaceOffset(state.layoutOrigin, x, y, radius);
       const p = normalize({ x, y, z: radius });
       return { x: p.x * radius, y: p.y * radius, z: p.z * radius };
+    }
+
+    function pointFromSurfaceOffset(origin, x, y, radius) {
+      const basis = surfaceOffsetBasis(origin);
+      const tangentPoint = add(
+        add(scalePoint(basis.normal, radius), scalePoint(basis.right, x)),
+        scalePoint(basis.up, y)
+      );
+      return scalePoint(normalize(tangentPoint), radius);
+    }
+
+    function surfaceOffsetBasis(origin) {
+      if (state.layoutBasis) return state.layoutBasis;
+      const normal = normalize(origin);
+      const helper = Math.abs(normal.y) < 0.9 ? { x: 0, y: 1, z: 0 } : { x: 1, y: 0, z: 0 };
+      const right = normalize(cross(helper, normal));
+      const up = normalize(cross(normal, right));
+      return { normal, right, up };
     }
 
     function normalize(p) {
@@ -3392,18 +3570,194 @@
       const sy = Math.sin(state.yaw);
       const cp = Math.cos(state.pitch);
       const sp = Math.sin(state.pitch);
+      const cr = Math.cos(state.roll || 0);
+      const sr = Math.sin(state.roll || 0);
       const x1 = p.x * cy + p.z * sy;
       const z1 = -p.x * sy + p.z * cy;
+      const y1 = p.y * cp - z1 * sp;
+      const z2 = p.y * sp + z1 * cp;
       return {
-        x: x1,
-        y: p.y * cp - z1 * sp,
-        z: p.y * sp + z1 * cp
+        x: x1 * cr - y1 * sr,
+        y: x1 * sr + y1 * cr,
+        z: z2
       };
     }
 
     function project(p, scale, cx, cy) {
       const r = rotate(p);
       return { x: cx + r.x * scale, y: cy - r.y * scale, z: r.z };
+    }
+
+    function dualAngleLayoutEnabled() {
+      return Boolean(document.querySelector("#useDualAngleLayout")?.checked);
+    }
+
+    function calculateDualAngleLayout(radius) {
+      const rawPin = dualPinPoint(radius);
+      const rawMb = selectValue("layoutCoreType") === "morph" ? dualMassBiasSurfacePoint(radius) : null;
+      const pin = rawPin;
+      const mb = rawMb;
+      const cg = dualCgSurfacePoint(radius, pin, mb);
+      const virtualMb = dualVirtualMassBiasSurfacePoint(radius, pin, cg);
+      const layoutMb = mb || virtualMb;
+      const pinMbDown = tangentToward(pin, layoutMb);
+      const drillTangent = rotateTowardHandSide(pin, pinMbDown, value("layoutDrillAngle"));
+      const drillEnd = stepOnSphere(pin, drillTangent, 6.5, radius);
+      const pap = stepOnSphere(pin, drillTangent, value("layoutPinPap"), radius);
+      const drillTangentAtPap = value("layoutPinPap") < 1 / 128
+        ? drillTangent
+        : tangentToward(pap, drillEnd);
+      const valDownTangent = rotateTowardHandSide(pap, drillTangentAtPap, -value("layoutValAngle"));
+      const valEnd = stepOnSphere(pap, valDownTangent, 5.5, radius);
+      const valBack = stepOnSphere(pap, scalePoint(valDownTangent, -1), 5.5, radius);
+      const gcDown = stepOnSphere(pap, valDownTangent, value("layoutPapUp"), radius);
+      const valDownAtGcDown = tangentAtSurface(gcDown, valDownTangent);
+      const papUpAtGcDown = scalePoint(valDownAtGcDown, -1);
+      const papRightAtGcDown = layoutRightFromUpAxis(gcDown, papUpAtGcDown);
+      const gcLeftAtGcDown = scalePoint(papRightAtGcDown, -1);
+      const gripCenter = stepOnSphere(gcDown, gcLeftAtGcDown, value("layoutPapRight"), radius);
+      const layoutBasis = dualGripCenterBasis(gripCenter, papRightAtGcDown, papUpAtGcDown);
+      return {
+        pin, cg, mb, virtualMb, layoutMb, pinMbDown, drillTangent, drillEnd, pap,
+        drillTangentAtPap, valTangent: valDownTangent, valDownTangent, valEnd, valBack,
+        valDownAtGcDown, papUpAtGcDown, papRightAtGcDown, gcLeftAtGcDown, gcDown, gripCenter, layoutBasis,
+        rawPin, rawMb, coreOrigin: dualCoreOrigin(),
+        coreAxis: dualCoreAxis(radius)
+      };
+    }
+
+    function rotateTowardHandSide(surfacePoint, downTangent, degrees) {
+      const down = normalize(downTangent);
+      const side = handedSideFromDown(surfacePoint, down);
+      const angle = Number(degrees) * Math.PI / 180;
+      return normalize(add(scalePoint(down, Math.cos(angle)), scalePoint(side, Math.sin(angle))));
+    }
+
+    function handedSideFromDown(surfacePoint, downTangent) {
+      const normal = normalize(surfacePoint);
+      const rightSide = normalize(cross(normal, normalize(downTangent)));
+      return isLeftHanded() ? scalePoint(rightSide, -1) : rightSide;
+    }
+
+    function tangentAtSurface(surfacePoint, tangent) {
+      const normal = normalize(surfacePoint);
+      let projected = sub(tangent, scalePoint(normal, dot(tangent, normal)));
+      if (Math.hypot(projected.x, projected.y, projected.z) < 0.0001) projected = tangentToward(surfacePoint, add(surfacePoint, tangent));
+      return normalize(projected);
+    }
+
+    function layoutRightFromUpAxis(surfacePoint, upTangent) {
+      const normal = normalize(surfacePoint);
+      return normalize(cross(normalize(upTangent), normal));
+    }
+
+    function dualGripCenterBasis(gripCenter, papRightAtGcDown, papUpAtGcDown) {
+      const normal = normalize(gripCenter);
+      let up = sub(papUpAtGcDown, scalePoint(normal, dot(papUpAtGcDown, normal)));
+      if (Math.hypot(up.x, up.y, up.z) < 0.0001) up = normalize(cross(normal, papRightAtGcDown));
+      up = normalize(up);
+      let right = sub(papRightAtGcDown, scalePoint(normal, dot(papRightAtGcDown, normal)));
+      if (Math.hypot(right.x, right.y, right.z) < 0.0001) right = normalize(cross(up, normal));
+      right = normalize(right);
+      return { normal, right, up };
+    }
+
+    function dualPinDirection() {
+      return normalize(FIXED_PIN_DIRECTION);
+    }
+
+    function dualPinPoint(radius) {
+      return scalePoint(dualPinDirection(), radius);
+    }
+
+    function dualFixedPinBasis() {
+      const pin = dualPinDirection();
+      const helper = Math.abs(pin.y) < 0.9 ? { x: 0, y: 1, z: 0 } : { x: 1, y: 0, z: 0 };
+      const a = normalize(cross(pin, helper));
+      const b = normalize(cross(pin, a));
+      return { a, b };
+    }
+
+    function dualCoreOrigin() {
+      const basis = dualFixedPinBasis();
+      return add(scalePoint(basis.a, value("layoutEccX")), scalePoint(basis.b, value("layoutEccY")));
+    }
+
+    function dualCoreAxis(radius) {
+      return normalize(sub(dualPinPoint(radius), dualCoreOrigin()));
+    }
+
+    function dualTargetPinCgDistance() {
+      const massTerm = 0;
+      const eccTerm = (Math.hypot(value("layoutEccX"), value("layoutEccY")) - 0.45) * 0.85;
+      return clamp(2.8 + massTerm + eccTerm, 2.0, 4.0);
+    }
+
+    function dualCgSurfacePoint(radius, layoutPin = dualPinPoint(radius), layoutMb = null) {
+      const pin = normalize(layoutPin);
+      const targetAngle = dualTargetPinCgDistance() / radius;
+      if (selectValue("layoutCoreType") === "morph" && layoutMb) {
+        const mb = normalize(layoutMb);
+        const pinMbDistance = Math.max(0.01, surfaceDistance(layoutPin, layoutMb, radius));
+        const alongFraction = clamp(dualTargetPinCgDistance() / pinMbDistance, 0.12, 0.82);
+        let direction = slerpDirection(pin, mb, alongFraction);
+        const lineNormal = normalize(cross(pin, mb));
+        const sideAngle = clamp(value("layoutEccY") * 0.16, -0.14, 0.14);
+        direction = normalize(add(scalePoint(direction, Math.cos(sideAngle)), scalePoint(lineNormal, Math.sin(sideAngle))));
+        return scalePoint(direction, radius);
+      }
+      const origin = dualCoreOrigin();
+      let tangent = sub(origin, scalePoint(pin, dot(origin, pin)));
+      if (Math.hypot(tangent.x, tangent.y, tangent.z) < 0.001) tangent = dualFixedPinBasis().a;
+      tangent = normalize(tangent);
+      return scalePoint(normalize(add(scalePoint(pin, Math.cos(targetAngle)), scalePoint(tangent, Math.sin(targetAngle)))), radius);
+    }
+
+    function dualMassBiasSurfacePoint(radius) {
+      const axis = dualCoreAxis(radius);
+      const helper = Math.abs(axis.y) < 0.9 ? { x: 0, y: 1, z: 0 } : { x: 1, y: 0, z: 0 };
+      const a = normalize(cross(axis, helper));
+      const b = normalize(cross(axis, a));
+      const mb = add(dualCoreOrigin(), add(scalePoint(axis, 0.16), add(scalePoint(a, 1.34), scalePoint(b, -0.42))));
+      return scalePoint(normalize(mb), radius);
+    }
+
+    function dualVirtualMassBiasSurfacePoint(radius, pin, cg) {
+      return stepOnSphere(pin, tangentToward(pin, cg), 6.5, radius);
+    }
+
+    function angularDistance(a, b) {
+      return Math.acos(clamp(dot(normalize(a), normalize(b)), -1, 1));
+    }
+
+    function tangentToward(from, to) {
+      const fromNormal = normalize(from);
+      const toNormal = normalize(to);
+      return normalize(sub(toNormal, scalePoint(fromNormal, dot(fromNormal, toNormal))));
+    }
+
+    function slerpDirection(from, to, fraction) {
+      const a = normalize(from);
+      const b = normalize(to);
+      const angle = angularDistance(a, b);
+      if (angle < 0.0001) return a;
+      const s = Math.sin(angle);
+      return normalize(add(
+        scalePoint(a, Math.sin((1 - fraction) * angle) / s),
+        scalePoint(b, Math.sin(fraction * angle) / s)
+      ));
+    }
+
+    function stepOnSphere(from, tangent, inches, radius) {
+      const angle = inches / radius;
+      return scalePoint(normalize(add(
+        scalePoint(normalize(from), Math.cos(angle)),
+        scalePoint(normalize(tangent), Math.sin(angle))
+      )), radius);
+    }
+
+    function surfaceDistance(a, b, radius) {
+      return radius * angularDistance(a, b);
     }
 
     function draw() {
@@ -3417,10 +3771,13 @@
       const cx = w * 0.5;
       const cy = h * 0.54;
       const scale = Math.min(w, h) * 0.39 / radius * state.zoom;
+      state.layoutOrigin = data.usesDualAngleLayout ? data.dualLayout.gripCenter : null;
+      state.layoutBasis = data.usesDualAngleLayout ? data.dualLayout.layoutBasis : null;
       const collisions = findCollisions(data);
       renderZoom();
 
       drawBall(cx, cy, radius, scale);
+      drawDualAngleLayout(data, cx, cy, scale);
       drawSpanAngles(data, cx, cy, scale);
       data.holes.forEach((hole) => drawTrajectory(hole, data, cx, cy, scale));
       if (data.hasThumb) drawHole(data.thumb, data, cx, cy, scale);
@@ -3432,7 +3789,10 @@
       drawCollisionMarkers(collisions, cx, cy, scale);
       renderSheetPitchTokens(data);
       renderGripWallOutputs(data);
+      renderDualLayoutReadout(data);
       renderWarning(collisions);
+      state.layoutOrigin = null;
+      state.layoutBasis = null;
     }
 
     function renderGripShapeOverlay(data) {
@@ -3623,6 +3983,218 @@
       ctx.strokeStyle = color;
       ctx.lineWidth = width;
       ctx.stroke();
+    }
+
+    function drawDualAngleLayout(data, cx, cy, scale) {
+      if (!data.usesDualAngleLayout || !data.dualLayout) return;
+      const dual = data.dualLayout;
+      drawDualCoreModel(data, cx, cy, scale);
+      drawSurfaceArc(dual.pin, dual.layoutMb, data.ballRadius, cx, cy, scale, DUAL_LAYOUT_COLORS.pinMb, 1.8);
+      drawSurfaceArc(dual.pin, dual.drillEnd, data.ballRadius, cx, cy, scale, "rgba(255, 107, 74, .48)", 1.5);
+      drawSurfaceArc(dual.pin, dual.pap, data.ballRadius, cx, cy, scale, DUAL_LAYOUT_COLORS.drill, 3.2);
+      drawSurfaceArc(dual.valBack, dual.valEnd, data.ballRadius, cx, cy, scale, DUAL_LAYOUT_COLORS.val, 2.4);
+      drawSurfaceArc(dual.pap, dual.gcDown, data.ballRadius, cx, cy, scale, DUAL_LAYOUT_COLORS.reverse, 2.2, [7, 5]);
+      drawSurfaceArc(dual.gcDown, dual.gripCenter, data.ballRadius, cx, cy, scale, DUAL_LAYOUT_COLORS.reverse, 2.2, [7, 5]);
+      drawSurfacePointMarker(dual.pin, "PIN", DUAL_LAYOUT_COLORS.pin, cx, cy, scale);
+      drawSurfacePointMarker(dual.cg, "CG", DUAL_LAYOUT_COLORS.cg, cx, cy, scale);
+      drawSurfacePointMarker(dual.mb || dual.virtualMb, dual.mb ? "MB" : "vMB", DUAL_LAYOUT_COLORS.mb, cx, cy, scale);
+      drawSurfacePointMarker(dual.pap, "PAP", DUAL_LAYOUT_COLORS.pap, cx, cy, scale);
+      drawSurfacePointMarker(dual.gripCenter, "GC", DUAL_LAYOUT_COLORS.gripCenter, cx, cy, scale);
+    }
+
+    function drawDualCoreModel(data, cx, cy, scale) {
+      const dual = data.dualLayout;
+      const basis = coreModelBasis(dual.coreAxis);
+      const morph = selectValue("layoutCoreType") === "morph";
+      const panels = [];
+      ctx.save();
+      drawLatheCoreSurface(dual, basis, cx, cy, scale, morph
+        ? [[-1.50, .70], [-1.38, .86], [-1.15, .86], [-1.02, .70]]
+        : [[-1.45, .18], [-1.28, .44], [-.72, .78], [.10, .90], [.82, .64], [1.34, .24]],
+        morph ? "rgba(198, 143, 61, .42)" : "rgba(92, 151, 190, .36)"
+      );
+      if (morph) {
+        addExtrudedCorePolygon(panels, dual, basis, [
+          [-1.16, -.56], [-1.16, .56], [-1.02, .70], [.20, .70],
+          [.42, .50], [.42, -.50], [.20, -.70], [-1.02, -.70]
+        ], .42, "rgba(198, 143, 61, .74)");
+        addExtrudedCorePolygon(panels, dual, basis, [
+          [.02, .68], [.22, 1.16], [.44, 1.70], [.66, 2.05],
+          [.48, 2.30], [.18, 2.02], [-.04, 1.28]
+        ], .22, "rgba(231, 185, 86, .70)");
+        addExtrudedCorePolygon(panels, dual, basis, [
+          [.02, -.68], [.22, -1.16], [.44, -1.70], [.66, -2.05],
+          [.48, -2.30], [.18, -2.02], [-.04, -1.28]
+        ], .22, "rgba(231, 185, 86, .70)");
+        addCoreBoxPanels(panels, dual, basis, .20, .55, -.88, .88, -.48, .48, "rgba(213, 158, 70, .74)");
+        addCoreCylinderPanels(panels, dual, basis.a, dual.coreAxis, basis.b, addScaled(dual.coreOrigin, dual.coreAxis, .82), .55, .36, "rgba(225, 169, 77, .78)");
+        drawCorePanelSet(panels, cx, cy, scale);
+        drawLatheCoreSurface(dual, basis, cx, cy, scale, [[.98, .08], [1.16, .08], [1.16, .14], [1.60, .14]], "rgba(225, 169, 77, .42)");
+      } else {
+        addCoreCylinderPanels(panels, dual, dual.coreAxis, basis.a, basis.b, dual.coreOrigin, 1.42, .36, "rgba(105, 184, 255, .48)");
+        addCoreCylinderPanels(panels, dual, basis.a, dual.coreAxis, basis.b, addScaled(dual.coreOrigin, dual.coreAxis, -.18), .72, .30, "rgba(105, 184, 255, .40)");
+        drawCorePanelSet(panels, cx, cy, scale);
+      }
+      strokeProjected([
+        addScaled(dual.coreOrigin, dual.coreAxis, -1.7),
+        addScaled(dual.coreOrigin, dual.coreAxis, 1.35)
+      ], cx, cy, scale, "rgba(255,255,255,.18)", 1.2);
+      ctx.restore();
+    }
+
+    function coreModelBasis(axis) {
+      const helper = Math.abs(axis.y) < 0.9 ? { x: 0, y: 1, z: 0 } : { x: 1, y: 0, z: 0 };
+      const a = normalize(cross(axis, helper));
+      const b = normalize(cross(axis, a));
+      return { a, b };
+    }
+
+    function coreModelRing(origin, axis, a, b, z, radius) {
+      const center = addScaled(origin, axis, z);
+      const points = [];
+      for (let i = 0; i <= 72; i++) {
+        const theta = i / 72 * Math.PI * 2;
+        points.push(add(center, add(scalePoint(a, Math.cos(theta) * radius), scalePoint(b, Math.sin(theta) * radius))));
+      }
+      return points;
+    }
+
+    function corePoint(dual, basis, z, x, y) {
+      return add(addScaled(dual.coreOrigin, dual.coreAxis, z), add(scalePoint(basis.a, x), scalePoint(basis.b, y)));
+    }
+
+    function addCorePanel(panels, points, fill, stroke = "rgba(255,255,255,.16)") {
+      panels.push({ points, fill, stroke });
+    }
+
+    function drawCorePanelSet(panels, cx, cy, scale) {
+      panels
+        .map((panel) => {
+          const projected = panel.points.map((point) => project(point, scale, cx, cy));
+          return { ...panel, projected, z: projected.reduce((sum, point) => sum + point.z, 0) / projected.length };
+        })
+        .sort((left, right) => left.z - right.z)
+        .forEach((panel) => {
+          if (panel.projected.every((point) => point.z <= 0)) return;
+          ctx.beginPath();
+          panel.projected.forEach((point, index) => {
+            if (index === 0) ctx.moveTo(point.x, point.y);
+            else ctx.lineTo(point.x, point.y);
+          });
+          ctx.closePath();
+          ctx.fillStyle = panel.fill;
+          ctx.strokeStyle = panel.stroke;
+          ctx.lineWidth = 0.8;
+          ctx.fill();
+          ctx.stroke();
+        });
+    }
+
+    function drawLatheCoreSurface(dual, basis, cx, cy, scale, profile, fill) {
+      const panels = [];
+      const segments = 36;
+      for (let i = 0; i < profile.length - 1; i++) {
+        const [z0, r0] = profile[i];
+        const [z1, r1] = profile[i + 1];
+        for (let j = 0; j < segments; j++) {
+          const t0 = j / segments * Math.PI * 2;
+          const t1 = (j + 1) / segments * Math.PI * 2;
+          addCorePanel(panels, [
+            corePoint(dual, basis, z0, Math.cos(t0) * r0, Math.sin(t0) * r0),
+            corePoint(dual, basis, z0, Math.cos(t1) * r0, Math.sin(t1) * r0),
+            corePoint(dual, basis, z1, Math.cos(t1) * r1, Math.sin(t1) * r1),
+            corePoint(dual, basis, z1, Math.cos(t0) * r1, Math.sin(t0) * r1)
+          ], fill);
+        }
+      }
+      drawCorePanelSet(panels, cx, cy, scale);
+    }
+
+    function addCoreBoxPanels(panels, dual, basis, z0, z1, x0, x1, y0, y1, fill) {
+      const p = (z, x, y) => corePoint(dual, basis, z, x, y);
+      const c = {
+        a: p(z0, x0, y0), b: p(z0, x1, y0), c: p(z1, x1, y0), d: p(z1, x0, y0),
+        e: p(z0, x0, y1), f: p(z0, x1, y1), g: p(z1, x1, y1), h: p(z1, x0, y1)
+      };
+      [[c.a,c.b,c.c,c.d], [c.e,c.h,c.g,c.f], [c.a,c.d,c.h,c.e], [c.b,c.f,c.g,c.c], [c.d,c.c,c.g,c.h], [c.a,c.e,c.f,c.b]]
+        .forEach((face) => addCorePanel(panels, face, fill));
+    }
+
+    function addExtrudedCorePolygon(panels, dual, basis, polygon, yHalf, fill) {
+      const front = polygon.map(([z, x]) => corePoint(dual, basis, z, x, yHalf));
+      const back = polygon.map(([z, x]) => corePoint(dual, basis, z, x, -yHalf));
+      addCorePanel(panels, front, fill);
+      addCorePanel(panels, back.slice().reverse(), fill);
+      for (let i = 0; i < polygon.length; i++) {
+        const next = (i + 1) % polygon.length;
+        addCorePanel(panels, [back[i], back[next], front[next], front[i]], fill);
+      }
+    }
+
+    function addCoreCylinderPanels(panels, dual, axisDir, radialA, radialB, center, half, radius, fill) {
+      const segments = 36;
+      const left = [];
+      const right = [];
+      for (let i = 0; i <= segments; i++) {
+        const theta = i / segments * Math.PI * 2;
+        const rim = add(scalePoint(radialA, Math.cos(theta) * radius), scalePoint(radialB, Math.sin(theta) * radius));
+        left.push(add(addScaled(center, axisDir, -half), rim));
+        right.push(add(addScaled(center, axisDir, half), rim));
+      }
+      for (let i = 0; i < segments; i++) addCorePanel(panels, [left[i], left[i + 1], right[i + 1], right[i]], fill);
+      addCorePanel(panels, left, fill);
+      addCorePanel(panels, right.slice().reverse(), fill);
+    }
+
+    function drawSurfaceArc(from, to, radius, cx, cy, scale, color, width, dash = null) {
+      const points = [];
+      const steps = 64;
+      const fromDir = normalize(from);
+      const toDir = normalize(to);
+      for (let i = 0; i <= steps; i++) {
+        points.push(scalePoint(slerpDirection(fromDir, toDir, i / steps), radius));
+      }
+      ctx.save();
+      if (dash) ctx.setLineDash(dash);
+      strokeProjected(points, cx, cy, scale, color, width);
+      ctx.restore();
+    }
+
+    function drawSurfacePointMarker(point, label, color, cx, cy, scale) {
+      const p = project(point, scale, cx, cy);
+      if (p.z <= 0) return;
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.strokeStyle = "rgba(5,8,10,.82)";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.font = "11px Segoe UI, system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(6,10,12,.86)";
+      const width = ctx.measureText(label).width + 10;
+      roundRect(p.x + 8, p.y - 9, width, 18, 5);
+      ctx.fill();
+      ctx.fillStyle = color;
+      ctx.fillText(label, p.x + 13, p.y);
+      ctx.restore();
+    }
+
+    function renderDualLayoutReadout(data) {
+      const readout = document.querySelector("#dualLayoutReadout");
+      if (!readout) return;
+      if (!data.usesDualAngleLayout || !data.dualLayout) {
+        readout.textContent = "Dual Angleガイドは未表示です。";
+        return;
+      }
+      const dual = data.dualLayout;
+      const mbLabel = dual.mb ? "MB" : "vMB";
+      const pinPap = surfaceDistance(dual.pin, dual.pap, data.ballRadius);
+      const papGc = surfaceDistance(dual.pap, dual.gripCenter, data.ballRadius);
+      readout.textContent = `基準: PIN-${mbLabel} / PIN-PAP ${formatInch(pinPap)} / PAP-GC ${formatInch(papGc)} / 算出GCを三穴ローカル配置の原点に適用中`;
     }
 
     function drawGuideLines(data, cx, cy, scale) {
@@ -4564,7 +5136,7 @@
     }
 
     function drawGripCenter(point, radius, cx, cy, scale) {
-      const p = project(toSphere(point.x, point.y, radius), scale, cx, cy);
+      const p = project(point.surfacePoint || toSphere(point.x, point.y, radius), scale, cx, cy);
       if (p.z <= 0) return;
       ctx.save();
       ctx.fillStyle = point.color;
@@ -4977,8 +5549,8 @@
       const dy = event.clientY - state.lastY;
       state.lastX = event.clientX;
       state.lastY = event.clientY;
-      state.yaw += dx * 0.008;
-      state.pitch = Math.max(-0.85, Math.min(0.85, state.pitch + dy * 0.008));
+      state.yaw -= dx * 0.008;
+      state.pitch = Math.max(-0.85, Math.min(0.85, state.pitch - dy * 0.008));
       draw();
     });
 
