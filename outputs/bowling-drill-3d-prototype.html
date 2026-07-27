@@ -264,8 +264,16 @@
       align-items: stretch;
     }
 
+    .pap-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .pap-grid .dual-layout-field.wide {
-      grid-column: span 2;
+      grid-column: auto;
+    }
+
+    .drill-layout-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .drill-layout-grid .dual-layout-field.wide {
@@ -285,6 +293,10 @@
     .dual-layout-field select,
     .dual-layout-field input[type="range"] {
       width: 100%;
+    }
+
+    .dual-layout-field > input[type="range"] {
+      display: none;
     }
 
     .dual-layout-toggle {
@@ -320,23 +332,45 @@
       border-top: 1px solid rgba(180, 230, 245, 0.35);
     }
 
+    .dual-layout-scale.length-scale {
+      height: 50px;
+      margin-top: 0;
+      border: 1px solid rgba(151, 214, 255, .28);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,0)), rgba(9, 20, 27, .82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      overflow: hidden;
+    }
+
+    .dual-layout-scale.length-scale::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 50%;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(238,243,245,.16);
+      transform: translateY(-50%);
+    }
+
     .dual-layout-tick {
       position: absolute;
-      top: -1px;
+      top: 50%;
       width: 1px;
-      height: 7px;
-      transform: translateX(-50%);
+      height: 11px;
+      transform: translate(-50%, -50%);
       background: rgba(190, 225, 235, 0.45);
     }
 
     .dual-layout-tick.major {
-      height: 12px;
+      height: 18px;
       background: rgba(228, 246, 250, 0.8);
     }
 
     .dual-layout-tick-label {
       position: absolute;
-      top: 11px;
+      top: 30px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 9px;
@@ -347,32 +381,37 @@
 
     .dual-layout-current {
       position: absolute;
-      top: -6px;
-      width: 3px;
-      height: 18px;
-      border-radius: 3px;
-      transform: translateX(-50%);
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
       background: var(--cyan);
-      box-shadow: 0 0 12px rgba(116, 230, 255, 0.55);
+      box-shadow: 0 0 0 3px rgba(10,14,16,.9), 0 0 12px rgba(116, 230, 255, 0.55);
     }
 
     .dual-layout-scale.angle-scale {
-      height: 58px;
+      height: 74px;
       margin-top: 0;
       border-top: 0;
       overflow: hidden;
+      border: 1px solid rgba(151, 214, 255, .28);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,0)), rgba(9, 20, 27, .82);
+      cursor: pointer;
+      touch-action: none;
+      user-select: none;
     }
 
     .dual-layout-angle-arc {
       position: absolute;
       left: 50%;
-      bottom: -30px;
-      width: 104px;
-      height: 104px;
-      border: 2px solid rgba(180, 230, 245, 0.3);
-      border-bottom-color: transparent;
-      border-left-color: rgba(180, 230, 245, 0.2);
-      border-radius: 50%;
+      bottom: 12px;
+      width: 126px;
+      height: 63px;
+      border: 2px solid rgba(180, 230, 245, 0.32);
+      border-bottom: 0;
+      border-radius: 126px 126px 0 0;
       transform: translateX(-50%);
       box-shadow: inset 0 0 16px rgba(116, 230, 255, 0.06);
     }
@@ -380,9 +419,9 @@
     .dual-layout-angle-needle {
       position: absolute;
       left: 50%;
-      bottom: 20px;
+      bottom: 12px;
       width: 3px;
-      height: 39px;
+      height: 52px;
       border-radius: 3px;
       background: var(--cyan);
       transform-origin: 50% 100%;
@@ -392,7 +431,7 @@
     .dual-layout-angle-zero {
       position: absolute;
       left: 50%;
-      bottom: 17px;
+      bottom: 8px;
       width: 8px;
       height: 8px;
       border-radius: 50%;
@@ -402,7 +441,7 @@
 
     .dual-layout-angle-label {
       position: absolute;
-      bottom: 1px;
+      bottom: 4px;
       color: rgba(220, 235, 240, 0.74);
       font-size: 10px;
       font-weight: 800;
@@ -410,9 +449,27 @@
       white-space: nowrap;
     }
 
-    .dual-layout-angle-label.min { left: 2px; }
+    .dual-layout-angle-label.min { left: 8px; }
     .dual-layout-angle-label.mid { left: 50%; transform: translateX(-50%); }
-    .dual-layout-angle-label.max { right: 2px; }
+    .dual-layout-angle-label.max { right: 8px; }
+
+    .dual-layout-angle-value {
+      position: absolute;
+      left: 50%;
+      top: 6px;
+      min-width: 52px;
+      padding: 3px 8px;
+      border: 1px solid rgba(120, 230, 255, 0.28);
+      border-radius: 999px;
+      background: rgba(4, 14, 18, 0.88);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.1;
+      text-align: center;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
 
     .dual-layout-readout {
       grid-column: 1 / -1;
@@ -854,6 +911,352 @@
       font-weight: 700;
     }
 
+    .physical-model-output {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      min-width: 0;
+      width: 100%;
+      margin: 0;
+    }
+
+    .modeling-subsection {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 9px;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
+      padding: 10px;
+      border: 1px solid rgba(134, 211, 255, 0.16);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, 0.5);
+    }
+
+    .modeling-subsection h3 {
+      grid-column: 1;
+      margin: 0;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .modeling-split {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .modeling-column {
+      display: grid;
+      gap: 9px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .modeling-column h4,
+    .modeling-subsection > h4 {
+      grid-column: 1;
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .modeling-column .catalog-model-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .modeling-column .physical-model-output {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .modeling-core-selector {
+      grid-column: 1;
+    }
+
+    .physical-delta-pill {
+      display: grid;
+      justify-items: center;
+      gap: 2px;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 51px;
+      color: rgba(213, 232, 238, 0.72);
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .physical-delta-pill span {
+      max-width: 100%;
+      padding: 3px 5px;
+      border-radius: 5px;
+      background: rgba(4, 14, 18, 0.82);
+      font-size: 10px;
+      font-weight: 900;
+      text-align: center;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .physical-delta-pill em {
+      font-style: normal;
+    }
+
+    .physical-delta-pill.is-plus span {
+      color: #78e09a;
+    }
+
+    .physical-delta-pill.is-minus span {
+      color: #ff7f86;
+    }
+
+    .physical-delta-pill.is-zero span {
+      color: rgba(213, 232, 238, 0.72);
+    }
+
+    .physical-comparison-output {
+      grid-column: 1;
+      display: grid;
+      width: 100%;
+      gap: 8px;
+    }
+
+    .physical-comparison-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr);
+      gap: 6px;
+      align-items: stretch;
+    }
+
+    .physical-comparison-row > .catalog-model-field,
+    .physical-comparison-row > div {
+      min-width: 0;
+      width: 100%;
+      min-height: 64px;
+      box-sizing: border-box;
+    }
+
+    .physical-comparison-row > div > .physical-model-metric,
+    .physical-comparison-row > div > .physical-delta-pill {
+      height: 100%;
+      width: 100%;
+      justify-self: stretch;
+    }
+
+    .physical-comparison-row .physical-delta-pill {
+      min-height: 100%;
+      align-content: center;
+    }
+
+    .catalog-rg-field {
+      gap: 7px;
+    }
+
+    .catalog-weight-field {
+      gap: 7px;
+    }
+
+    .catalog-weight-inputs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .catalog-weight-inputs label {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .catalog-weight-inputs label small {
+      color: rgba(213, 232, 238, 0.58);
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .catalog-rg-field .catalog-rg-inputs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .catalog-rg-field label {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .catalog-rg-field label small {
+      color: rgba(213, 232, 238, 0.58);
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .catalog-derived-value {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.2;
+      text-align: right;
+    }
+
+    .catalog-model-grid {
+      grid-column: 1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .stamp-model-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .catalog-model-field {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+      align-content: start;
+      padding: 9px;
+      border: 1px solid rgba(134, 211, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, 0.72);
+    }
+
+    .catalog-model-field span {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .catalog-model-field input {
+      width: 100%;
+      min-height: 32px;
+      border: 1px solid rgba(120, 230, 255, 0.28);
+      border-radius: 7px;
+      background: rgba(8, 18, 24, 0.92);
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 900;
+      text-align: right;
+      padding: 5px 8px;
+    }
+
+    .catalog-model-field select {
+      width: 100%;
+      min-height: 32px;
+      border: 1px solid rgba(120, 230, 255, 0.28);
+      border-radius: 7px;
+      background: rgba(8, 18, 24, 0.92);
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 900;
+      padding: 5px 8px;
+    }
+
+    .sheet-card select,
+    .material-field select {
+      border: 1px solid rgba(134, 211, 255, 0.28);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, 0.78);
+      color: var(--text);
+      font-weight: 850;
+    }
+
+    .physical-model-note {
+      display: none;
+    }
+
+    #coreMetaOutput {
+      grid-column: 1;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .layout-impact-grid {
+      grid-column: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .layout-impact-card {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+      padding: 9px;
+      border: 1px solid rgba(134, 211, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, 0.72);
+    }
+
+    .layout-impact-card span {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .layout-impact-card strong {
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .layout-impact-card em {
+      color: rgba(213, 232, 238, .72);
+      font-style: normal;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .physical-model-metric {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 51px;
+      padding: 9px;
+      border: 1px solid rgba(134, 211, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, 0.72);
+    }
+
+    .physical-model-metric span {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .physical-model-metric strong {
+      min-width: 0;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
     .span-gauge-section {
       display: grid;
       grid-template-columns: minmax(92px, .8fr) minmax(170px, 1.4fr) minmax(92px, .8fr);
@@ -913,6 +1316,64 @@
     .span-horizontal-gauge {
       width: min(100%, 240px);
       height: 96px;
+    }
+
+    .dual-length-gauge {
+      width: 100%;
+      max-width: none;
+      height: 82px;
+    }
+
+    .dual-length-gauge .span-gauge-current {
+      display: none;
+    }
+
+    .signed-axis-gauge::after {
+      content: "";
+      position: absolute;
+      left: var(--signed-fill-left, 50%);
+      top: 50%;
+      width: var(--signed-fill-width, 0%);
+      height: 5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(120, 230, 255, .24), rgba(120, 230, 255, .86));
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .signed-axis-gauge .span-gauge-current {
+      display: block;
+      width: 2px;
+      height: 32px;
+      border-radius: 999px;
+      background: rgba(238, 243, 245, .95);
+      box-shadow: 0 0 0 2px rgba(4,14,18,.94), 0 0 8px rgba(120,230,255,.45);
+    }
+
+    .signed-axis-gauge .span-gauge-zero {
+      position: absolute;
+      top: 50%;
+      left: var(--signed-zero-percent, 50%);
+      width: 2px;
+      height: 44px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 2px rgba(4,14,18,.9);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .signed-axis-gauge .span-gauge-zero::after {
+      content: "0";
+      position: absolute;
+      left: 50%;
+      bottom: -16px;
+      color: rgba(213, 232, 238, .78);
+      font-size: 10px;
+      font-weight: 900;
+      transform: translateX(-50%);
     }
 
     .span-gauge-track {
@@ -1101,6 +1562,14 @@
     .indicator-wrap select {
       width: 100%;
       min-height: 30px;
+      border: 1px solid rgba(134, 211, 255, 0.28);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, 0.78);
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
+      padding: 5px 8px;
     }
 
     .indicator-wrap input[type="range"]:disabled,
@@ -1997,14 +2466,26 @@
         <h2>個人PAP・回転軸情報</h2>
         <div class="dual-layout-grid pap-grid">
           <label class="dual-layout-field wide">
-            <span>PAP左右 <output id="layoutPapRightValue">5"</output></span>
-            <input id="layoutPapRight" type="range" min="-7" max="7" step="0.0625" value="5" />
-            <div class="dual-layout-scale" data-range="layoutPapRight"></div>
+            <span>PAP左右</span>
+            <input id="layoutPapRight" type="range" min="-7" max="7" step="0.03125" value="5" />
+            <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapRight" aria-label="PAP左右">
+              <span class="span-gauge-min"></span>
+              <span class="span-gauge-track"></span>
+              <span class="span-gauge-current"></span>
+              <span class="span-gauge-value"></span>
+              <span class="span-gauge-max"></span>
+            </button>
           </label>
           <label class="dual-layout-field wide">
-            <span>PAP上下 <output id="layoutPapUpValue">0"</output></span>
-            <input id="layoutPapUp" type="range" min="-3" max="3" step="0.0625" value="0" />
-            <div class="dual-layout-scale" data-range="layoutPapUp"></div>
+            <span>PAP上下</span>
+            <input id="layoutPapUp" type="range" min="-3" max="3" step="0.03125" value="0" />
+            <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapUp" aria-label="PAP上下">
+              <span class="span-gauge-min"></span>
+              <span class="span-gauge-track"></span>
+              <span class="span-gauge-current"></span>
+              <span class="span-gauge-value"></span>
+              <span class="span-gauge-max"></span>
+            </button>
           </label>
         </div>
       </section>
@@ -2017,21 +2498,132 @@
             <span class="dual-layout-toggle"><input id="useDualAngleLayout" type="checkbox" checked /> 表面レイアウトを表示</span>
           </label>
           <label class="dual-layout-field">
-            <span>ドリル角 <output id="layoutDrillAngleValue">45°</output></span>
+            <span>ドリル角</span>
             <input id="layoutDrillAngle" type="range" min="-120" max="120" step="1" value="45" />
-            <div class="dual-layout-scale" data-range="layoutDrillAngle"></div>
+            <button class="dual-layout-scale" type="button" data-range="layoutDrillAngle" aria-label="ドリル角"></button>
           </label>
           <label class="dual-layout-field">
-            <span>PIN-PAP <output id="layoutPinPapValue">4 1/2"</output></span>
-            <input id="layoutPinPap" type="range" min="0" max="6.5" step="0.0625" value="4.5" />
-            <div class="dual-layout-scale" data-range="layoutPinPap"></div>
+            <span>PIN-PAP</span>
+            <input id="layoutPinPap" type="range" min="0" max="6.5" step="0.03125" value="4.5" />
+            <button class="span-horizontal-gauge dual-length-gauge" type="button" data-span-range="layoutPinPap" aria-label="PIN-PAP">
+              <span class="span-gauge-min"></span>
+              <span class="span-gauge-track"></span>
+              <span class="span-gauge-current"></span>
+              <span class="span-gauge-value"></span>
+              <span class="span-gauge-max"></span>
+            </button>
           </label>
           <label class="dual-layout-field">
-            <span>VAL角 <output id="layoutValAngleValue">45°</output></span>
+            <span>VAL角</span>
             <input id="layoutValAngle" type="range" min="-120" max="120" step="1" value="45" />
-            <div class="dual-layout-scale" data-range="layoutValAngle"></div>
+            <button class="dual-layout-scale" type="button" data-range="layoutValAngle" aria-label="VAL角"></button>
           </label>
           <p id="dualLayoutReadout" class="dual-layout-readout">Dual Angleガイドは未表示です。</p>
+        </div>
+      </section>
+
+      <section class="section section-wide dual-layout-panel ball-model-panel hole-model-subpanel">
+        <h2>ボール本体モデリング</h2>
+        <div class="dual-layout-grid modeling-grid">
+          <div class="modeling-subsection core-meta-section">
+            <h3>コア・刻印・レイアウト影響</h3>
+            <label class="dual-layout-field wide modeling-core-selector">
+              <span>コアモデル</span>
+              <select id="layoutCoreType">
+                <option value="morph" selected>非対称 / MB</option>
+                <option value="symmetric">対称 / vMB</option>
+              </select>
+            </label>
+            <label class="dual-layout-field wide modeling-core-selector">
+              <span>コア外接半径</span>
+              <select id="layoutCoreEnvelopeRadius" data-inch-select="true" data-min="2.5" data-max="3.75" data-step="0.03125" data-default="3.25"></select>
+            </label>
+            <label class="catalog-model-field catalog-rg-field">
+              <span>箱記載トップ/ボトムウエイト</span>
+              <div class="catalog-weight-inputs">
+                <label>
+                  <small>方向</small>
+                  <select id="layoutStaticWeightDirection">
+                    <option value="top" selected>Top</option>
+                    <option value="bottom">Bottom</option>
+                  </select>
+                </label>
+                <label>
+                  <small>oz</small>
+                  <input id="layoutStaticWeightOz" type="text" inputmode="decimal" data-ounce-input="true" data-min="0" data-max="5" data-step="0.0625" value="3 oz" />
+                </label>
+              </div>
+              <strong id="staticWeightModelValue" class="catalog-derived-value">Top 3 oz</strong>
+            </label>
+            <h4>物理入力とドリル後比較</h4>
+            <div class="physical-comparison-output" aria-label="物理入力からドリル後への一対一比較">
+              <div class="physical-comparison-row">
+                <div class="catalog-model-field catalog-weight-field">
+                  <span>総重量</span>
+                  <div class="catalog-weight-inputs">
+                    <label>
+                      <small>lbs</small>
+                      <input id="layoutBallWeightLb" type="number" min="12" max="16" step="1" value="15" />
+                    </label>
+                    <label>
+                      <small>oz</small>
+                      <input id="layoutBallWeightOz" type="number" min="0" max="15" step="1" value="0" />
+                    </label>
+                  </div>
+                  <strong id="massBeforeValue" class="catalog-derived-value">15 lbs 0 oz</strong>
+                </div>
+                <div id="massDeltaSlot"></div>
+                <div id="massAfterSlot"></div>
+              </div>
+              <div class="physical-comparison-row">
+                <div class="catalog-model-field catalog-rg-field">
+                  <span>PAP-NAP RG（カタログ値から算出）</span>
+                  <div class="catalog-rg-inputs">
+                    <label>
+                      <small>RG低</small>
+                      <input id="layoutCatalogRg" type="number" min="2.430" max="2.650" step="0.001" value="2.480" />
+                    </label>
+                    <label>
+                      <small>Diff</small>
+                      <input id="layoutCatalogDiff" type="number" min="0" max="0.090" step="0.001" value="0.052" />
+                    </label>
+                    <label>
+                      <small>IntDiff</small>
+                      <input id="layoutCatalogIntDiff" type="number" min="0" max="0.040" step="0.001" value="0.018" />
+                    </label>
+                  </div>
+                  <strong id="rgBeforeValue" class="catalog-derived-value">-</strong>
+                </div>
+                <div id="rgDeltaSlot"></div>
+                <div id="rgAfterSlot"></div>
+              </div>
+              <div class="physical-comparison-row">
+                <div id="inertiaBeforeSlot"></div>
+                <div id="inertiaDeltaSlot"></div>
+                <div id="inertiaAfterSlot"></div>
+              </div>
+            </div>
+            <p class="physical-model-note">PAP-NAP軸 I は、カタログ重量とRG低/Differential/Intermediate Differentialから主慣性を作り、現在のPAP-NAP回転軸へ投影した計算値です。ドリル後は各穴の削除質量を差し引いた推定値として表示しています。</p>
+            <h4>レイアウト寄与</h4>
+            <div id="layoutImpactOutput" class="layout-impact-grid" aria-label="ドリル角、PIN-PAP、VAL角の物理寄与"></div>
+            <h4>刻印位置関係</h4>
+            <div class="catalog-model-grid stamp-model-grid" aria-label="表面刻印からの位置関係">
+              <label class="catalog-model-field">
+                <span>PIN-MB 表面距離</span>
+                <select id="stampPinMbDistance" data-inch-select="true" data-min="0.5" data-max="6.5" data-step="0.03125" data-default="6"></select>
+              </label>
+              <label class="catalog-model-field">
+                <span>PIN-CG 表面距離</span>
+                <select id="stampPinCgDistance" data-inch-select="true" data-min="0.5" data-max="6.5" data-step="0.03125" data-default="3"></select>
+              </label>
+              <label class="catalog-model-field">
+                <span>CG横ずれ</span>
+                <select id="stampCgOffset" data-inch-select="true" data-min="-1.5" data-max="1.5" data-step="0.03125" data-default="0.25"></select>
+              </label>
+            </div>
+            <div id="coreMetaOutput" class="physical-model-output" aria-label="刻印情報からの偏心推定"></div>
+            <p class="physical-model-note">刻印距離は1/32インチ刻みで選択し、下にPIN-CG比率と推定偏心を表示します。刻印位置関係そのものは入力情報なので差分表示の対象にはしません。</p>
+          </div>
         </div>
       </section>
 
@@ -2399,28 +2991,7 @@
         </div>
       </section>
 
-        <section class="section section-wide dual-layout-panel ball-model-panel hole-model-subpanel">
-        <h2>ボール本体モデリング</h2>
-        <div class="dual-layout-grid modeling-grid">
-          <label class="dual-layout-field wide">
-            <span>コア</span>
-            <select id="layoutCoreType">
-              <option value="morph" selected>非対称 / MB</option>
-              <option value="symmetric">対称 / vMB</option>
-            </select>
-          </label>
-          <label class="dual-layout-field">
-            <span>偏心X <output id="layoutEccXValue">1/2"</output></span>
-            <input id="layoutEccX" type="range" min="-1.5" max="1.5" step="0.0625" value="0.5" />
-            <div class="dual-layout-scale" data-range="layoutEccX"></div>
-          </label>
-          <label class="dual-layout-field">
-            <span>偏心Y <output id="layoutEccYValue">1/4"</output></span>
-            <input id="layoutEccY" type="range" min="-1.5" max="1.5" step="0.0625" value="0.25" />
-            <div class="dual-layout-scale" data-range="layoutEccY"></div>
-          </label>
-        </div>
-      </section>
+
       </section>
     </aside>
 
@@ -2543,6 +3114,15 @@
       setValueOutput(range, valueOutput);
     });
 
+    document.querySelectorAll(".catalog-model-field input").forEach((input) => {
+      input.addEventListener("input", draw);
+      input.addEventListener("change", () => {
+        normalizeCatalogInput(input);
+        draw();
+      });
+    });
+
+    setupInchSelects();
     document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
     setupBridgeSelect();
     document.querySelectorAll(".dual-layout-scale").forEach(renderDualLayoutScale);
@@ -2551,6 +3131,7 @@
     setupDepthGauges();
     updateAllDepthGauges();
     setupSpanInputControls();
+    setupAngleGaugeControls();
 
     document.querySelector("#handedness").addEventListener("change", (event) => {
       document.querySelector("#measureDiagram").dataset.hand = event.target.value;
@@ -2646,9 +3227,13 @@
       document.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
         checks[checkbox.id] = checkbox.checked;
       });
+      const catalogs = {};
+      document.querySelectorAll(".catalog-model-field input").forEach((input) => {
+        catalogs[input.id] = input.value;
+      });
       const person = currentProfilePerson();
       const existingProfile = readProfiles()[person.displayName || ""];
-      const changeEntry = buildChangeEntry(existingProfile, { person, ranges, selects, checks });
+      const changeEntry = buildChangeEntry(existingProfile, { person, ranges, selects, checks, catalogs });
       return {
         version: 2,
         savedAt: new Date().toISOString(),
@@ -2656,7 +3241,8 @@
         changeLog: existingProfile?.changeLog ? [...existingProfile.changeLog, changeEntry] : [changeEntry],
         ranges,
         selects,
-        checks
+        checks,
+        catalogs
       };
     }
 
@@ -2823,6 +3409,9 @@
       Object.keys(nextProfile.ranges || {}).forEach((id) => {
         collectDiff(changes, id, previousProfile.ranges?.[id], nextProfile.ranges?.[id]);
       });
+      Object.keys(nextProfile.catalogs || {}).forEach((id) => {
+        collectDiff(changes, id, previousProfile.catalogs?.[id], nextProfile.catalogs?.[id]);
+      });
       return changes;
     }
 
@@ -2847,6 +3436,10 @@
         range.value = clamp(snapToStep(range.value, range.step), Number(range.min), Number(range.max));
         setValueOutput(range, document.querySelector(`#${id}Value`));
       });
+      document.querySelectorAll(".catalog-model-field input").forEach((input) => {
+        input.value = input.defaultValue || input.getAttribute("value") || input.min || "0";
+        normalizeCatalogInput(input);
+      });
       document.querySelector("#measureDiagram").dataset.hand = selectValue("handedness");
       updateThumbSolidMode();
       updateBowlingStyleMode();
@@ -2868,6 +3461,9 @@
 
     function applyProfileValues(profile) {
       const selects = profile.selects || {};
+      document.querySelectorAll("select").forEach((select) => {
+        if (select.id && select.id !== "profileList") setSelectValue(select.id, selects[select.id]);
+      });
       ["handedness", "bowlingStyle", "twoHandThumbUse", "thumbSolidMode", "thumbSolid", "middleGripType", "ringGripType", "middleGripOuter", "ringGripOuter", "layoutCoreType"].forEach((id) => {
         setSelectValue(id, selects[id]);
       });
@@ -2887,6 +3483,12 @@
         if (!range) return;
         range.value = clamp(snapToStep(raw, range.step), Number(range.min), Number(range.max));
         setValueOutput(range, document.querySelector(`#${id}Value`));
+      });
+      Object.entries(profile.catalogs || {}).forEach(([id, raw]) => {
+        const input = document.querySelector(`#${id}`);
+        if (!input) return;
+        input.value = raw;
+        normalizeCatalogInput(input);
       });
       updateThumbSolidMode();
       updateBowlingStyleMode();
@@ -2922,7 +3524,50 @@
     }
 
     function value(id) {
-      return Number(inputs.get(id).value);
+      const range = inputs.get(id);
+      if (range) return Number(range.value);
+      const input = document.querySelector(`#${id}`);
+      if (!input) return 0;
+      if (input.dataset.inchInput === "true") {
+        const parsed = parseInch(input.value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      if (input.dataset.ounceInput === "true") {
+        const parsed = parseOunce(input.value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      return Number(input.value ?? 0);
+    }
+
+    function formatNumberControlValue(input, number) {
+      if (!Number.isFinite(number)) number = Number(input.defaultValue || input.min || 0);
+      const stepText = String(input.step || "");
+      const decimals = stepText.includes(".") ? stepText.split(".")[1].length : 0;
+      return Number(number).toFixed(Math.min(6, decimals));
+    }
+
+    function normalizeCatalogInput(input) {
+      if (input.dataset.inchInput === "true") {
+        const min = Number(input.dataset.min ?? 0);
+        const max = Number(input.dataset.max ?? 10);
+        const step = Number(input.dataset.step ?? 1 / 32);
+        const parsed = parseInch(input.value);
+        const normalized = Number.isFinite(parsed) ? clamp(snapToStep(parsed, step), min, max) : min;
+        input.value = formatInch32(normalized);
+        return;
+      }
+      if (input.dataset.ounceInput === "true") {
+        const min = Number(input.dataset.min ?? 0);
+        const max = Number(input.dataset.max ?? 16);
+        const step = Number(input.dataset.step ?? 1 / 16);
+        const parsed = parseOunce(input.value);
+        const normalized = Number.isFinite(parsed) ? clamp(snapToStep(parsed, step), min, max) : min;
+        input.value = formatOunceFraction(normalized);
+        return;
+      }
+      if (input.type === "number") {
+        input.value = formatNumberControlValue(input, clamp(Number(input.value), Number(input.min), Number(input.max)));
+      }
     }
 
     function selectValue(id) {
@@ -2936,6 +3581,25 @@
 
     function range64(start, end) {
       return Array.from({ length: end - start + 1 }, (_, index) => (start + index) / 64);
+    }
+
+    function setupInchSelects() {
+      document.querySelectorAll("select[data-inch-select='true']").forEach((select) => {
+        const min = Number(select.dataset.min ?? 0);
+        const max = Number(select.dataset.max ?? 1);
+        const step = Number(select.dataset.step ?? 1 / 32);
+        const current = select.value || select.dataset.default || String(min);
+        const values = [];
+        for (let value = min; value <= max + 1e-8; value += step) values.push(snapToStep(value, step));
+        select.innerHTML = values.map((number) => {
+          const normalized = String(Number(number.toFixed(6)));
+          return `<option value="${normalized}">${formatInch32(number)}</option>`;
+        }).join("");
+        const target = snapToStep(parseInch(current), step);
+        const option = Array.from(select.options).find((item) => Math.abs(Number(item.value) - target) < 1e-8);
+        select.value = option?.value || select.options[0]?.value || "";
+        select.addEventListener("change", draw);
+      });
     }
 
     function isLeftHanded() {
@@ -3009,6 +3673,7 @@
         scaleEl.innerHTML = '<span class="dual-layout-angle-arc"></span>'
           + '<span class="dual-layout-angle-needle"></span>'
           + '<span class="dual-layout-angle-zero"></span>'
+          + '<span class="dual-layout-angle-value"></span>'
           + '<span class="dual-layout-angle-label min">' + Math.round(Number(range.min)) + '°</span>'
           + '<span class="dual-layout-angle-label mid">0°</span>'
           + '<span class="dual-layout-angle-label max">' + Math.round(Number(range.max)) + '°</span>';
@@ -3052,7 +3717,7 @@
 
     function dualLayoutScaleLabel(range, value) {
       if (value === 0) return "0";
-      return formatInch(value);
+      return formatInch32(value);
     }
 
     function updateDualLayoutScale(range) {
@@ -3066,8 +3731,10 @@
         const needle = scaleEl.querySelector(".dual-layout-angle-needle");
         if (!needle) return;
         const angle = clamp(value, min, max);
-        const displayAngle = clamp(angle, -75, 75);
+        const displayAngle = ((angle - min) / (max - min)) * 150 - 75;
         needle.style.transform = "translateX(-50%) rotate(" + displayAngle + "deg)";
+        const valueEl = scaleEl.querySelector(".dual-layout-angle-value");
+        if (valueEl) valueEl.textContent = dualLayoutValueLabel(range.id, value);
         return;
       }
       const marker = scaleEl.querySelector(".dual-layout-current");
@@ -3103,6 +3770,65 @@
           nudgeSpanGauge(gauge, event.key);
         });
       });
+    }
+
+    function setupAngleGaugeControls() {
+      document.querySelectorAll(".dual-layout-scale[data-range]").forEach((gauge) => {
+        const range = document.querySelector("#" + gauge.dataset.range);
+        if (!isDualAngleRange(range)) return;
+        gauge.tabIndex = 0;
+        const applyPointer = (event) => {
+          event.preventDefault();
+          setAngleGaugeFromPointer(gauge, event);
+        };
+        gauge.addEventListener("pointerdown", (event) => {
+          gauge.setPointerCapture?.(event.pointerId);
+          gauge.dataset.dragging = "true";
+          applyPointer(event);
+        });
+        gauge.addEventListener("pointermove", (event) => {
+          if (gauge.dataset.dragging === "true") applyPointer(event);
+        });
+        gauge.addEventListener("pointerup", (event) => {
+          gauge.releasePointerCapture?.(event.pointerId);
+          delete gauge.dataset.dragging;
+        });
+        gauge.addEventListener("pointercancel", () => {
+          delete gauge.dataset.dragging;
+        });
+        gauge.addEventListener("keydown", (event) => {
+          if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+          event.preventDefault();
+          nudgeAngleGauge(gauge, event.key);
+        });
+      });
+    }
+
+    function setAngleGaugeFromPointer(gauge, event) {
+      const range = document.querySelector("#" + gauge.dataset.range);
+      if (!range) return;
+      const rect = gauge.getBoundingClientRect();
+      const pivotX = rect.left + rect.width / 2;
+      const pivotY = rect.bottom - 12;
+      const displayAngle = clamp(Math.atan2(event.clientX - pivotX, pivotY - event.clientY) * 180 / Math.PI, -75, 75);
+      const min = Number(range.min);
+      const max = Number(range.max);
+      const next = min + ((displayAngle + 75) / 150) * (max - min);
+      setRangeValue(range, next);
+    }
+
+    function nudgeAngleGauge(gauge, key) {
+      const range = document.querySelector("#" + gauge.dataset.range);
+      if (!range) return;
+      const step = Number(range.step) || 1;
+      const min = Number(range.min);
+      const max = Number(range.max);
+      let next = Number(range.value) || 0;
+      if (key === "Home") next = min;
+      else if (key === "End") next = max;
+      else if (key === "ArrowRight") next += step;
+      else next -= step;
+      setRangeValue(range, next);
     }
 
     function updateSpanInputControls() {
@@ -3153,6 +3879,7 @@
       const percent = clamp((value - min) / (max - min) * 100, 0, 100);
       const displayPercent = gauge.classList.contains("span-vertical-gauge") ? 100 - percent : percent;
       renderSpanGaugeTicks(gauge, min, max, range);
+      updateSignedAxisGauge(gauge, min, max, percent);
       const current = gauge.querySelector(".span-gauge-current");
       const valueEl = gauge.querySelector(".span-gauge-value");
       const minEl = gauge.querySelector(".span-gauge-min");
@@ -3176,9 +3903,24 @@
           valueEl.style.top = "50%";
         }
       }
-      if (valueEl) valueEl.textContent = formatInch(value);
-      if (minEl) minEl.textContent = formatInch(min);
-      if (maxEl) maxEl.textContent = formatInch(max);
+      if (valueEl) valueEl.textContent = range.id.startsWith("layout") ? dualLayoutValueLabel(range.id, value) : formatInch(value);
+      if (minEl) minEl.textContent = range.id.startsWith("layout") ? dualLayoutValueLabel(range.id, min) : formatInch(min);
+      if (maxEl) maxEl.textContent = range.id.startsWith("layout") ? dualLayoutValueLabel(range.id, max) : formatInch(max);
+    }
+
+    function updateSignedAxisGauge(gauge, min, max, percent) {
+      if (!gauge.classList.contains("signed-axis-gauge")) return;
+      const zeroPercent = clamp((0 - min) / (max - min) * 100, 0, 100);
+      const fillLeft = Math.min(zeroPercent, percent);
+      const fillWidth = Math.abs(percent - zeroPercent);
+      gauge.style.setProperty("--signed-zero-percent", zeroPercent + "%");
+      gauge.style.setProperty("--signed-fill-left", fillLeft + "%");
+      gauge.style.setProperty("--signed-fill-width", fillWidth + "%");
+      if (!gauge.querySelector(".span-gauge-zero")) {
+        const zero = document.createElement("span");
+        zero.className = "span-gauge-zero";
+        gauge.appendChild(zero);
+      }
     }
 
     function renderSpanGaugeTicks(gauge, min, max, range) {
@@ -3593,18 +4335,22 @@
     }
 
     function dualLayoutValueLabel(id, number) {
+      if (id === "layoutBallWeight") return `${number.toFixed(1)} lb`;
+      if (id === "layoutCatalogRg" || id === "layoutCatalogDiff" || id === "layoutCatalogIntDiff") {
+        return number.toFixed(3);
+      }
       if (id === "layoutDrillAngle" || id === "layoutValAngle") {
         return `${number > 0 ? "+" : ""}${Math.round(number)}°`;
       }
       if (id === "layoutPapRight") {
         if (Math.abs(number) < 1 / 128) return "左右 0";
-        return `${number > 0 ? "右" : "左"} ${formatInch(Math.abs(number))}`;
+        return `${number > 0 ? "右" : "左"} ${formatInch32(Math.abs(number))}`;
       }
       if (id === "layoutPapUp") {
         if (Math.abs(number) < 1 / 128) return "上下 0";
-        return `${number > 0 ? "上" : "下"} ${formatInch(Math.abs(number))}`;
+        return `${number > 0 ? "上" : "下"} ${formatInch32(Math.abs(number))}`;
       }
-      return formatInch(number);
+      return formatInch32(number);
     }
 
     function snap64(number) {
@@ -3642,6 +4388,10 @@
       return sign * (whole + fraction);
     }
 
+    function parseOunce(text) {
+      return parseInch(String(text).replace(/oz/gi, "").trim());
+    }
+
     function formatInch(number) {
       const rounded = snap64(number);
       const sign = rounded < 0 ? "-" : "";
@@ -3654,6 +4404,36 @@
       const denominator = 64 / divisor;
       if (whole === 0) return `${sign}${numerator}/${denominator}"`;
       return `${sign}${whole} ${numerator}/${denominator}"`;
+    }
+
+    function formatInch32(number) {
+      return formatFractionUnit(number, 32, "\"");
+    }
+
+    function formatOunceFraction(number) {
+      return formatFractionUnit(number, 16, " oz");
+    }
+
+    function formatFractionUnit(number, denominator, suffix) {
+      const rounded = Math.round(Number(number) * denominator) / denominator;
+      const sign = rounded < 0 ? "-" : "";
+      let units = Math.abs(Math.round(rounded * denominator));
+      const whole = Math.floor(units / denominator);
+      let numerator = units % denominator;
+      if (numerator === 0) return `${sign}${whole}${suffix}`;
+      const divisor = gcd(numerator, denominator);
+      numerator /= divisor;
+      const reducedDenominator = denominator / divisor;
+      if (whole === 0) return `${sign}${numerator}/${reducedDenominator}${suffix}`;
+      return `${sign}${whole} ${numerator}/${reducedDenominator}${suffix}`;
+    }
+
+    function formatWeightLbOz(pounds) {
+      const sign = Number(pounds) < 0 ? "-" : "";
+      let totalOz = Math.max(0, Math.round(Math.abs(Number(pounds)) * 16 * 16) / 16);
+      const lbs = Math.floor(totalOz / 16);
+      const oz = totalOz - lbs * 16;
+      return `${sign}${lbs} lbs ${formatOunceFraction(oz)}`;
     }
 
     function gcd(a, b) {
@@ -3966,9 +4746,7 @@
       const drillTangent = rotateTowardHandSide(pin, pinMbDown, value("layoutDrillAngle"));
       const drillEnd = stepOnSphere(pin, drillTangent, 6.5, radius);
       const pap = stepOnSphere(pin, drillTangent, value("layoutPinPap"), radius);
-      const drillTangentAtPap = value("layoutPinPap") < 1 / 128
-        ? drillTangent
-        : tangentToward(pap, drillEnd);
+      const drillTangentAtPap = tangentAtSurface(pap, drillTangent);
       const valDownTangent = rotateTowardHandSide(pap, drillTangentAtPap, -value("layoutValAngle"));
       const valEnd = stepOnSphere(pap, valDownTangent, 5.5, radius);
       const valBack = stepOnSphere(pap, scalePoint(valDownTangent, -1), 5.5, radius);
@@ -4040,9 +4818,47 @@
       return { a, b };
     }
 
+    function stampedCoreRelationship() {
+      const pinMb = Math.max(0.5, value("stampPinMbDistance"));
+      const pinCg = clamp(value("stampPinCgDistance"), 0.5, 6.5);
+      const cgOffset = clamp(value("stampCgOffset"), -1.5, 1.5);
+      const alongRatio = clamp(pinCg / Math.max(0.01, pinMb), 0, 1);
+      const estimatedMagnitude = clamp(0.45 + (pinCg - 2.8) / 0.85, 0.05, 1.5);
+      const lateral = clamp(cgOffset, -estimatedMagnitude, estimatedMagnitude);
+      const lengthwise = Math.sqrt(Math.max(0, estimatedMagnitude ** 2 - lateral ** 2));
+      const staticWeight = staticTopWeightModel();
+      const correctedLengthwise = Math.max(0.01, lengthwise + staticWeight.cgShift);
+      return {
+        pinMb,
+        pinCg,
+        cgOffset,
+        alongRatio,
+        staticWeight,
+        eccentricityBaseX: lengthwise,
+        eccentricityX: correctedLengthwise,
+        eccentricityY: lateral,
+        eccentricityMagnitude: Math.hypot(correctedLengthwise, lateral)
+      };
+    }
+
+    function staticTopWeightModel() {
+      const direction = selectValue("layoutStaticWeightDirection") === "bottom" ? "bottom" : "top";
+      const sign = direction === "top" ? 1 : -1;
+      const ounces = clamp(value("layoutStaticWeightOz"), 0, 5);
+      const momentOzIn = sign * ounces * 3.294;
+      const totalOz = Math.max(1, catalogWeightPounds() * 16);
+      return {
+        direction,
+        ounces,
+        momentOzIn,
+        cgShift: momentOzIn / totalOz
+      };
+    }
+
     function dualCoreOrigin() {
       const basis = dualFixedPinBasis();
-      return add(scalePoint(basis.a, value("layoutEccX")), scalePoint(basis.b, value("layoutEccY")));
+      const core = stampedCoreRelationship();
+      return add(scalePoint(basis.a, core.eccentricityX), scalePoint(basis.b, core.eccentricityY));
     }
 
     function dualCoreAxis(radius) {
@@ -4051,7 +4867,7 @@
 
     function dualTargetPinCgDistance() {
       const massTerm = 0;
-      const eccTerm = (Math.hypot(value("layoutEccX"), value("layoutEccY")) - 0.45) * 0.85;
+      const eccTerm = (stampedCoreRelationship().eccentricityMagnitude - 0.45) * 0.85;
       return clamp(2.8 + massTerm + eccTerm, 2.0, 4.0);
     }
 
@@ -4064,7 +4880,7 @@
         const alongFraction = clamp(dualTargetPinCgDistance() / pinMbDistance, 0.12, 0.82);
         let direction = slerpDirection(pin, mb, alongFraction);
         const lineNormal = normalize(cross(pin, mb));
-        const sideAngle = clamp(value("layoutEccY") * 0.16, -0.14, 0.14);
+        const sideAngle = clamp(stampedCoreRelationship().eccentricityY * 0.16, -0.14, 0.14);
         direction = normalize(add(scalePoint(direction, Math.cos(sideAngle)), scalePoint(lineNormal, Math.sin(sideAngle))));
         return scalePoint(direction, radius);
       }
@@ -4135,7 +4951,9 @@
       const scale = Math.min(w, h) * 0.39 / radius * state.zoom;
       state.layoutOrigin = data.usesDualAngleLayout ? data.dualLayout.gripCenter : null;
       state.layoutBasis = data.usesDualAngleLayout ? data.dualLayout.layoutBasis : null;
+      data.physicalModel = calculatePhysicalModel(data);
       const collisions = findCollisions(data);
+      const coreContacts = findCoreContacts(data);
       renderZoom();
 
       drawBall(cx, cy, radius, scale);
@@ -4152,7 +4970,10 @@
       renderSheetPitchTokens(data);
       renderGripWallOutputs(data);
       renderDualLayoutReadout(data);
-      renderWarning(collisions);
+      renderCoreMetaOutput(data);
+      renderPhysicalModelOutput(data.physicalModel);
+      renderLayoutImpactOutput(data);
+      renderWarning(collisions, coreContacts);
       state.layoutOrigin = null;
       state.layoutBasis = null;
     }
@@ -4398,8 +5219,8 @@
         drawCorePanelSet(panels, cx, cy, scale);
       }
       strokeProjected([
-        addScaled(dual.coreOrigin, dual.coreAxis, -1.7),
-        addScaled(dual.coreOrigin, dual.coreAxis, 1.35)
+        scaleCoreWorldPoint(dual, addScaled(dual.coreOrigin, dual.coreAxis, -1.7)),
+        scaleCoreWorldPoint(dual, addScaled(dual.coreOrigin, dual.coreAxis, 1.35))
       ], cx, cy, scale, "rgba(255,255,255,.18)", 1.2);
       ctx.restore();
     }
@@ -4409,6 +5230,18 @@
       const a = normalize(cross(axis, helper));
       const b = normalize(cross(axis, a));
       return { a, b };
+    }
+
+    function coreEnvelopeRadius() {
+      return clamp(selectNumber("layoutCoreEnvelopeRadius", 3.25), 2.5, 3.75);
+    }
+
+    function coreGeometryScale() {
+      return coreEnvelopeRadius() / 2.35;
+    }
+
+    function scaleCoreWorldPoint(dual, point) {
+      return add(dual.coreOrigin, scalePoint(sub(point, dual.coreOrigin), coreGeometryScale()));
     }
 
     function coreModelRing(origin, axis, a, b, z, radius) {
@@ -4422,7 +5255,8 @@
     }
 
     function corePoint(dual, basis, z, x, y) {
-      return add(addScaled(dual.coreOrigin, dual.coreAxis, z), add(scalePoint(basis.a, x), scalePoint(basis.b, y)));
+      const s = coreGeometryScale();
+      return add(addScaled(dual.coreOrigin, dual.coreAxis, z * s), add(scalePoint(basis.a, x * s), scalePoint(basis.b, y * s)));
     }
 
     function addCorePanel(panels, points, fill, stroke = "rgba(255,255,255,.16)") {
@@ -4497,11 +5331,14 @@
       const segments = 36;
       const left = [];
       const right = [];
+      const scaledCenter = scaleCoreWorldPoint(dual, center);
+      const scaledHalf = half * coreGeometryScale();
+      const scaledRadius = radius * coreGeometryScale();
       for (let i = 0; i <= segments; i++) {
         const theta = i / segments * Math.PI * 2;
-        const rim = add(scalePoint(radialA, Math.cos(theta) * radius), scalePoint(radialB, Math.sin(theta) * radius));
-        left.push(add(addScaled(center, axisDir, -half), rim));
-        right.push(add(addScaled(center, axisDir, half), rim));
+        const rim = add(scalePoint(radialA, Math.cos(theta) * scaledRadius), scalePoint(radialB, Math.sin(theta) * scaledRadius));
+        left.push(add(addScaled(scaledCenter, axisDir, -scaledHalf), rim));
+        right.push(add(addScaled(scaledCenter, axisDir, scaledHalf), rim));
       }
       for (let i = 0; i < segments; i++) addCorePanel(panels, [left[i], left[i + 1], right[i + 1], right[i]], fill);
       addCorePanel(panels, left, fill);
@@ -4557,6 +5394,267 @@
       const pinPap = surfaceDistance(dual.pin, dual.pap, data.ballRadius);
       const papGc = surfaceDistance(dual.pap, dual.gripCenter, data.ballRadius);
       readout.textContent = `基準: PIN-${mbLabel} / PIN-PAP ${formatInch(pinPap)} / PAP-GC ${formatInch(papGc)} / 算出GCを三穴ローカル配置の原点に適用中`;
+    }
+
+    function calculatePhysicalModel(data) {
+      const mass = catalogWeightPounds();
+      const rgLow = value("layoutCatalogRg");
+      const diff = Math.max(0, value("layoutCatalogDiff"));
+      const intDiff = clamp(value("layoutCatalogIntDiff"), 0, diff);
+      const core = stampedCoreRelationship();
+      const rgMid = rgLow + intDiff;
+      const rgHigh = rgLow + diff;
+      const papAxis = normalize(data.dualLayout?.pap || { x: 0, y: 0, z: data.ballRadius });
+      const basis = physicalPrincipalBasis(data);
+      const iLow = mass * rgLow * rgLow;
+      const iMid = mass * rgMid * rgMid;
+      const iHigh = mass * rgHigh * rgHigh;
+      const iBefore = axisInertiaFromPrincipal(papAxis, basis, iLow, iMid, iHigh);
+      const removed = drilledRemovalInertia(data, papAxis, mass);
+      const massAfter = Math.max(0.001, mass - removed.mass);
+      const iAfter = Math.max(0, iBefore - removed.inertia);
+      const rgBefore = Math.sqrt(iBefore / mass);
+      const rgAfter = Math.sqrt(iAfter / massAfter);
+      return {
+        mass,
+        massAfter,
+        rgLow,
+        rgMid,
+        rgHigh,
+        diff,
+        intDiff,
+        core,
+        papAxis,
+        iBefore,
+        iAfter,
+        rgBefore,
+        rgAfter,
+        removedMass: removed.mass,
+        removedOz: removed.mass * 16,
+        removedInertia: removed.inertia,
+        axisDifferential: rgAfter - rgBefore
+      };
+    }
+
+    function catalogWeightPounds() {
+      const lbInput = document.querySelector("#layoutBallWeightLb");
+      const ozInput = document.querySelector("#layoutBallWeightOz");
+      if (lbInput || ozInput) {
+        const pounds = clamp(Number(lbInput?.value ?? 15), 12, 16);
+        const ounces = clamp(Number(ozInput?.value ?? 0), 0, 15);
+        return pounds + ounces / 16;
+      }
+      return value("layoutBallWeight") || 15;
+    }
+
+    function physicalPrincipalBasis(data) {
+      const lowAxis = normalize(data.dualLayout?.pin || { x: 0, y: 1, z: 0 });
+      const mbPoint = data.dualLayout?.layoutMb || data.dualLayout?.virtualMb || { x: 1, y: 0, z: 0 };
+      let mbAxis = sub(normalize(mbPoint), scalePoint(lowAxis, dot(normalize(mbPoint), lowAxis)));
+      if (Math.hypot(mbAxis.x, mbAxis.y, mbAxis.z) < 0.0001) mbAxis = Math.abs(lowAxis.y) < 0.9 ? cross(lowAxis, { x: 0, y: 1, z: 0 }) : cross(lowAxis, { x: 1, y: 0, z: 0 });
+      mbAxis = normalize(mbAxis);
+      const highAxis = normalize(cross(lowAxis, mbAxis));
+      return { lowAxis, midAxis: mbAxis, highAxis };
+    }
+
+    function axisInertiaFromPrincipal(axis, basis, iLow, iMid, iHigh) {
+      const u = normalize(axis);
+      return iLow * dot(u, basis.lowAxis) ** 2
+        + iMid * dot(u, basis.midAxis) ** 2
+        + iHigh * dot(u, basis.highAxis) ** 2;
+    }
+
+    function drilledRemovalInertia(data, axis, ballMass) {
+      const density = ballMass / (4 / 3 * Math.PI * data.ballRadius ** 3);
+      return data.holes.reduce((total, hole) => {
+        const segment = drillSegment(hole, data, drilledOpeningRadius(hole));
+        const cylinder = cylinderRemovalContribution(segment.start, segment.axis, segment.radius, segment.cylinderLength, density, axis);
+        const cone = coneRemovalContribution(segment.cylinderEnd, segment.axis, segment.radius, segment.pointLength, density, axis);
+        total.mass += cylinder.mass + cone.mass;
+        total.inertia += cylinder.inertia + cone.inertia;
+        return total;
+      }, { mass: 0, inertia: 0 });
+    }
+
+    function cylinderRemovalContribution(start, drillAxis, radius, length, density, evalAxis) {
+      if (length <= 0 || radius <= 0) return { mass: 0, inertia: 0 };
+      const mass = density * Math.PI * radius ** 2 * length;
+      const center = addScaled(start, drillAxis, length / 2);
+      const axial = 0.5 * mass * radius ** 2;
+      const perpendicular = mass * (3 * radius ** 2 + length ** 2) / 12;
+      return { mass, inertia: bodyAxisInertia(evalAxis, drillAxis, center, mass, axial, perpendicular) };
+    }
+
+    function coneRemovalContribution(base, drillAxis, radius, length, density, evalAxis) {
+      if (length <= 0 || radius <= 0) return { mass: 0, inertia: 0 };
+      const mass = density * Math.PI * radius ** 2 * length / 3;
+      const center = addScaled(base, drillAxis, length / 4);
+      const axial = 0.3 * mass * radius ** 2;
+      const perpendicular = 3 * mass * (4 * radius ** 2 + length ** 2) / 80;
+      return { mass, inertia: bodyAxisInertia(evalAxis, drillAxis, center, mass, axial, perpendicular) };
+    }
+
+    function bodyAxisInertia(evalAxis, bodyAxis, center, mass, axial, perpendicular) {
+      const u = normalize(evalAxis);
+      const a = normalize(bodyAxis);
+      const alignment = dot(u, a);
+      const centroidInertia = perpendicular * (1 - alignment ** 2) + axial * alignment ** 2;
+      const parallel = mass * Math.max(0, dot(center, center) - dot(u, center) ** 2);
+      return centroidInertia + parallel;
+    }
+
+    function renderPhysicalModelOutput(model) {
+      if (!model) return;
+      const rgDelta = model.rgAfter - model.rgBefore;
+      const massDeltaOz = (model.massAfter - model.mass) * 16;
+      const inertiaDelta = model.iAfter - model.iBefore;
+      const massBeforeValue = document.querySelector("#massBeforeValue");
+      if (massBeforeValue) massBeforeValue.textContent = formatWeightLbOz(model.mass);
+      const rgBeforeValue = document.querySelector("#rgBeforeValue");
+      if (rgBeforeValue) rgBeforeValue.textContent = `変更前 ${model.rgBefore.toFixed(3)}`;
+      renderSlot("massDeltaSlot", physicalDeltaPill(formatSignedOunces(massDeltaOz)));
+      renderSlot("massAfterSlot", physicalMetric("総重量", formatWeightLbOz(model.massAfter)));
+      renderSlot("rgDeltaSlot", physicalDeltaPill(signedFixed(rgDelta, 4)));
+      renderSlot("rgAfterSlot", physicalMetric("PAP-NAP RG", model.rgAfter.toFixed(3)));
+      renderSlot("inertiaBeforeSlot", physicalMetric("PAP-NAP軸 I", `${model.iBefore.toFixed(3)} lb in^2`));
+      renderSlot("inertiaDeltaSlot", physicalDeltaPill(`${signedFixed(inertiaDelta, 3)} lb in^2`));
+      renderSlot("inertiaAfterSlot", physicalMetric("PAP-NAP軸 I", `${model.iAfter.toFixed(3)} lb in^2`));
+    }
+
+    function renderLayoutImpactOutput(data) {
+      const output = document.querySelector("#layoutImpactOutput");
+      if (!output || !data?.physicalModel) return;
+      const base = physicalImpactSnapshot(data);
+      const cases = [
+        {
+          id: "layoutDrillAngle",
+          label: "ドリル角",
+          step: 5,
+          unit: "5°",
+          note: "読み出し位置と角度和。小さいほど早く、大きいほど奥へ寄る。"
+        },
+        {
+          id: "layoutPinPap",
+          label: "PIN-PAP",
+          step: 0.25,
+          unit: "1/4\"",
+          note: "PAP-NAP軸に対するコア姿勢。フレアと軸慣性への寄与が最も直接的。"
+        },
+        {
+          id: "layoutValAngle",
+          label: "VAL角",
+          step: 5,
+          unit: "5°",
+          note: "角度和とブレイク形状。小さいほど移行が速く、大きいほど緩やか。"
+        }
+      ];
+      output.innerHTML = cases.map((item) => layoutImpactCard(item, base)).join("");
+    }
+
+    function physicalImpactSnapshot(data) {
+      const model = data.physicalModel || calculatePhysicalModel(data);
+      const contacts = findCoreContacts(data);
+      return {
+        rg: model.rgAfter,
+        inertia: model.iAfter,
+        removedOz: model.removedOz,
+        coreDepth: contacts[0]?.depth ?? null
+      };
+    }
+
+    function layoutImpactCard(item, base) {
+      const plus = sampleLayoutImpact(item.id, item.step, base);
+      const minus = sampleLayoutImpact(item.id, -item.step, base);
+      return `<div class="layout-impact-card">`
+        + `<span>${escapeHtml(item.label)} ±${escapeHtml(item.unit)}</span>`
+        + `<strong>+側 ${impactDeltaLine(plus)}</strong>`
+        + `<strong>-側 ${impactDeltaLine(minus)}</strong>`
+        + `<em>${escapeHtml(coreContactImpactLabel(base.coreDepth, plus.coreDepth, minus.coreDepth))}</em>`
+        + `<em>${escapeHtml(item.note)}</em>`
+        + `</div>`;
+    }
+
+    function sampleLayoutImpact(id, delta, base) {
+      const range = inputs.get(id);
+      if (!range) return { rgDelta: 0, inertiaDelta: 0, removedDeltaOz: 0, coreDepth: null };
+      const previous = range.value;
+      const next = clamp(snapToStep(Number(previous) + delta, range.step), Number(range.min), Number(range.max));
+      range.value = next;
+      const previousLayoutOrigin = state.layoutOrigin;
+      const previousLayoutBasis = state.layoutBasis;
+      const variant = layout();
+      variant.physicalModel = calculatePhysicalModel(variant);
+      const snapshot = physicalImpactSnapshot(variant);
+      state.layoutOrigin = previousLayoutOrigin;
+      state.layoutBasis = previousLayoutBasis;
+      range.value = previous;
+      return {
+        rgDelta: snapshot.rg - base.rg,
+        inertiaDelta: snapshot.inertia - base.inertia,
+        removedDeltaOz: snapshot.removedOz - base.removedOz,
+        coreDepth: snapshot.coreDepth
+      };
+    }
+
+    function impactDeltaLine(delta) {
+      return `RG ${signedFixed(delta.rgDelta, 4)} / I ${signedFixed(delta.inertiaDelta, 3)}`;
+    }
+
+    function coreContactImpactLabel(baseDepth, plusDepth, minusDepth) {
+      const base = baseDepth === null ? "なし" : formatInch32(baseDepth);
+      const plus = plusDepth === null ? "なし" : formatInch32(plusDepth);
+      const minus = minusDepth === null ? "なし" : formatInch32(minusDepth);
+      return `コア接触 現在 ${base} / + ${plus} / - ${minus}`;
+    }
+
+    function renderCoreMetaOutput(data) {
+      const output = document.querySelector("#coreMetaOutput");
+      if (!output) return;
+      const core = stampedCoreRelationship();
+      const actualPinCg = data.dualLayout ? surfaceDistance(data.dualLayout.pin, data.dualLayout.cg, data.ballRadius) : core.pinCg;
+      const actualPinMb = data.dualLayout?.layoutMb ? surfaceDistance(data.dualLayout.pin, data.dualLayout.layoutMb, data.ballRadius) : core.pinMb;
+      const envelope = coreEnvelopeRadius();
+      const staticLabel = `${core.staticWeight.direction === "top" ? "Top" : "Bottom"} ${formatOunceFraction(core.staticWeight.ounces)}`;
+      setFieldText(document.querySelector("#staticWeightModelValue"), `${staticLabel} / CG ${formatInch32(core.staticWeight.cgShift)}`);
+      output.innerHTML = [
+        physicalMetric("PIN-CG比率", core.alongRatio.toFixed(3)),
+        physicalMetric("描画距離", `PIN-CG ${formatInch32(actualPinCg)} / PIN-MB ${formatInch32(actualPinMb)}`),
+        physicalMetric("CG横ずれ", formatInch32(core.cgOffset)),
+        physicalMetric("偏心補正前", `X ${formatInch32(core.eccentricityBaseX)} / Y ${formatInch32(core.eccentricityY)}`),
+        physicalMetric("推定偏心", `X ${formatInch32(core.eccentricityX)} / Y ${formatInch32(core.eccentricityY)}`),
+        physicalMetric("静的補正", `${staticLabel} / ${formatInch32(core.staticWeight.cgShift)}`),
+        physicalMetric("静的モーメント", `${signedFixed(core.staticWeight.momentOzIn, 2)} oz-in`),
+        physicalMetric("コア外接半径", formatInch32(envelope)),
+        physicalMetric("表面-外接", formatInch32(Math.max(0, data.ballRadius - envelope)))
+      ].join("");
+    }
+
+    function signedFixed(number, digits) {
+      const value = Number.isFinite(number) ? number : 0;
+      const sign = value > 0 ? "+" : "";
+      return sign + value.toFixed(digits);
+    }
+
+    function formatSignedOunces(ounces) {
+      const value = Number.isFinite(ounces) ? ounces : 0;
+      const rounded = Math.round(value * 16) / 16;
+      const sign = rounded > 0 ? "+" : rounded < 0 ? "-" : "";
+      return sign + formatOunceFraction(Math.abs(rounded));
+    }
+
+    function physicalDeltaPill(delta) {
+      const deltaNumber = Number(String(delta).replace(/[^\d.+-]/g, ""));
+      const tone = deltaNumber > 0 ? "is-plus" : deltaNumber < 0 ? "is-minus" : "is-zero";
+      return `<div class="physical-delta-pill ${tone}"><span>${delta}</span><em aria-hidden="true">→</em></div>`;
+    }
+
+    function renderSlot(id, html) {
+      const slot = document.querySelector("#" + id);
+      if (slot) slot.innerHTML = html;
+    }
+
+    function physicalMetric(label, value) {
+      return `<div class="physical-model-metric"><span>${label}</span><strong>${value}</strong></div>`;
     }
 
     function drawGuideLines(data, cx, cy, scale) {
@@ -5323,6 +6421,38 @@
       return collisions;
     }
 
+    function findCoreContacts(data) {
+      if (!data.usesDualAngleLayout || !data.dualLayout) return [];
+      const coreCenter = data.dualLayout.coreOrigin;
+      const coreRadius = coreEnvelopeRadius();
+      return data.holes
+        .map((hole) => {
+          const segment = drillSegment(hole, data, drilledOpeningRadius(hole));
+          const depth = drillCoreEntryDepth(segment, coreCenter, coreRadius);
+          if (depth === null) return null;
+          return {
+            hole: hole.name,
+            depth,
+            point: addScaled(segment.start, segment.axis, depth)
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.depth - b.depth);
+    }
+
+    function drillCoreEntryDepth(segment, coreCenter, coreRadius) {
+      const oc = sub(segment.start, coreCenter);
+      const b = 2 * dot(segment.axis, oc);
+      const c = dot(oc, oc) - coreRadius * coreRadius;
+      const discriminant = b * b - 4 * c;
+      if (discriminant < 0) return null;
+      const root = Math.sqrt(discriminant);
+      const candidates = [(-b - root) / 2, (-b + root) / 2]
+        .filter((t) => t >= 0 && t <= segment.cylinderLength + segment.pointLength)
+        .sort((a, b) => a - b);
+      return candidates.length ? candidates[0] : null;
+    }
+
     function closestConePoints(a, b) {
       let best = { clearance: Infinity, point: midpoint(a.start, b.start), a: a.start, b: b.start };
       for (let i = 0; i <= 40; i++) {
@@ -5364,17 +6494,22 @@
       }
     }
 
-    function renderWarning(collisions) {
+    function renderWarning(collisions, coreContacts = []) {
       const warning = document.querySelector("#warning");
-      if (!collisions.length) {
+      const messages = [];
+      collisions.forEach((collision) => {
+        messages.push(`${collision.a} と ${collision.b} のドリル軌跡が約 ${formatInch(Math.abs(collision.clearance))} 干渉しています。`);
+      });
+      coreContacts.forEach((contact) => {
+        messages.push(`${contact.hole} は表面から約 ${formatInch32(contact.depth)} でコア外接領域に接触します。`);
+      });
+      if (!messages.length) {
         warning.classList.remove("is-active");
         warning.textContent = "";
         return;
       }
       warning.classList.add("is-active");
-      warning.textContent = collisions.map((collision) => {
-        return `${collision.a} と ${collision.b} のドリル軌跡が約 ${formatInch(Math.abs(collision.clearance))} 干渉しています。`;
-      }).join(" ");
+      warning.textContent = messages.join(" ");
     }
 
     function renderSheetPitchTokens(data) {
