@@ -239,13 +239,48 @@
 
     .dual-layout-field {
       display: grid;
-      gap: 5px;
+      gap: 8px;
       min-width: 0;
+      padding: 10px;
+      border: 1px solid rgba(134, 211, 255, 0.18);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(20, 40, 50, 0.84), rgba(11, 22, 28, 0.92));
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
       font-size: 12px;
       color: var(--muted);
     }
 
     .dual-layout-field.wide { grid-column: span 2; }
+
+    .ball-model-panel,
+    .personal-axis-panel,
+    .drill-layout-panel {
+      border-color: rgba(134, 211, 255, 0.18);
+    }
+
+    .modeling-grid,
+    .pap-grid,
+    .drill-layout-grid {
+      align-items: stretch;
+    }
+
+    .pap-grid .dual-layout-field.wide {
+      grid-column: span 2;
+    }
+
+    .drill-layout-grid .dual-layout-field.wide {
+      grid-column: 1 / -1;
+    }
+
+    .dual-layout-field > span:first-child {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+      color: var(--text);
+      font-weight: 800;
+    }
 
     .dual-layout-field select,
     .dual-layout-field input[type="range"] {
@@ -258,18 +293,126 @@
       gap: 8px;
       min-height: 32px;
       padding: 6px 8px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #11161a;
+      border: 1px solid rgba(134, 211, 255, 0.22);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, 0.78);
       color: var(--text);
       font-weight: 700;
     }
 
     .dual-layout-field output {
+      min-width: 52px;
+      padding: 3px 8px;
+      border: 1px solid rgba(120, 230, 255, 0.28);
+      border-radius: 999px;
+      background: rgba(4, 14, 18, 0.78);
       color: var(--text);
-      font-weight: 800;
+      font-weight: 900;
+      line-height: 1.2;
+      text-align: center;
       justify-self: end;
     }
+
+    .dual-layout-scale {
+      position: relative;
+      height: 22px;
+      margin-top: -2px;
+      border-top: 1px solid rgba(180, 230, 245, 0.35);
+    }
+
+    .dual-layout-tick {
+      position: absolute;
+      top: -1px;
+      width: 1px;
+      height: 7px;
+      transform: translateX(-50%);
+      background: rgba(190, 225, 235, 0.45);
+    }
+
+    .dual-layout-tick.major {
+      height: 12px;
+      background: rgba(228, 246, 250, 0.8);
+    }
+
+    .dual-layout-tick-label {
+      position: absolute;
+      top: 11px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      line-height: 1;
+      color: rgba(220, 235, 240, 0.72);
+      white-space: nowrap;
+    }
+
+    .dual-layout-current {
+      position: absolute;
+      top: -6px;
+      width: 3px;
+      height: 18px;
+      border-radius: 3px;
+      transform: translateX(-50%);
+      background: var(--cyan);
+      box-shadow: 0 0 12px rgba(116, 230, 255, 0.55);
+    }
+
+    .dual-layout-scale.angle-scale {
+      height: 58px;
+      margin-top: 0;
+      border-top: 0;
+      overflow: hidden;
+    }
+
+    .dual-layout-angle-arc {
+      position: absolute;
+      left: 50%;
+      bottom: -30px;
+      width: 104px;
+      height: 104px;
+      border: 2px solid rgba(180, 230, 245, 0.3);
+      border-bottom-color: transparent;
+      border-left-color: rgba(180, 230, 245, 0.2);
+      border-radius: 50%;
+      transform: translateX(-50%);
+      box-shadow: inset 0 0 16px rgba(116, 230, 255, 0.06);
+    }
+
+    .dual-layout-angle-needle {
+      position: absolute;
+      left: 50%;
+      bottom: 20px;
+      width: 3px;
+      height: 39px;
+      border-radius: 3px;
+      background: var(--cyan);
+      transform-origin: 50% 100%;
+      box-shadow: 0 0 12px rgba(116, 230, 255, 0.55);
+    }
+
+    .dual-layout-angle-zero {
+      position: absolute;
+      left: 50%;
+      bottom: 17px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(232, 247, 250, 0.86);
+      transform: translateX(-50%);
+    }
+
+    .dual-layout-angle-label {
+      position: absolute;
+      bottom: 1px;
+      color: rgba(220, 235, 240, 0.74);
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .dual-layout-angle-label.min { left: 2px; }
+    .dual-layout-angle-label.mid { left: 50%; transform: translateX(-50%); }
+    .dual-layout-angle-label.max { right: 2px; }
 
     .dual-layout-readout {
       grid-column: 1 / -1;
@@ -278,6 +421,31 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.45;
+    }
+
+    .personal-measure-data-panel h2,
+    .hole-modeling-panel > h2 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    .personal-measure-panel h2 {
+      color: var(--text);
+    }
+
+    .hole-modeling-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .hole-modeling-panel > .sheet-control-groups {
+      margin: 0;
+    }
+
+    .hole-model-subpanel {
+      margin-bottom: 0;
     }
 
     .save-controls {
@@ -650,6 +818,40 @@
     .ring-span-horizontal-control,
     .bridge-horizontal-control {
       display: none;
+    }
+
+
+    .bridge-list-card {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid rgba(134, 211, 255, 0.18);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(20, 40, 50, 0.84), rgba(9, 20, 26, 0.94));
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .bridge-select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid rgba(134, 211, 255, 0.28);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, 0.78);
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .bridge-list-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
     }
 
     .span-gauge-section {
@@ -1682,8 +1884,8 @@
 </head>
 <body>
   <main class="app">
-    <section class="section sheet-section measure-section">
-      <h2>メジャーシート</h2>
+    <section class="section sheet-section measure-section personal-measure-panel">
+      <h2>メジャーシート情報</h2>
       <div id="measureDiagram" class="measure-diagram" data-hand="right">
           <svg viewBox="0 0 1100 760" aria-hidden="true">
             <g fill="none" stroke="#0b0d0f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -1731,7 +1933,8 @@
     </section>
 
     <aside>
-      <section class="section save-panel data-section">
+      <section class="section save-panel data-section personal-measure-data-panel">
+        <h2>個人情報・保存データ</h2>
         <div class="save-controls">
           <div class="saved-profile-box">
             <div class="save-field">
@@ -1788,53 +1991,55 @@
         <p id="saveStatus" class="save-status"></p>
       </section>
 
-      <section class="section section-wide dual-layout-panel">
-        <h2>Dual Angle レイアウト</h2>
-        <div class="dual-layout-grid">
+      
+
+      <section class="section section-wide dual-layout-panel personal-axis-panel">
+        <h2>個人PAP・回転軸情報</h2>
+        <div class="dual-layout-grid pap-grid">
+          <label class="dual-layout-field wide">
+            <span>PAP左右 <output id="layoutPapRightValue">5"</output></span>
+            <input id="layoutPapRight" type="range" min="-7" max="7" step="0.0625" value="5" />
+            <div class="dual-layout-scale" data-range="layoutPapRight"></div>
+          </label>
+          <label class="dual-layout-field wide">
+            <span>PAP上下 <output id="layoutPapUpValue">0"</output></span>
+            <input id="layoutPapUp" type="range" min="-3" max="3" step="0.0625" value="0" />
+            <div class="dual-layout-scale" data-range="layoutPapUp"></div>
+          </label>
+        </div>
+      </section>
+
+      <section class="section section-wide dual-layout-panel drill-layout-panel">
+        <h2>ドリルレイアウト</h2>
+        <div class="dual-layout-grid drill-layout-grid">
           <label class="dual-layout-field wide">
             <span>算出GC</span>
             <span class="dual-layout-toggle"><input id="useDualAngleLayout" type="checkbox" checked /> 表面レイアウトを表示</span>
           </label>
           <label class="dual-layout-field">
-            <span>コア</span>
-            <select id="layoutCoreType">
-              <option value="morph" selected>非対称 / MB</option>
-              <option value="symmetric">対称 / vMB</option>
-            </select>
-          </label>
-          <label class="dual-layout-field">
             <span>ドリル角 <output id="layoutDrillAngleValue">45°</output></span>
             <input id="layoutDrillAngle" type="range" min="-120" max="120" step="1" value="45" />
+            <div class="dual-layout-scale" data-range="layoutDrillAngle"></div>
           </label>
           <label class="dual-layout-field">
             <span>PIN-PAP <output id="layoutPinPapValue">4 1/2"</output></span>
             <input id="layoutPinPap" type="range" min="0" max="6.5" step="0.0625" value="4.5" />
+            <div class="dual-layout-scale" data-range="layoutPinPap"></div>
           </label>
           <label class="dual-layout-field">
             <span>VAL角 <output id="layoutValAngleValue">45°</output></span>
             <input id="layoutValAngle" type="range" min="-120" max="120" step="1" value="45" />
-          </label>
-          <label class="dual-layout-field">
-            <span>PAP左右 <output id="layoutPapRightValue">5"</output></span>
-            <input id="layoutPapRight" type="range" min="-7" max="7" step="0.0625" value="5" />
-          </label>
-          <label class="dual-layout-field">
-            <span>PAP上下 <output id="layoutPapUpValue">0"</output></span>
-            <input id="layoutPapUp" type="range" min="-3" max="3" step="0.0625" value="0" />
-          </label>
-          <label class="dual-layout-field">
-            <span>偏心X <output id="layoutEccXValue">1/2"</output></span>
-            <input id="layoutEccX" type="range" min="-1.5" max="1.5" step="0.0625" value="0.5" />
-          </label>
-          <label class="dual-layout-field">
-            <span>偏心Y <output id="layoutEccYValue">1/4"</output></span>
-            <input id="layoutEccY" type="range" min="-1.5" max="1.5" step="0.0625" value="0.25" />
+            <div class="dual-layout-scale" data-range="layoutValAngle"></div>
           </label>
           <p id="dualLayoutReadout" class="dual-layout-readout">Dual Angleガイドは未表示です。</p>
         </div>
       </section>
 
-      <div class="sheet-control-groups section-wide">
+      <section class="section section-wide hole-modeling-panel">
+        <h2>ホールモデリング</h2>
+        
+
+        <div class="sheet-control-groups section-wide">
           <div class="sheet-hidden-controls" aria-hidden="true">
             <input id="middleSpan" type="range" min="2.5" max="5.5" step="0.03125" value="4" />
             <input id="ringSpanOffset" type="range" min="-0.5" max="0.5" step="0.03125" value="0" />
@@ -2064,13 +2269,14 @@
             </div>
             <div class="span-gauge-control bridge-gauge-control" data-role="bridge">
               <h3>ブリッジ</h3>
-              <button id="bridgeGauge" class="span-horizontal-gauge" type="button" data-span-range="bridge" aria-label="ブリッジ">
-                <span class="span-gauge-min"></span>
-                <span class="span-gauge-track"></span>
-                <span class="span-gauge-current"></span>
-                <span class="span-gauge-value"></span>
-                <span class="span-gauge-max"></span>
-              </button>
+              <div class="bridge-list-card">
+                <select id="bridgeSelect" class="bridge-select" aria-label="ブリッジ"></select>
+                <div class="bridge-list-meta">
+                  <span id="bridgeSelectMin"></span>
+                  <span>1/64刻み</span>
+                  <span id="bridgeSelectMax"></span>
+                </div>
+              </div>
             </div>
             <div class="span-gauge-control offset-span-gauge-control" data-role="offset">
               <h3>薬指 +/-</h3>
@@ -2191,6 +2397,30 @@
           </div>
           <p id="saveResult" class="save-status save-result"></p>
         </div>
+      </section>
+
+        <section class="section section-wide dual-layout-panel ball-model-panel hole-model-subpanel">
+        <h2>ボール本体モデリング</h2>
+        <div class="dual-layout-grid modeling-grid">
+          <label class="dual-layout-field wide">
+            <span>コア</span>
+            <select id="layoutCoreType">
+              <option value="morph" selected>非対称 / MB</option>
+              <option value="symmetric">対称 / vMB</option>
+            </select>
+          </label>
+          <label class="dual-layout-field">
+            <span>偏心X <output id="layoutEccXValue">1/2"</output></span>
+            <input id="layoutEccX" type="range" min="-1.5" max="1.5" step="0.0625" value="0.5" />
+            <div class="dual-layout-scale" data-range="layoutEccX"></div>
+          </label>
+          <label class="dual-layout-field">
+            <span>偏心Y <output id="layoutEccYValue">1/4"</output></span>
+            <input id="layoutEccY" type="range" min="-1.5" max="1.5" step="0.0625" value="0.25" />
+            <div class="dual-layout-scale" data-range="layoutEccY"></div>
+          </label>
+        </div>
+      </section>
       </section>
     </aside>
 
@@ -2314,6 +2544,8 @@
     });
 
     document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
+    setupBridgeSelect();
+    document.querySelectorAll(".dual-layout-scale").forEach(renderDualLayoutScale);
     setupPitchCrossControls();
     updateAllPitchCrossControls();
     setupDepthGauges();
@@ -2734,6 +2966,115 @@
       document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
     }
 
+    function setupBridgeSelect() {
+      const select = document.querySelector("#bridgeSelect");
+      const range = document.querySelector("#bridge");
+      if (!select || !range) return;
+      const min = Number(range.min);
+      const max = Number(range.max);
+      const step = Number(range.step) || 1 / 64;
+      const options = [];
+      for (let value = min; value <= max + step / 2; value += step) {
+        const snapped = snapToStep(value, range.step);
+        options.push('<option value="' + snapped + '">' + formatInch(snapped) + '</option>');
+      }
+      select.innerHTML = options.join("");
+      select.addEventListener("change", () => setRangeValue(range, Number(select.value)));
+      updateBridgeSelectFromRange(range);
+    }
+
+    function updateBridgeSelectFromRange(range) {
+      if (!range || range.id !== "bridge") return;
+      const select = document.querySelector("#bridgeSelect");
+      if (!select) return;
+      const value = Number(range.value);
+      let nearest = null;
+      Array.from(select.options).forEach((option) => {
+        const distance = Math.abs(Number(option.value) - value);
+        if (!nearest || distance < nearest.distance) nearest = { option, distance };
+      });
+      if (nearest && select.value !== nearest.option.value) select.value = nearest.option.value;
+      const minLabel = document.querySelector("#bridgeSelectMin");
+      const maxLabel = document.querySelector("#bridgeSelectMax");
+      if (minLabel) minLabel.textContent = formatInch(Number(range.min));
+      if (maxLabel) maxLabel.textContent = formatInch(Number(range.max));
+    }
+
+    function renderDualLayoutScale(scaleEl) {
+      const range = document.querySelector('#' + scaleEl.dataset.range);
+      if (!range) return;
+      scaleEl.classList.toggle("angle-scale", isDualAngleRange(range));
+      scaleEl.classList.toggle("length-scale", !isDualAngleRange(range));
+      if (isDualAngleRange(range)) {
+        scaleEl.innerHTML = '<span class="dual-layout-angle-arc"></span>'
+          + '<span class="dual-layout-angle-needle"></span>'
+          + '<span class="dual-layout-angle-zero"></span>'
+          + '<span class="dual-layout-angle-label min">' + Math.round(Number(range.min)) + '°</span>'
+          + '<span class="dual-layout-angle-label mid">0°</span>'
+          + '<span class="dual-layout-angle-label max">' + Math.round(Number(range.max)) + '°</span>';
+        updateDualLayoutScale(range);
+        return;
+      }
+      const min = Number(range.min);
+      const max = Number(range.max);
+      const ticks = dualLayoutTicks(range, min, max);
+      scaleEl.innerHTML = ticks.map((tick) => {
+        const left = ((tick.value - min) / (max - min)) * 100;
+        const label = tick.label ? '<span class="dual-layout-tick-label">' + tick.label + '</span>' : '';
+        return '<span class="dual-layout-tick' + (tick.major ? ' major' : '') + '" style="left:' + left + '%">' + label + '</span>';
+      }).join("") + '<span class="dual-layout-current"></span>';
+      updateDualLayoutScale(range);
+    }
+
+    function isDualAngleRange(range) {
+      return range?.id === "layoutDrillAngle" || range?.id === "layoutValAngle";
+    }
+
+    function dualLayoutTicks(range, min, max) {
+      const step = 1;
+      const first = Math.ceil(min / step) * step;
+      const values = [min, max];
+      for (let value = first; value <= max; value += step) {
+        if (value >= min && value <= max) values.push(value);
+      }
+      if (min < 0 && max > 0) values.push(0);
+      return Array.from(new Set(values.map((value) => Number(value.toFixed(6)))))
+        .sort((a, b) => a - b)
+        .map((value) => {
+          const major = Math.abs(value % 2) < 0.0001 || value === 0 || value === min || value === max;
+          return {
+            value,
+            major,
+            label: major ? dualLayoutScaleLabel(range, value) : "",
+          };
+        });
+    }
+
+    function dualLayoutScaleLabel(range, value) {
+      if (value === 0) return "0";
+      return formatInch(value);
+    }
+
+    function updateDualLayoutScale(range) {
+      if (!range || !range.id || !range.id.startsWith("layout")) return;
+      const scaleEl = document.querySelector('.dual-layout-scale[data-range="' + range.id + '"]');
+      if (!scaleEl) return;
+      const min = Number(range.min);
+      const max = Number(range.max);
+      const value = Number(range.value);
+      if (isDualAngleRange(range)) {
+        const needle = scaleEl.querySelector(".dual-layout-angle-needle");
+        if (!needle) return;
+        const angle = clamp(value, min, max);
+        const displayAngle = clamp(angle, -75, 75);
+        needle.style.transform = "translateX(-50%) rotate(" + displayAngle + "deg)";
+        return;
+      }
+      const marker = scaleEl.querySelector(".dual-layout-current");
+      if (!marker) return;
+      marker.style.left = ((value - min) / (max - min)) * 100 + "%";
+    }
+
     function setupSpanInputControls() {
       updateSpanInputControls();
       document.querySelectorAll(".span-vertical-gauge, .span-horizontal-gauge").forEach((gauge) => {
@@ -2771,6 +3112,7 @@
         const range = document.querySelector("#" + gauge.dataset.spanRange);
         if (range) updateSpanGaugeForRange(range);
       });
+      updateBridgeSelectFromRange(document.querySelector("#bridge"));
     }
 
     function setSpanGaugeFromPointer(gauge, event) {
@@ -3072,6 +3414,8 @@
       range.value = value;
       setValueOutput(range, document.querySelector(`#${range.id}Value`));
       if (document.querySelector(`[data-span-range="${range.id}"]`)) updateSpanGaugeForRange(range);
+      updateBridgeSelectFromRange(range);
+      updateDualLayoutScale(range);
       if (shouldDraw) draw();
     }
 
@@ -3410,20 +3754,24 @@
         ringSpan,
         drillDepth: Math.max(thumbDrillDepth, middleDrillDepth, ringDrillDepth)
       };
-      for (let i = 0; i < 4; i++) {
-        solveFingerBridgePosition(data);
-        if (data.hasThumb) {
-          solveFingerSpanPosition(data, data.middle, middleSpan);
-          solveFingerSpanPosition(data, data.ring, ringSpan);
-        } else {
-          applyFingerCenterY(data.middle, value("middleNoThumbOffset"));
-          applyFingerCenterY(data.ring, value("ringNoThumbOffset"));
-        }
-      }
       data.dualLayout = calculateDualAngleLayout(data.ballRadius);
       data.usesDualAngleLayout = dualAngleLayoutEnabled();
       data.gripCenter.surfacePoint = data.usesDualAngleLayout ? data.dualLayout.gripCenter : null;
       data.gripCenter.color = data.usesDualAngleLayout ? DUAL_LAYOUT_COLORS.gripCenter : "#ffffff";
+
+      const previousLayoutOrigin = state.layoutOrigin;
+      const previousLayoutBasis = state.layoutBasis;
+      state.layoutOrigin = data.usesDualAngleLayout ? data.dualLayout.gripCenter : null;
+      state.layoutBasis = data.usesDualAngleLayout ? data.dualLayout.layoutBasis : null;
+      if (data.hasThumb) {
+        solveFingerSpanPosition(data, data.middle, middleSpan);
+        solveFingerSpanPosition(data, data.ring, ringSpan);
+      } else {
+        applyFingerCenterY(data.middle, value("middleNoThumbOffset"));
+        applyFingerCenterY(data.ring, value("ringNoThumbOffset"));
+      }
+      state.layoutOrigin = previousLayoutOrigin;
+      state.layoutBasis = previousLayoutBasis;
       data.holes = data.hasThumb ? [data.thumb, data.middle, data.ring] : [data.middle, data.ring];
       return data;
     }
@@ -3549,6 +3897,20 @@
         scalePoint(basis.up, y)
       );
       return scalePoint(normalize(tangentPoint), radius);
+    }
+
+    function surfaceLocalOffset(point, radius) {
+      const basis = state.layoutOrigin
+        ? surfaceOffsetBasis(state.layoutOrigin)
+        : { normal: { x: 0, y: 0, z: 1 }, right: { x: 1, y: 0, z: 0 }, up: { x: 0, y: 1, z: 0 } };
+      const direction = normalize(point);
+      const normalProjection = dot(direction, basis.normal);
+      if (Math.abs(normalProjection) < 1e-6) return { x: 0, y: 0 };
+      const tangentPoint = scalePoint(direction, radius / normalProjection);
+      return {
+        x: dot(tangentPoint, basis.right),
+        y: dot(tangentPoint, basis.up)
+      };
     }
 
     function surfaceOffsetBasis(origin) {
@@ -4371,7 +4733,7 @@
       const originalX = hole.x;
       const edgeAt = (x) => {
         hole.x = x;
-        return bridgeContactPoint(hole, side, data).x;
+        return bridgeContactLocalX(hole, side, data);
       };
       let lowEdge = edgeAt(low);
       let highEdge = edgeAt(high);
@@ -4392,13 +4754,19 @@
       hole.x = (low + high) / 2;
     }
 
+    function bridgeContactLocalX(hole, side, data) {
+      return surfaceLocalOffset(bridgeContactPoint(hole, side, data), data.ballRadius).x;
+    }
+
     function bridgeContactPoint(hole, side, data) {
       const points = openingBoundaryPoints(hole, drilledOpeningRadius(hole), data, 256);
       if (!points.length) return toSphere(hole.x, hole.y, data.ballRadius);
       return points.reduce((best, point) => {
+        const pointX = surfaceLocalOffset(point, data.ballRadius).x;
+        const bestX = surfaceLocalOffset(best, data.ballRadius).x;
         return side === "right"
-          ? point.x > best.x ? point : best
-          : point.x < best.x ? point : best;
+          ? pointX > bestX ? point : best
+          : pointX < bestX ? point : best;
       }, points[0]);
     }
 
