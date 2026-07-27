@@ -97,3 +97,52 @@ The right-hand control panel has been compacted:
   - a central angle arc with arrow
   - `Thumb-Middle` and `Thumb-Ring` labels near the angle arc
 - The previous sphere-surface angle arc was removed.
+
+## Application Direction
+
+The prototype is no longer only a single drilling calculator. The intended product direction is an integrated bowling-ball management application with three major layers.
+
+1. Measure Sheet And Personal Data
+   - This is the highest-priority and top-level section.
+   - It should combine:
+     - saved-data search
+     - personal data display/editing
+     - PAP registration
+     - measure-sheet registration
+   - The main deliverable in this layer is a reliable measure-sheet registry and its corresponding 3D grip/hole model.
+
+2. Drill Layout Modeling
+   - This sits below the measure-sheet section.
+   - It includes Dual Angle layout, PIN/CG/MB/vMB, PAP, VAL, GC calculation, and ball/core visualization.
+   - Current implementation already has a first working version, but it needs more rigorous physical ball modeling.
+   - Future work should deepen core shape, mass distribution, surface reference points, and how those influence layout marks.
+
+3. Shelf Application
+   - This is the final application shell.
+   - It should manage:
+     - bowlers/person profiles
+     - measure sheets
+     - owned bowling balls
+     - each ball's usage status/history
+     - drill layout records
+     - layout and drilling previews per ball
+   - The expected direction is similar to the separate `ymsh003/ball-shelf-project` concept.
+
+## Current UI Organization Target
+
+- Top: integrated personal/measure-sheet section.
+- Middle: drill layout and ball/core modeling section.
+- Later: shelf-style ownership and usage management section.
+
+The next development focus is physical ball modeling, not further ad-hoc UI reshuffling.
+
+## Physical Modeling Focus Next
+
+The next work should refine the ball model itself:
+
+- core geometry fidelity
+- core eccentricity and density assumptions
+- relationship between core model and surface `PIN`, `CG`, `MB`
+- stable calculation of virtual MB for symmetric cores
+- visual separation between actual ball marks and derived layout marks
+- validation that Dual Angle geometry is calculated from the intended physical reference points
