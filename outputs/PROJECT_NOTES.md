@@ -107,6 +107,15 @@ The right-hand control panel has been compacted:
 
 Reason for priority: these issues either made working controls look broken, made requested fixed sections fail, or kept removed controls alive as hidden UI debt.
 
+## 2026-07-28 Measure Review And Mobile Usability Update
+
+- The large left-side measure sheet no longer follows scroll.
+- A compact right-side `メジャーシート確認` panel now stays near the 3D preview and updates from the same input state as the model.
+- Depth controls were restyled to match the pitch stepper pattern.
+- Buttons and inputs were enlarged toward mobile-friendly touch targets, with narrow-screen steppers using 48px controls and 16px input text.
+
+Reason for the direction change: reviewing values while editing is useful, but making the full measure sheet sticky reduced the working area. The compact review panel keeps feedback visible without blocking detailed inputs.
+
 ## Application Direction
 
 The prototype is no longer only a single drilling calculator. The intended product direction is an integrated bowling-ball management application with three major layers.

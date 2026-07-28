@@ -45,6 +45,38 @@ Verification performed in headless Chrome after this repair pass:
   - body scroll width stayed `390`.
   - `.app` stacked into a single 390px-wide column instead of forcing the old 1440px desktop grid.
 
+## 2026-07-28 Measure Review And Mobile Usability Pass
+
+The user reported that the sticky measure sheet was still hard to use. The direction changed from making the large left-side measure sheet follow the scroll to keeping a compact, always-visible review panel near the 3D viewer.
+
+Repairs applied:
+
+- Disabled sticky behavior for the large `メジャーシート情報` section.
+  - Reason: the large sheet consumed too much left-pane working space while editing detailed hole settings.
+  - Change: `.measure-section` now remains in normal scroll flow. `個人情報・保存データ` remains sticky.
+- Added right-side `メジャーシート確認`.
+  - Reason: detailed edits are easier when the current measure values are visible near the 3D preview.
+  - Change: a compact live summary panel was inserted between the viewer and right-side modeling controls. It renders current finger sizes, span, thumb, PAP, pitch, and layout values from the same input state used by `draw()`.
+- Unified depth controls with pitch-style steppers.
+  - Reason: depth controls visually differed from pitch controls because they still carried old gauge sizing.
+  - Change: depth steppers now use the same full-row `- / value / +` structure and 44px targets as pitch steppers.
+- Improved mobile readability and touch sizing.
+  - Reason: many controls used 9-12px text and small hit targets, which is unsuitable for phone use.
+  - Change: common inputs/buttons now use at least 44px targets on desktop and 48px on narrow screens; narrow-screen input text is forced to 16px.
+
+Verification performed:
+
+- Desktop 1440x900:
+  - no JavaScript page errors.
+  - `メジャーシート情報` computed as `position: relative` and scrolls away normally.
+  - `メジャーシート確認` displayed 8 live summary items with no hidden items.
+  - depth and pitch steppers were both 44px tall, and depth value input expanded to 177px without clipping.
+  - drill layout steppers did not overflow their cards.
+- Mobile 390x844:
+  - body scroll width stayed `390`.
+  - visible stepper buttons measured 48px square.
+  - visible stepper input measured 48px high with 16px text.
+
 ## Repository And Files
 
 - Main local workspace:
