@@ -24,7 +24,7 @@
 
     body {
       margin: 0;
-      min-width: 1440px;
+      min-width: 0;
       min-height: 900px;
       overflow: auto;
       display: grid;
@@ -37,15 +37,15 @@
 
     .app {
       display: grid;
-      grid-template-columns: 680px 724px;
+      grid-template-columns: minmax(620px, 680px) minmax(620px, 724px);
       grid-template-rows: 876px;
       grid-template-areas:
         "controls viewer";
       gap: 12px;
       padding: 12px;
-      width: 1440px;
+      width: min(1440px, 100vw);
       height: 900px;
-      min-width: 1440px;
+      min-width: 0;
       min-height: 900px;
       overflow: hidden;
     }
@@ -227,6 +227,16 @@
     .section,
     .sheet-card {
       position: relative;
+    }
+
+    .section.data-section {
+      position: sticky;
+      top: 0;
+    }
+
+    .section.measure-section {
+      position: sticky;
+      top: var(--measure-sticky-top, 154px);
     }
 
     .section::before,
@@ -439,7 +449,13 @@
       font-size: 14px;
     }
 
-    .pitch-axis .range-adjust-control,
+    .pitch-axis .range-adjust-control {
+      width: 100%;
+      max-width: none;
+      grid-template-columns: 34px minmax(9.5rem, 1fr) 34px;
+      justify-self: stretch;
+    }
+
     .depth-panel .range-adjust-control {
       width: auto;
       max-width: max-content;
@@ -1504,6 +1520,7 @@
 
     .main-span-gauge-control { grid-area: main; }
     .bridge-gauge-control { display: none !important; }
+    .bridge-gauge-control .bridge-list-card { display: none !important; }
     .offset-span-gauge-control { grid-area: offset; }
 
     .span-gauge-control {
@@ -2631,9 +2648,10 @@
     }
 
     .pitch-axis .range-adjust-control {
-      grid-template-columns: 34px minmax(0, 1fr) 34px !important;
+      grid-template-columns: 34px minmax(9.5rem, 1fr) 34px !important;
       width: 100% !important;
       max-width: 100%;
+      justify-self: stretch;
     }
 
     .depth-panel .range-adjust-control {
@@ -2643,11 +2661,45 @@
     }
 
     .pitch-axis .range-adjust-input {
+      width: 100%;
       min-width: 0;
       overflow: visible;
       text-overflow: clip;
       font-size: 13px;
       padding-inline: 6px;
+    }
+
+    @media (max-width: 1200px) {
+      body {
+        min-height: 900px;
+        place-items: start;
+      }
+
+      .app {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(720px, 78vh) auto;
+        grid-template-areas:
+          "controls"
+          "viewer";
+        width: 100vw;
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+      }
+
+      aside {
+        height: 100%;
+      }
+
+      .right-workspace {
+        min-height: 760px;
+        grid-template-rows: minmax(360px, 52vh) auto;
+        overflow: visible;
+      }
+
+      .right-modeling-controls {
+        overflow: visible;
+      }
     }
   </style>
 </head>
@@ -4095,6 +4147,11 @@
       const select = document.querySelector("#bridgeSelect");
       const range = document.querySelector("#bridge");
       if (!select || !range) return;
+      const bridgeControl = select.closest(".bridge-gauge-control");
+      if (bridgeControl && getComputedStyle(bridgeControl).display === "none") {
+        select.innerHTML = "";
+        return;
+      }
       const min = Number(range.min);
       const max = Number(range.max);
       const step = Number(range.step) || 1 / 64;

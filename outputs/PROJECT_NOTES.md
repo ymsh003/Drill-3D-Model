@@ -95,8 +95,17 @@ The right-hand control panel has been compacted:
 - Angle visualization was revised to match the requested reference style:
   - center-origin rays to the thumb and finger hole positions
   - a central angle arc with arrow
-  - `Thumb-Middle` and `Thumb-Ring` labels near the angle arc
+- `Thumb-Middle` and `Thumb-Ring` labels near the angle arc
 - The previous sphere-surface angle arc was removed.
+
+## 2026-07-28 UI Repair Record
+
+- Sticky personal/measure-sheet sections were repaired by preventing the shared `.section` positioning rule from overriding `position: sticky`.
+- Pitch steppers were widened so long Japanese pitch labels such as `フォワード 1/16"` can fit after a `+/-` click.
+- Hidden bridge select generation was stopped while bridge editing remains intentionally absent from the visible UI.
+- A first narrow-viewport stacked layout was added so the app is no longer hard locked to a desktop-only two-column canvas on small screens.
+
+Reason for priority: these issues either made working controls look broken, made requested fixed sections fail, or kept removed controls alive as hidden UI debt.
 
 ## Application Direction
 

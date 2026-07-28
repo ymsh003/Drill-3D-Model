@@ -6,6 +6,45 @@ This document is the handoff record for the bowling-ball drilling 3D prototype. 
 
 The current implementation is not in a clean finished state. The user is dissatisfied with recent UI changes around pitch/stepper controls. Treat the current UI as a work in progress and verify every visual change in the browser before saying it is fixed.
 
+## 2026-07-28 High-Risk UI Repair Pass
+
+Repairs applied after a whole-UI risk audit:
+
+- Fixed sticky section CSS precedence.
+  - Reason: `.data-section` and `.measure-section` declared `position: sticky`, but the later `.section, .sheet-card { position: relative; }` rule overrode them. Browser measurement showed both sections computed as `position: relative`, so the requested sticky behavior was not actually active.
+  - Change: added more specific `.section.data-section` and `.section.measure-section` rules after the shared `.section` positioning rule.
+- Expanded pitch stepper value fields.
+  - Reason: pitch `+/-` buttons did change values internally by `1/16"`, but `フォワード 1/16"` was clipped in a 74px field. This made the control appear broken to the user.
+  - Change: removed the pitch-specific 74px middle-column constraint and made pitch steppers stretch with `minmax(9.5rem, 1fr)`. Depth steppers keep their compact width because their labels are short.
+- Stopped hidden bridge UI option generation.
+  - Reason: bridge editing was intentionally removed from visible UI, but the hidden `#bridgeSelect` still generated many options inside a hidden control. This kept an obsolete control alive and increased the chance of a future CSS change exposing it again.
+  - Change: `.bridge-gauge-control .bridge-list-card` is explicitly hidden, and `setupBridgeSelect()` exits without generating options when the bridge control is hidden.
+- Added a first narrow-viewport escape layout.
+  - Reason: the app was hard-fixed to 1440px wide and 900px high, causing controls to disappear offscreen on narrow/mobile viewports.
+  - Change: default body/app minimum width was relaxed, and a `max-width: 1200px` media rule stacks the control and viewer workspaces vertically instead of forcing the desktop two-column grid.
+
+Verification required after any follow-up edits:
+
+1. Open `outputs/bowling-drill-3d-prototype.html` in a browser.
+2. Scroll the left pane and confirm `個人情報・保存データ` sticks at the top and `メジャーシート情報` sticks below it.
+3. Scroll to pitch controls, click `+`, and confirm `フォワード 1/16"` or equivalent labels are fully visible.
+4. Confirm no bridge select/control is visible.
+5. Check at least one narrow viewport around 390px wide and confirm controls are reachable without clipped action buttons.
+
+Verification performed in headless Chrome after this repair pass:
+
+- Desktop 1440x900:
+  - no page JavaScript errors were reported.
+  - `.data-section` computed as `position: sticky; top: 0px`.
+  - `.measure-section` computed as `position: sticky; top: 204px`.
+  - after scrolling the left pane, both sticky sections stayed at the expected y positions.
+  - clicking `middleVerticalAxis +` changed the hidden range to `0.0625` and displayed `フォワード 1/16"` without clipping (`clientWidth 197`, `scrollWidth 197`).
+  - hidden `#bridgeSelect` generated `0` options and `.bridge-gauge-control` remained invisible.
+- Narrow viewport 390x844:
+  - document client width stayed `390`.
+  - body scroll width stayed `390`.
+  - `.app` stacked into a single 390px-wide column instead of forcing the old 1440px desktop grid.
+
 ## Repository And Files
 
 - Main local workspace:
@@ -536,4 +575,3 @@ Minimum verification before responding:
 The recent failure pattern was repeatedly editing CSS/source and claiming completion without browser-visible confirmation. Do not repeat this. The user is explicitly checking the actual screen.
 
 If a fix cannot be visually verified from this environment, report that limitation plainly and give exact files changed and exact expected visible result.
-
