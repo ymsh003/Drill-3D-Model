@@ -116,6 +116,15 @@ Reason for priority: these issues either made working controls look broken, made
 
 Reason for the direction change: reviewing values while editing is useful, but making the full measure sheet sticky reduced the working area. The compact review panel keeps feedback visible without blocking detailed inputs.
 
+Correction after user clarification:
+
+- The separate compact `メジャーシート確認` panel was removed.
+- The actual diagram-style `メジャーシート情報` section was moved to the right workspace under the 3D viewer.
+- The left pane now focuses on detailed input sections.
+- Drill layout steppers were compacted locally so `ドリル角`, `PIN-PAP`, and `VAL角` buttons no longer protrude from their cards.
+
+Reason: the user wanted the existing measure sheet diagram itself to stay visible, not a separate summary screen.
+
 ## Application Direction
 
 The prototype is no longer only a single drilling calculator. The intended product direction is an integrated bowling-ball management application with three major layers.

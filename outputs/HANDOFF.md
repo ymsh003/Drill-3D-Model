@@ -77,6 +77,37 @@ Verification performed:
   - visible stepper buttons measured 48px square.
   - visible stepper input measured 48px high with 16px text.
 
+## 2026-07-28 Correction: Use The Actual Measure Sheet Diagram
+
+The previous pass misunderstood the user's intent. The user did not want a separate summarized review panel; they wanted the existing diagram-style `メジャーシート情報` itself to remain visible while editing details.
+
+Corrections applied:
+
+- Removed the separate `メジャーシート確認` summary panel.
+  - Reason: it duplicated information and did not satisfy the request to keep the actual measure sheet diagram visible.
+- Moved the existing `メジャーシート情報` section from the left `aside` into the right workspace, directly under the 3D viewer.
+  - Reason: the same diagram and live field positions are now always visible near the 3D model while the left pane is used for detailed editing.
+  - Important: the existing DOM was moved, not duplicated, so IDs such as `#measureDiagram`, `#middleSpanValue`, and pitch token elements remain unique.
+- Kept the large measure sheet diagram in normal flow on the right side.
+  - Reason: the left pane should stay focused on input details, while the right side carries visual feedback.
+- Fixed the drill layout stepper overflow introduced by larger touch targets.
+  - Reason: the `ドリル角`, `PIN-PAP`, and `VAL角` cards are narrow. The previous 44px-wide general stepper sizing made the `+` button protrude from its card.
+  - Change: drill-layout card steppers use a compact local rule while pitch/depth controls keep larger touch targets.
+
+Verification performed:
+
+- Desktop 1440x900:
+  - no JavaScript page errors.
+  - no old left-side `aside > .measure-section` remained.
+  - exactly one `#measureDiagram` existed.
+  - the right-side measure diagram rendered under the 3D viewer.
+  - the obsolete `.measure-live-panel` no longer existed.
+  - drill layout steppers had `0` overflow cases.
+- Mobile 390x844:
+  - body scroll width stayed `390`.
+  - the moved measure diagram remained within the viewport width.
+  - visible stepper button target remained 48px square.
+
 ## Repository And Files
 
 - Main local workspace:
