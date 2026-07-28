@@ -37,10 +37,9 @@
 
     .app {
       display: grid;
-      grid-template-columns: 760px 644px;
-      grid-template-rows: 344px 520px;
+      grid-template-columns: 680px 724px;
+      grid-template-rows: 876px;
       grid-template-areas:
-        "controls measure"
         "controls viewer";
       gap: 12px;
       padding: 12px;
@@ -52,7 +51,6 @@
     }
 
     .viewer {
-      grid-area: viewer;
       position: relative;
       min-height: 0;
       border: 1px solid var(--line);
@@ -203,9 +201,20 @@
 
     .data-section {
       min-height: 0;
+      position: sticky;
+      top: 0;
+      z-index: 40;
       background:
         linear-gradient(135deg, rgba(89,201,167,.10), transparent 42%),
         var(--panel-2);
+      box-shadow: 0 8px 14px rgba(4, 14, 18, .35);
+    }
+
+    .measure-section {
+      position: sticky;
+      top: var(--measure-sticky-top, 154px);
+      z-index: 39;
+      box-shadow: 0 8px 14px rgba(4, 14, 18, .30);
     }
 
     .section {
@@ -213,6 +222,56 @@
       border-radius: 8px;
       background: var(--panel-2);
       padding: 10px;
+    }
+
+    .section,
+    .sheet-card {
+      position: relative;
+    }
+
+    .section::before,
+    .sheet-card::before {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      left: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 4px;
+      border-radius: 0 4px 4px 0;
+      background: var(--section-accent, rgba(134, 211, 255, .42));
+    }
+
+    .section > h2,
+    .sheet-card > h2,
+    .sheet-card > h3 {
+      color: var(--section-heading, var(--text));
+    }
+
+    .data-section {
+      --section-accent: #59c9a7;
+      --section-heading: #bff5e6;
+    }
+
+    .measure-section,
+    .hole-modeling-panel {
+      --section-accent: #69b8ff;
+      --section-heading: #cdeaff;
+    }
+
+    .personal-axis-panel {
+      --section-accent: #f1c75f;
+      --section-heading: #ffe7a6;
+    }
+
+    .drill-layout-panel {
+      --section-accent: #ff9f68;
+      --section-heading: #ffd1b6;
+    }
+
+    .ball-model-panel {
+      --section-accent: #d78cff;
+      --section-heading: #edcffd;
     }
 
     .section-wide { grid-column: 1 / -1; }
@@ -299,6 +358,149 @@
       display: none;
     }
 
+    input[type="range"] {
+      display: none;
+    }
+
+    .range-list-control,
+    .range-adjust-input {
+      width: 100%;
+      min-height: 34px;
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+      border: 1px solid rgba(120, 230, 255, 0.28);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, 0.84);
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
+      padding: 6px 8px;
+    }
+
+    .range-adjust-control {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) 34px;
+      gap: 5px;
+      align-items: stretch;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .range-adjust-button {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      min-height: 34px;
+      border: 1px solid rgba(120, 230, 255, 0.24);
+      border-radius: 8px;
+      background: rgba(8, 24, 31, 0.9);
+      color: var(--text);
+      font: inherit;
+      font-size: 17px;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .range-adjust-button:active {
+      transform: translateY(1px);
+    }
+
+    .range-adjust-input {
+      text-align: center;
+    }
+
+    .pitch-axis .range-list-control,
+    .pitch-axis .range-adjust-control,
+    .pitch-axis .range-list-meta,
+    .pitch-axis .range-adjust-meta,
+    .depth-panel .range-list-control,
+    .depth-panel .range-adjust-control,
+    .depth-panel .range-adjust-meta {
+      grid-column: 1 / -1;
+    }
+
+    .range-adjust-meta,
+    .axis-label {
+      display: none !important;
+    }
+
+    .pitch-axis .range-list-control,
+    .depth-panel .range-list-control {
+      min-height: 38px;
+      font-size: 14px;
+    }
+
+    .pitch-axis .range-adjust-input,
+    .depth-panel .range-adjust-input {
+      min-height: 38px;
+      font-size: 14px;
+    }
+
+    .pitch-axis .range-adjust-control,
+    .depth-panel .range-adjust-control {
+      width: auto;
+      max-width: max-content;
+      grid-template-columns: 34px 74px 34px;
+      justify-self: start;
+    }
+
+    .pitch-axis .range-adjust-meta,
+    .depth-panel .range-adjust-meta {
+      justify-self: start;
+      text-align: left;
+    }
+
+    .range-list-meta {
+      color: rgba(213, 232, 238, .58);
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .range-adjust-meta {
+      color: rgba(213, 232, 238, .58);
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .bridge-list-card {
+      display: none;
+    }
+
+    [data-range-adjust="bridge"],
+    [data-range-adjust="bridge"] + .range-adjust-meta,
+    .range-adjust-meta:has(+ [data-range-adjust="bridge"]) {
+      display: none !important;
+    }
+
+    .dual-layout-scale,
+    .span-vertical-gauge,
+    .span-horizontal-gauge,
+    .indicator-scale,
+    .depth-gauge,
+    .pitch-cross {
+      display: none !important;
+    }
+
+    .pitch-axis.pitch-source,
+    .pitch-axis.depth-range-source {
+      display: grid !important;
+    }
+
+    .pitch-depth-layout,
+    .pitch-depth-layout.depth-right {
+      grid-template-columns: 1fr !important;
+    }
+
+    .depth-panel {
+      align-items: stretch;
+      justify-items: stretch;
+    }
+
     .dual-layout-toggle {
       display: flex;
       align-items: center;
@@ -340,6 +542,27 @@
       background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,0)), rgba(9, 20, 27, .82);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
       overflow: hidden;
+    }
+
+    .right-workspace {
+      grid-area: viewer;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(430px, 1fr) 390px;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .right-modeling-controls {
+      min-height: 0;
+      display: grid;
+      gap: 10px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .right-modeling-controls .section {
+      min-width: 0;
     }
 
     .dual-layout-scale.length-scale::before {
@@ -687,10 +910,10 @@
     }
 
     .measure-section {
-      grid-area: measure;
       display: grid;
       grid-template-rows: auto minmax(0, 1fr);
       gap: 8px;
+      height: 344px;
       min-height: 0;
       overflow: hidden;
     }
@@ -795,6 +1018,9 @@
     .measure-diagram[data-hand="left"] .field-middle-hole { left: 60.909%; }
     .field-middle-hole,
     .field-ring-hole { top: 28.947%; transform: translate(-50%, -50%); }
+    .measure-diagram .field-bridge {
+      display: none;
+    }
     .measure-diagram[data-hand="right"] .field-main-span,
     .measure-diagram[data-hand="left"] .field-offset-span { left: 25.455%; }
     .measure-diagram[data-hand="right"] .field-offset-span,
@@ -1259,12 +1485,12 @@
 
     .span-gauge-section {
       display: grid;
-      grid-template-columns: minmax(92px, .8fr) minmax(170px, 1.4fr) minmax(92px, .8fr);
-      grid-template-areas: "main bridge offset";
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas: "main offset";
       gap: 14px;
       align-items: center;
-      min-height: 360px;
-      padding: 18px 12px;
+      min-height: 0;
+      padding: 14px 12px;
       border: 1px solid rgba(255,255,255,.1);
       border-radius: 8px;
       background: rgba(12, 15, 18, .28);
@@ -1273,18 +1499,32 @@
     }
 
     .span-gauge-section[data-hand="left"] {
-      grid-template-areas: "offset bridge main";
+      grid-template-areas: "offset main";
     }
 
     .main-span-gauge-control { grid-area: main; }
-    .bridge-gauge-control { grid-area: bridge; }
+    .bridge-gauge-control { display: none !important; }
     .offset-span-gauge-control { grid-area: offset; }
 
     .span-gauge-control {
       display: grid;
-      gap: 8px;
+      gap: 6px;
       justify-items: center;
       min-width: 0;
+    }
+
+    .span-gauge-control .range-adjust-control {
+      grid-template-columns: 34px minmax(72px, 1fr) 34px;
+      max-width: 180px;
+    }
+
+    .bridge-gauge-control .range-adjust-control {
+      max-width: 140px;
+      margin-inline: auto;
+    }
+
+    .span-gauge-control .range-adjust-meta {
+      text-align: center;
     }
 
     .span-gauge-control h3 {
@@ -1981,7 +2221,7 @@
       display: grid;
       grid-template-columns: 42px minmax(0, 1fr) 42px;
       grid-template-rows: auto auto auto;
-      gap: 4px 5px;
+      gap: 2px 5px;
       align-items: center;
     }
 
@@ -2349,60 +2589,74 @@
         padding-inline: 5px;
       }
     }
+
+    .pitch-cross,
+    .depth-gauge,
+    .indicator-scale,
+    .span-vertical-gauge,
+    .span-horizontal-gauge,
+    .dual-layout-scale {
+      display: none !important;
+    }
+
+    .pitch-axis.pitch-source,
+    .pitch-axis.depth-range-source {
+      display: grid !important;
+    }
+
+    .pitch-depth-layout,
+    .pitch-depth-layout.depth-right {
+      grid-template-columns: 1fr !important;
+    }
+
+    .depth-panel {
+      align-items: stretch !important;
+      justify-items: stretch !important;
+    }
+
+    .depth-panel .range-list-control {
+      width: 100%;
+    }
+
+    .pitch-axis {
+      grid-template-columns: minmax(0, 1fr) !important;
+      grid-template-rows: auto !important;
+    }
+
+    .pitch-axis > output.pitch-readout,
+    .pitch-axis .axis-label,
+    .pitch-axis .indicator-scale,
+    .range-adjust-meta {
+      display: none !important;
+    }
+
+    .pitch-axis .range-adjust-control {
+      grid-template-columns: 34px minmax(0, 1fr) 34px !important;
+      width: 100% !important;
+      max-width: 100%;
+    }
+
+    .depth-panel .range-adjust-control {
+      grid-template-columns: 34px 128px 34px !important;
+      width: max-content !important;
+      max-width: 100%;
+    }
+
+    .pitch-axis .range-adjust-input {
+      min-width: 0;
+      overflow: visible;
+      text-overflow: clip;
+      font-size: 13px;
+      padding-inline: 6px;
+    }
   </style>
 </head>
 <body>
   <main class="app">
-    <section class="section sheet-section measure-section personal-measure-panel">
-      <h2>メジャーシート情報</h2>
-      <div id="measureDiagram" class="measure-diagram" data-hand="right">
-          <svg viewBox="0 0 1100 760" aria-hidden="true">
-            <g fill="none" stroke="#0b0d0f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="430" cy="220" r="62"></circle>
-              <circle cx="670" cy="220" r="62"></circle>
-              <circle class="thumb-dependent" cx="550" cy="560" r="62"></circle>
-              <line x1="495" y1="220" x2="605" y2="220"></line>
-              <line class="thumb-dependent" x1="433" y1="285" x2="520" y2="498"></line>
-              <line class="thumb-dependent" x1="667" y1="285" x2="580" y2="498"></line>
-              <path d="M390 10 H358 V76 H390 M470 10 H502 V76 H470"></path>
-              <path d="M630 10 H598 V76 H630 M710 10 H742 V76 H710"></path>
-              <path d="M510 100 H478 V142 H510 M590 100 H622 V142 H590"></path>
-              <path d="M240 332 H206 V396 H240 M320 332 H354 V396 H320"></path>
-              <path d="M780 332 H746 V396 H780 M860 332 H894 V396 H860"></path>
-              <path class="thumb-dependent" d="M510 680 H478 V738 H510 M590 680 H622 V738 H590"></path>
-            </g>
-            <g fill="none" stroke="#0b0d0f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M185 176 L185 264 M140 220 L230 220"></path>
-              <path d="M932.5 176 L932.5 264 M890 220 L975 220"></path>
-              <path class="thumb-dependent" d="M850 512 L850 604 M805 558 L895 558"></path>
-            </g>
-          </svg>
-          <span class="pitch-token left left-cross-left" data-cross="left" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
-          <span class="pitch-token right left-cross-right" data-cross="left" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
-          <span class="pitch-token top left-cross-top" data-cross="left" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
-          <span class="pitch-token bottom left-cross-bottom" data-cross="left" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
-          <span class="pitch-token left right-cross-left" data-cross="right" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
-          <span class="pitch-token right right-cross-right" data-cross="right" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
-          <span class="pitch-token top right-cross-top" data-cross="right" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
-          <span class="pitch-token bottom right-cross-bottom" data-cross="right" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
-          <span class="pitch-token left thumb-cross-left thumb-dependent" data-hole="thumb" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
-          <span class="pitch-token right thumb-cross-right thumb-dependent" data-hole="thumb" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
-          <span class="pitch-token top thumb-cross-top thumb-dependent" data-hole="thumb" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
-          <span class="pitch-token bottom thumb-cross-bottom thumb-dependent" data-hole="thumb" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
-          <div id="middleGripIdValue" class="sheet-input grip field-middle-grip" contenteditable="true" role="textbox" aria-label="中指グリップ内径">25/32</div>
-          <div id="ringGripIdValue" class="sheet-input grip field-ring-grip" contenteditable="true" role="textbox" aria-label="薬指グリップ内径">3/4</div>
-          <div id="middleDiameterValue" class="sheet-input small hole-size field-middle-hole" contenteditable="true" role="textbox" aria-label="中指ホールサイズ">25/32</div>
-          <div id="ringDiameterValue" class="sheet-input small hole-size field-ring-hole" contenteditable="true" role="textbox" aria-label="薬指ホールサイズ">3/4</div>
-          <div id="bridgeValue" class="sheet-input small field-bridge" contenteditable="true" role="textbox" aria-label="ブリッジ">1/4</div>
-          <div id="middleSpanValue" class="sheet-input wide field-main-span thumb-dependent" contenteditable="true" role="textbox" aria-label="メインスパン">4</div>
-          <div id="ringSpanOffsetValue" class="sheet-input wide field-offset-span thumb-dependent" contenteditable="true" role="textbox" aria-label="スパン差分">0</div>
-          <div id="thumbDiameterValue" class="sheet-input small hole-size field-thumb-hole thumb-dependent" contenteditable="true" role="textbox" aria-label="サム内径">1</div>
-          <div id="thumbSolidValue" class="sheet-input grip field-thumb-solid thumb-dependent" contenteditable="true" role="textbox" aria-label="サムソリッド外径">1 1/4</div>
-      </div>
-    </section>
+    
 
     <aside>
-      <section class="section save-panel data-section personal-measure-data-panel">
+<section class="section save-panel data-section personal-measure-data-panel">
         <h2>個人情報・保存データ</h2>
         <div class="save-controls">
           <div class="saved-profile-box">
@@ -2460,175 +2714,58 @@
         <p id="saveStatus" class="save-status"></p>
       </section>
 
-      
 
-      <section class="section section-wide dual-layout-panel personal-axis-panel">
-        <h2>個人PAP・回転軸情報</h2>
-        <div class="dual-layout-grid pap-grid">
-          <label class="dual-layout-field wide">
-            <span>PAP左右</span>
-            <input id="layoutPapRight" type="range" min="-7" max="7" step="0.03125" value="5" />
-            <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapRight" aria-label="PAP左右">
-              <span class="span-gauge-min"></span>
-              <span class="span-gauge-track"></span>
-              <span class="span-gauge-current"></span>
-              <span class="span-gauge-value"></span>
-              <span class="span-gauge-max"></span>
-            </button>
-          </label>
-          <label class="dual-layout-field wide">
-            <span>PAP上下</span>
-            <input id="layoutPapUp" type="range" min="-3" max="3" step="0.03125" value="0" />
-            <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapUp" aria-label="PAP上下">
-              <span class="span-gauge-min"></span>
-              <span class="span-gauge-track"></span>
-              <span class="span-gauge-current"></span>
-              <span class="span-gauge-value"></span>
-              <span class="span-gauge-max"></span>
-            </button>
-          </label>
-        </div>
-      </section>
 
-      <section class="section section-wide dual-layout-panel drill-layout-panel">
-        <h2>ドリルレイアウト</h2>
-        <div class="dual-layout-grid drill-layout-grid">
-          <label class="dual-layout-field wide">
-            <span>算出GC</span>
-            <span class="dual-layout-toggle"><input id="useDualAngleLayout" type="checkbox" checked /> 表面レイアウトを表示</span>
-          </label>
-          <label class="dual-layout-field">
-            <span>ドリル角</span>
-            <input id="layoutDrillAngle" type="range" min="-120" max="120" step="1" value="45" />
-            <button class="dual-layout-scale" type="button" data-range="layoutDrillAngle" aria-label="ドリル角"></button>
-          </label>
-          <label class="dual-layout-field">
-            <span>PIN-PAP</span>
-            <input id="layoutPinPap" type="range" min="0" max="6.5" step="0.03125" value="4.5" />
-            <button class="span-horizontal-gauge dual-length-gauge" type="button" data-span-range="layoutPinPap" aria-label="PIN-PAP">
-              <span class="span-gauge-min"></span>
-              <span class="span-gauge-track"></span>
-              <span class="span-gauge-current"></span>
-              <span class="span-gauge-value"></span>
-              <span class="span-gauge-max"></span>
-            </button>
-          </label>
-          <label class="dual-layout-field">
-            <span>VAL角</span>
-            <input id="layoutValAngle" type="range" min="-120" max="120" step="1" value="45" />
-            <button class="dual-layout-scale" type="button" data-range="layoutValAngle" aria-label="VAL角"></button>
-          </label>
-          <p id="dualLayoutReadout" class="dual-layout-readout">Dual Angleガイドは未表示です。</p>
-        </div>
-      </section>
+<section class="section sheet-section measure-section personal-measure-panel">
+      <h2>メジャーシート情報</h2>
+      <div id="measureDiagram" class="measure-diagram" data-hand="right">
+          <svg viewBox="0 0 1100 760" aria-hidden="true">
+            <g fill="none" stroke="#0b0d0f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="430" cy="220" r="62"></circle>
+              <circle cx="670" cy="220" r="62"></circle>
+              <circle class="thumb-dependent" cx="550" cy="560" r="62"></circle>
+              <line x1="495" y1="220" x2="605" y2="220"></line>
+              <line class="thumb-dependent" x1="433" y1="285" x2="520" y2="498"></line>
+              <line class="thumb-dependent" x1="667" y1="285" x2="580" y2="498"></line>
+              <path d="M390 10 H358 V76 H390 M470 10 H502 V76 H470"></path>
+              <path d="M630 10 H598 V76 H630 M710 10 H742 V76 H710"></path>
+              <path d="M510 100 H478 V142 H510 M590 100 H622 V142 H590"></path>
+              <path d="M240 332 H206 V396 H240 M320 332 H354 V396 H320"></path>
+              <path d="M780 332 H746 V396 H780 M860 332 H894 V396 H860"></path>
+              <path class="thumb-dependent" d="M510 680 H478 V738 H510 M590 680 H622 V738 H590"></path>
+            </g>
+            <g fill="none" stroke="#0b0d0f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M185 176 L185 264 M140 220 L230 220"></path>
+              <path d="M932.5 176 L932.5 264 M890 220 L975 220"></path>
+              <path class="thumb-dependent" d="M850 512 L850 604 M805 558 L895 558"></path>
+            </g>
+          </svg>
+          <span class="pitch-token left left-cross-left" data-cross="left" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
+          <span class="pitch-token right left-cross-right" data-cross="left" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
+          <span class="pitch-token top left-cross-top" data-cross="left" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
+          <span class="pitch-token bottom left-cross-bottom" data-cross="left" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
+          <span class="pitch-token left right-cross-left" data-cross="right" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
+          <span class="pitch-token right right-cross-right" data-cross="right" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
+          <span class="pitch-token top right-cross-top" data-cross="right" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
+          <span class="pitch-token bottom right-cross-bottom" data-cross="right" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
+          <span class="pitch-token left thumb-cross-left thumb-dependent" data-hole="thumb" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
+          <span class="pitch-token right thumb-cross-right thumb-dependent" data-hole="thumb" data-axis="lateral" data-side="right"><strong></strong><span>R</span></span>
+          <span class="pitch-token top thumb-cross-top thumb-dependent" data-hole="thumb" data-axis="vertical" data-side="forward"><strong></strong><span>FWD</span></span>
+          <span class="pitch-token bottom thumb-cross-bottom thumb-dependent" data-hole="thumb" data-axis="vertical" data-side="reverse"><strong></strong><span>REV</span></span>
+          <div id="middleGripIdValue" class="sheet-input grip field-middle-grip" contenteditable="true" role="textbox" aria-label="中指グリップ内径">25/32</div>
+          <div id="ringGripIdValue" class="sheet-input grip field-ring-grip" contenteditable="true" role="textbox" aria-label="薬指グリップ内径">3/4</div>
+          <div id="middleDiameterValue" class="sheet-input small hole-size field-middle-hole" contenteditable="true" role="textbox" aria-label="中指ホールサイズ">25/32</div>
+          <div id="ringDiameterValue" class="sheet-input small hole-size field-ring-hole" contenteditable="true" role="textbox" aria-label="薬指ホールサイズ">3/4</div>
+          <div id="bridgeValue" class="sheet-input small field-bridge" contenteditable="true" role="textbox" aria-label="ブリッジ">1/4</div>
+          <div id="middleSpanValue" class="sheet-input wide field-main-span thumb-dependent" contenteditable="true" role="textbox" aria-label="メインスパン">4</div>
+          <div id="ringSpanOffsetValue" class="sheet-input wide field-offset-span thumb-dependent" contenteditable="true" role="textbox" aria-label="スパン差分">0</div>
+          <div id="thumbDiameterValue" class="sheet-input small hole-size field-thumb-hole thumb-dependent" contenteditable="true" role="textbox" aria-label="サム内径">1</div>
+          <div id="thumbSolidValue" class="sheet-input grip field-thumb-solid thumb-dependent" contenteditable="true" role="textbox" aria-label="サムソリッド外径">1 1/4</div>
+      </div>
+    </section>
 
-      <section class="section section-wide dual-layout-panel ball-model-panel hole-model-subpanel">
-        <h2>ボール本体モデリング</h2>
-        <div class="dual-layout-grid modeling-grid">
-          <div class="modeling-subsection core-meta-section">
-            <h3>コア・刻印・レイアウト影響</h3>
-            <label class="dual-layout-field wide modeling-core-selector">
-              <span>コアモデル</span>
-              <select id="layoutCoreType">
-                <option value="morph" selected>非対称 / MB</option>
-                <option value="symmetric">対称 / vMB</option>
-              </select>
-            </label>
-            <label class="dual-layout-field wide modeling-core-selector">
-              <span>コア外接半径</span>
-              <select id="layoutCoreEnvelopeRadius" data-inch-select="true" data-min="2.5" data-max="3.75" data-step="0.03125" data-default="3.25"></select>
-            </label>
-            <label class="catalog-model-field catalog-rg-field">
-              <span>箱記載トップ/ボトムウエイト</span>
-              <div class="catalog-weight-inputs">
-                <label>
-                  <small>方向</small>
-                  <select id="layoutStaticWeightDirection">
-                    <option value="top" selected>Top</option>
-                    <option value="bottom">Bottom</option>
-                  </select>
-                </label>
-                <label>
-                  <small>oz</small>
-                  <input id="layoutStaticWeightOz" type="text" inputmode="decimal" data-ounce-input="true" data-min="0" data-max="5" data-step="0.0625" value="3 oz" />
-                </label>
-              </div>
-              <strong id="staticWeightModelValue" class="catalog-derived-value">Top 3 oz</strong>
-            </label>
-            <h4>物理入力とドリル後比較</h4>
-            <div class="physical-comparison-output" aria-label="物理入力からドリル後への一対一比較">
-              <div class="physical-comparison-row">
-                <div class="catalog-model-field catalog-weight-field">
-                  <span>総重量</span>
-                  <div class="catalog-weight-inputs">
-                    <label>
-                      <small>lbs</small>
-                      <input id="layoutBallWeightLb" type="number" min="12" max="16" step="1" value="15" />
-                    </label>
-                    <label>
-                      <small>oz</small>
-                      <input id="layoutBallWeightOz" type="number" min="0" max="15" step="1" value="0" />
-                    </label>
-                  </div>
-                  <strong id="massBeforeValue" class="catalog-derived-value">15 lbs 0 oz</strong>
-                </div>
-                <div id="massDeltaSlot"></div>
-                <div id="massAfterSlot"></div>
-              </div>
-              <div class="physical-comparison-row">
-                <div class="catalog-model-field catalog-rg-field">
-                  <span>PAP-NAP RG（カタログ値から算出）</span>
-                  <div class="catalog-rg-inputs">
-                    <label>
-                      <small>RG低</small>
-                      <input id="layoutCatalogRg" type="number" min="2.430" max="2.650" step="0.001" value="2.480" />
-                    </label>
-                    <label>
-                      <small>Diff</small>
-                      <input id="layoutCatalogDiff" type="number" min="0" max="0.090" step="0.001" value="0.052" />
-                    </label>
-                    <label>
-                      <small>IntDiff</small>
-                      <input id="layoutCatalogIntDiff" type="number" min="0" max="0.040" step="0.001" value="0.018" />
-                    </label>
-                  </div>
-                  <strong id="rgBeforeValue" class="catalog-derived-value">-</strong>
-                </div>
-                <div id="rgDeltaSlot"></div>
-                <div id="rgAfterSlot"></div>
-              </div>
-              <div class="physical-comparison-row">
-                <div id="inertiaBeforeSlot"></div>
-                <div id="inertiaDeltaSlot"></div>
-                <div id="inertiaAfterSlot"></div>
-              </div>
-            </div>
-            <p class="physical-model-note">PAP-NAP軸 I は、カタログ重量とRG低/Differential/Intermediate Differentialから主慣性を作り、現在のPAP-NAP回転軸へ投影した計算値です。ドリル後は各穴の削除質量を差し引いた推定値として表示しています。</p>
-            <h4>レイアウト寄与</h4>
-            <div id="layoutImpactOutput" class="layout-impact-grid" aria-label="ドリル角、PIN-PAP、VAL角の物理寄与"></div>
-            <h4>刻印位置関係</h4>
-            <div class="catalog-model-grid stamp-model-grid" aria-label="表面刻印からの位置関係">
-              <label class="catalog-model-field">
-                <span>PIN-MB 表面距離</span>
-                <select id="stampPinMbDistance" data-inch-select="true" data-min="0.5" data-max="6.5" data-step="0.03125" data-default="6"></select>
-              </label>
-              <label class="catalog-model-field">
-                <span>PIN-CG 表面距離</span>
-                <select id="stampPinCgDistance" data-inch-select="true" data-min="0.5" data-max="6.5" data-step="0.03125" data-default="3"></select>
-              </label>
-              <label class="catalog-model-field">
-                <span>CG横ずれ</span>
-                <select id="stampCgOffset" data-inch-select="true" data-min="-1.5" data-max="1.5" data-step="0.03125" data-default="0.25"></select>
-              </label>
-            </div>
-            <div id="coreMetaOutput" class="physical-model-output" aria-label="刻印情報からの偏心推定"></div>
-            <p class="physical-model-note">刻印距離は1/32インチ刻みで選択し、下にPIN-CG比率と推定偏心を表示します。刻印位置関係そのものは入力情報なので差分表示の対象にはしません。</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section section-wide hole-modeling-panel">
-        <h2>ホールモデリング</h2>
+<section class="section section-wide hole-modeling-panel">
+        <h2>メジャーシート詳細</h2>
         
 
         <div class="sheet-control-groups section-wide">
@@ -2722,14 +2859,14 @@
                   </div>
                   <div class="pitch-axis pitch-source">
                     <span class="axis-label left">左 1"</span>
-                    <output id="middleLateralAxisValue" class="pitch-readout">左右 0</output>
+                    <output id="middleLateralAxisValue" class="pitch-readout">0</output>
                     <span class="axis-label right">右 1"</span>
                     <input id="middleLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 左右ピッチ" />
                     <div class="indicator-scale" data-range="middleLateralAxis"></div>
                   </div>
                   <div class="pitch-axis pitch-source">
                     <span class="axis-label left">リバース 1"</span>
-                    <output id="middleVerticalAxisValue" class="pitch-readout">前後 0</output>
+                    <output id="middleVerticalAxisValue" class="pitch-readout">0</output>
                     <span class="axis-label right">フォワード 1"</span>
                     <input id="middleVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="中指 前後ピッチ" />
                     <div class="indicator-scale" data-range="middleVerticalAxis"></div>
@@ -2824,14 +2961,14 @@
                   </div>
                   <div class="pitch-axis pitch-source">
                     <span class="axis-label left">左 1"</span>
-                    <output id="ringLateralAxisValue" class="pitch-readout">左右 0</output>
+                    <output id="ringLateralAxisValue" class="pitch-readout">0</output>
                     <span class="axis-label right">右 1"</span>
                     <input id="ringLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 左右ピッチ" />
                     <div class="indicator-scale" data-range="ringLateralAxis"></div>
                   </div>
                   <div class="pitch-axis pitch-source">
                     <span class="axis-label left">リバース 1"</span>
-                    <output id="ringVerticalAxisValue" class="pitch-readout">前後 0</output>
+                    <output id="ringVerticalAxisValue" class="pitch-readout">0</output>
                     <span class="axis-label right">フォワード 1"</span>
                     <input id="ringVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="薬指 前後ピッチ" />
                     <div class="indicator-scale" data-range="ringVerticalAxis"></div>
@@ -2908,14 +3045,14 @@
                 </div>
                 <div class="pitch-axis pitch-source">
                   <span class="axis-label left">左 1"</span>
-                  <output id="thumbLateralAxisValue" class="pitch-readout">左右 0</output>
+                  <output id="thumbLateralAxisValue" class="pitch-readout">0</output>
                   <span class="axis-label right">右 1"</span>
                   <input id="thumbLateralAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="サム 左右ピッチ" />
                   <div class="indicator-scale" data-range="thumbLateralAxis"></div>
                 </div>
                 <div class="pitch-axis pitch-source">
                   <span class="axis-label left">リバース 1"</span>
-                  <output id="thumbVerticalAxisValue" class="pitch-readout">前後 0</output>
+                  <output id="thumbVerticalAxisValue" class="pitch-readout">0</output>
                   <span class="axis-label right">フォワード 1"</span>
                   <input id="thumbVerticalAxis" type="range" min="-1" max="1" step="0.0625" value="0" aria-label="サム 前後ピッチ" />
                   <div class="indicator-scale" data-range="thumbVerticalAxis"></div>
@@ -2993,9 +3130,42 @@
 
 
       </section>
+
+<section class="section section-wide dual-layout-panel personal-axis-panel">
+        <h2>個人PAP・回転軸情報</h2>
+        <div class="dual-layout-grid pap-grid">
+          <label class="dual-layout-field wide">
+            <span>PAP左右</span>
+            <input id="layoutPapRight" type="range" min="-7" max="7" step="0.03125" value="5" />
+            <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapRight" aria-label="PAP左右">
+              <span class="span-gauge-min"></span>
+              <span class="span-gauge-track"></span>
+              <span class="span-gauge-current"></span>
+              <span class="span-gauge-value"></span>
+              <span class="span-gauge-max"></span>
+            </button>
+          </label>
+          <label class="dual-layout-field wide">
+            <span>PAP上下</span>
+            <input id="layoutPapUp" type="range" min="-3" max="3" step="0.03125" value="0" />
+            <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapUp" aria-label="PAP上下">
+              <span class="span-gauge-min"></span>
+              <span class="span-gauge-track"></span>
+              <span class="span-gauge-current"></span>
+              <span class="span-gauge-value"></span>
+              <span class="span-gauge-max"></span>
+            </button>
+          </label>
+        </div>
+      </section>
+
+
+
+
     </aside>
 
-    <section class="viewer">
+    <section class="right-workspace" aria-label="ボールモデリングと3Dプレビュー">
+      <section class="viewer">
       <canvas id="scene" aria-label="grip center drill layout preview"></canvas>
       <div class="title">
         <h1>グリップセンター ドリルレイアウト</h1>
@@ -3021,6 +3191,145 @@
       </div>
       <div class="zoom-hud">ズーム <output id="zoomValue">100%</output></div>
     </section>
+      <div class="right-modeling-controls">
+        <section class="section section-wide dual-layout-panel drill-layout-panel">
+        <h2>ドリルレイアウト</h2>
+        <div class="dual-layout-grid drill-layout-grid">
+          <label class="dual-layout-field wide">
+            <span>算出GC</span>
+            <span class="dual-layout-toggle"><input id="useDualAngleLayout" type="checkbox" checked /> 表面レイアウトを表示</span>
+          </label>
+          <label class="dual-layout-field">
+            <span>ドリル角</span>
+            <input id="layoutDrillAngle" type="range" min="-120" max="120" step="1" value="45" />
+            <button class="dual-layout-scale" type="button" data-range="layoutDrillAngle" aria-label="ドリル角"></button>
+          </label>
+          <label class="dual-layout-field">
+            <span>PIN-PAP</span>
+            <input id="layoutPinPap" type="range" min="0" max="6.5" step="0.03125" value="4.5" />
+            <button class="span-horizontal-gauge dual-length-gauge" type="button" data-span-range="layoutPinPap" aria-label="PIN-PAP">
+              <span class="span-gauge-min"></span>
+              <span class="span-gauge-track"></span>
+              <span class="span-gauge-current"></span>
+              <span class="span-gauge-value"></span>
+              <span class="span-gauge-max"></span>
+            </button>
+          </label>
+          <label class="dual-layout-field">
+            <span>VAL角</span>
+            <input id="layoutValAngle" type="range" min="-120" max="120" step="1" value="45" />
+            <button class="dual-layout-scale" type="button" data-range="layoutValAngle" aria-label="VAL角"></button>
+          </label>
+          <p id="dualLayoutReadout" class="dual-layout-readout">Dual Angleガイドは未表示です。</p>
+        </div>
+      </section>
+
+        <section class="section section-wide dual-layout-panel ball-model-panel hole-model-subpanel">
+        <h2>ボールモデリング情報</h2>
+        <div class="dual-layout-grid modeling-grid">
+          <div class="modeling-subsection core-meta-section">
+            <h3>コアモデル・トップウエイト・刻印位置関係</h3>
+            <label class="dual-layout-field wide modeling-core-selector">
+              <span>コアモデル</span>
+              <select id="layoutCoreType">
+                <option value="morph" selected>非対称 / MB</option>
+                <option value="symmetric">対称 / vMB</option>
+              </select>
+            </label>
+            <label class="dual-layout-field wide modeling-core-selector">
+              <span>コア外接半径</span>
+              <select id="layoutCoreEnvelopeRadius" data-inch-select="true" data-min="2.5" data-max="3.75" data-step="0.03125" data-default="3.25"></select>
+            </label>
+            <label class="catalog-model-field catalog-rg-field">
+              <span>箱記載トップ/ボトムウエイト</span>
+              <div class="catalog-weight-inputs">
+                <label>
+                  <small>方向</small>
+                  <select id="layoutStaticWeightDirection">
+                    <option value="top" selected>Top</option>
+                    <option value="bottom">Bottom</option>
+                  </select>
+                </label>
+                <label>
+                  <small>oz</small>
+                  <input id="layoutStaticWeightOz" type="text" inputmode="decimal" data-ounce-input="true" data-min="0" data-max="5" data-step="0.0625" value="3 oz" />
+                </label>
+              </div>
+              <strong id="staticWeightModelValue" class="catalog-derived-value">Top 3 oz</strong>
+            </label>
+            <h4>刻印位置関係</h4>
+            <div class="catalog-model-grid stamp-model-grid" aria-label="表面刻印からの位置関係">
+              <label class="catalog-model-field">
+                <span>PIN-MB 表面距離</span>
+                <select id="stampPinMbDistance" data-inch-select="true" data-min="0.5" data-max="6.5" data-step="0.03125" data-default="6"></select>
+              </label>
+              <label class="catalog-model-field">
+                <span>PIN-CG 表面距離</span>
+                <select id="stampPinCgDistance" data-inch-select="true" data-min="0.5" data-max="6.5" data-step="0.03125" data-default="3"></select>
+              </label>
+              <label class="catalog-model-field">
+                <span>CG横ずれ</span>
+                <select id="stampCgOffset" data-inch-select="true" data-min="-1.5" data-max="1.5" data-step="0.03125" data-default="0.25"></select>
+              </label>
+            </div>
+            <div id="coreMetaOutput" class="physical-model-output" aria-label="刻印情報からの偏心推定"></div>
+            <p class="physical-model-note">刻印距離は1/32インチ刻みで選択し、下にPIN-CG比率と推定偏心を表示します。刻印位置関係そのものは入力情報なので差分表示の対象にはしません。</p>
+            <h4>物理入力とドリル後比較</h4>
+            <div class="physical-comparison-output" aria-label="物理入力からドリル後への一対一比較">
+              <div class="physical-comparison-row">
+                <div class="catalog-model-field catalog-weight-field">
+                  <span>総重量</span>
+                  <div class="catalog-weight-inputs">
+                    <label>
+                      <small>lbs</small>
+                      <input id="layoutBallWeightLb" type="number" min="12" max="16" step="1" value="15" />
+                    </label>
+                    <label>
+                      <small>oz</small>
+                      <input id="layoutBallWeightOz" type="number" min="0" max="15" step="1" value="0" />
+                    </label>
+                  </div>
+                  <strong id="massBeforeValue" class="catalog-derived-value">15 lbs 0 oz</strong>
+                </div>
+                <div id="massDeltaSlot"></div>
+                <div id="massAfterSlot"></div>
+              </div>
+              <div class="physical-comparison-row">
+                <div class="catalog-model-field catalog-rg-field">
+                  <span>PAP-NAP RG（カタログ値から算出）</span>
+                  <div class="catalog-rg-inputs">
+                    <label>
+                      <small>RG低</small>
+                      <input id="layoutCatalogRg" type="number" min="2.430" max="2.650" step="0.001" value="2.480" />
+                    </label>
+                    <label>
+                      <small>Diff</small>
+                      <input id="layoutCatalogDiff" type="number" min="0" max="0.090" step="0.001" value="0.052" />
+                    </label>
+                    <label>
+                      <small>IntDiff</small>
+                      <input id="layoutCatalogIntDiff" type="number" min="0" max="0.040" step="0.001" value="0.018" />
+                    </label>
+                  </div>
+                  <strong id="rgBeforeValue" class="catalog-derived-value">-</strong>
+                </div>
+                <div id="rgDeltaSlot"></div>
+                <div id="rgAfterSlot"></div>
+              </div>
+              <div class="physical-comparison-row">
+                <div id="inertiaBeforeSlot"></div>
+                <div id="inertiaDeltaSlot"></div>
+                <div id="inertiaAfterSlot"></div>
+              </div>
+            </div>
+            <p class="physical-model-note">PAP-NAP軸 I は、カタログ重量とRG低/Differential/Intermediate Differentialから主慣性を作り、現在のPAP-NAP回転軸へ投影した計算値です。ドリル後は各穴の削除質量を差し引いた推定値として表示しています。</p>
+          </div>
+        </div>
+      </section>
+      </div>
+    </section>
+
+    
   </main>
 
   <script>
@@ -3114,6 +3423,8 @@
       setValueOutput(range, valueOutput);
     });
 
+    setupRangeListControls();
+
     document.querySelectorAll(".catalog-model-field input").forEach((input) => {
       input.addEventListener("input", draw);
       input.addEventListener("change", () => {
@@ -3123,6 +3434,13 @@
     });
 
     setupInchSelects();
+    updateStickySectionOffsets();
+    window.addEventListener("resize", updateStickySectionOffsets);
+    if ("ResizeObserver" in window) {
+      const stickyObserver = new ResizeObserver(updateStickySectionOffsets);
+      const dataSection = document.querySelector(".data-section");
+      if (dataSection) stickyObserver.observe(dataSection);
+    }
     document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
     setupBridgeSelect();
     document.querySelectorAll(".dual-layout-scale").forEach(renderDualLayoutScale);
@@ -3626,8 +3944,151 @@
       draw();
     }
 
+    function updateStickySectionOffsets() {
+      const dataSection = document.querySelector(".data-section");
+      if (!dataSection) return;
+      const top = Math.ceil(dataSection.getBoundingClientRect().height + 10);
+      document.documentElement.style.setProperty("--measure-sticky-top", `${top}px`);
+    }
+
     function refreshIndicatorScales() {
       document.querySelectorAll(".indicator-scale").forEach(renderIndicatorScale);
+    }
+
+    function setupRangeListControls() {
+      inputs.forEach((range) => {
+        if (!range.id) return;
+        if (range.id === "bridge") return;
+        if (document.querySelector(`[data-range-adjust="${range.id}"]`)) return;
+        range.step = String(rangeListStep(range));
+        const anchor = rangeListAnchor(range);
+        if (!anchor) return;
+        const control = document.createElement("div");
+        control.className = "range-adjust-control";
+        control.dataset.rangeAdjust = range.id;
+
+        const minus = document.createElement("button");
+        minus.type = "button";
+        minus.className = "range-adjust-button";
+        minus.textContent = "-";
+        minus.setAttribute("aria-label", `${range.id} を減らす`);
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "range-adjust-input";
+        input.inputMode = range.id === "layoutDrillAngle" || range.id === "layoutValAngle" ? "numeric" : "decimal";
+        input.dataset.rangeAdjustInput = range.id;
+        input.setAttribute("aria-label", range.getAttribute("aria-label") || range.id);
+
+        const plus = document.createElement("button");
+        plus.type = "button";
+        plus.className = "range-adjust-button";
+        plus.textContent = "+";
+        plus.setAttribute("aria-label", `${range.id} を増やす`);
+
+        control.append(minus, input, plus);
+        minus.addEventListener("click", () => nudgeRangeAdjust(range, -1));
+        plus.addEventListener("click", () => nudgeRangeAdjust(range, 1));
+        input.addEventListener("change", () => commitRangeAdjustInput(range));
+        input.addEventListener("blur", () => commitRangeAdjustInput(range));
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            commitRangeAdjustInput(range);
+            input.blur();
+          }
+          if (event.key === "ArrowUp") {
+            event.preventDefault();
+            nudgeRangeAdjust(range, 1);
+          }
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            nudgeRangeAdjust(range, -1);
+          }
+        });
+
+        const meta = document.createElement("div");
+        meta.className = "range-adjust-meta";
+        meta.textContent = rangeListMeta(range);
+        anchor.insertAdjacentElement("afterend", meta);
+        anchor.insertAdjacentElement("afterend", control);
+        updateRangeListForRange(range);
+      });
+    }
+
+    function rangeListAnchor(range) {
+      if (range.id.endsWith("Axis")) {
+        return document.querySelector(`#${range.id}Value`);
+      }
+      if (range.id.endsWith("DrillDepth")) {
+        return document.querySelector(`#${range.id}Gauge`)
+          || document.querySelector(`#${range.id}Value`);
+      }
+      return document.querySelector(`[data-span-range="${range.id}"]`)
+        || document.querySelector(`[data-range="${range.id}"]`)
+        || document.querySelector(`[data-depth-range="${range.id}"]`)
+        || document.querySelector(`.indicator-scale[data-range="${range.id}"]`)
+        || document.querySelector(`#${range.id}Value`)
+        || range;
+    }
+
+    function rangeListStep(range) {
+      if (range.id === "layoutDrillAngle" || range.id === "layoutValAngle") return 1;
+      if (range.id.endsWith("Axis")) return 1 / 16;
+      return 1 / 64;
+    }
+
+    function rangeListMeta(range) {
+      const step = rangeListStep(range);
+      if (range.id === "layoutDrillAngle" || range.id === "layoutValAngle") return `直接入力 / ${Math.round(step)}°刻み`;
+      return `直接入力 / ${formatInch(step)}刻み`;
+    }
+
+    function rangeListLabel(range, value) {
+      if (range.id === "layoutDrillAngle" || range.id === "layoutValAngle") return dualLayoutValueLabel(range.id, value);
+      if (range.id.startsWith("layout")) return dualLayoutValueLabel(range.id, value);
+      if (range.id.endsWith("Axis")) return pitchAxisLabel(range.id, value);
+      return formatInch(value);
+    }
+
+    function updateRangeListForRange(range, force = false) {
+      const input = document.querySelector(`input[data-range-adjust-input="${range.id}"]`);
+      if (!input || (!force && document.activeElement === input)) return;
+      input.value = rangeListLabel(range, clamp(Number(range.value), Number(range.min), Number(range.max)));
+    }
+
+    function nudgeRangeAdjust(range, direction) {
+      const step = rangeListStep(range);
+      setRangeValue(range, Number(range.value) + step * direction);
+      updateRangeListForRange(range, true);
+    }
+
+    function commitRangeAdjustInput(range) {
+      const input = document.querySelector(`input[data-range-adjust-input="${range.id}"]`);
+      if (!input) return;
+      const parsed = parseRangeAdjustInput(range, input.value);
+      if (Number.isFinite(parsed)) {
+        setRangeValue(range, parsed);
+      } else {
+        updateRangeListForRange(range);
+      }
+    }
+
+    function parseRangeAdjustInput(range, text) {
+      const raw = String(text).trim();
+      if (!raw) return NaN;
+      if (range.id === "layoutDrillAngle" || range.id === "layoutValAngle") {
+        return Number(raw.replace(/[^\d.+-]/g, ""));
+      }
+      let sign = 1;
+      if (/^-/.test(raw) || /(左|レフト|リバース|下)/.test(raw)) sign = -1;
+      if (/^(\\+|右|ライト|フォワード|上)/.test(raw)) sign = 1;
+      const stripped = raw
+        .replace(/(左右|前後|ライト|レフト|フォワード|リバース|右|左|上|下)/g, "")
+        .replace(/^[+]/, "")
+        .trim();
+      const parsed = parseInch(stripped);
+      return Number.isFinite(parsed) ? sign * Math.abs(parsed) : NaN;
     }
 
     function setupBridgeSelect() {
@@ -4093,6 +4554,7 @@
       marker.style.left = `${safePercent}%`;
       label.style.left = `${clamp(safePercent, 12, 88)}%`;
       label.textContent = range.id.endsWith("Axis") ? pitchAxisLabel(range.id, value) : formatInch(value);
+      updateRangeListForRange(range);
       if (["middleSpan", "ringSpanOffset", "bridge"].includes(range.id)) updateSpanGaugeForRange(range);
       updatePitchCrossForRange(range);
       updateDepthGaugeForRange(range);
@@ -4152,9 +4614,12 @@
     }
 
     function setRangeValue(range, rawValue, shouldDraw = true) {
-      const value = clamp(snapToStep(rawValue, range.step), Number(range.min), Number(range.max));
+      const step = rangeListStep(range);
+      range.step = String(step);
+      const value = clamp(snapToStep(rawValue, step), Number(range.min), Number(range.max));
       range.value = value;
       setValueOutput(range, document.querySelector(`#${range.id}Value`));
+      updateRangeListForRange(range, true);
       if (document.querySelector(`[data-span-range="${range.id}"]`)) updateSpanGaugeForRange(range);
       updateBridgeSelectFromRange(range);
       updateDualLayoutScale(range);
@@ -4329,8 +4794,8 @@
 
     function pitchAxisLabel(id, number) {
       if (!id.endsWith("Axis")) return formatInch(number);
-      if (Math.abs(number) < 1 / 128) return id.includes("Lateral") ? "左右 0" : "前後 0";
-      if (id.includes("Lateral")) return `${number > 0 ? "ライト" : "レフト"} ${formatInch(Math.abs(number))}`;
+      if (Math.abs(number) < 1 / 128) return "0";
+      if (id.includes("Lateral")) return `${number > 0 ? "右" : "左"} ${formatInch(Math.abs(number))}`;
       return `${number > 0 ? "フォワード" : "リバース"} ${formatInch(Math.abs(number))}`;
     }
 
@@ -4343,14 +4808,14 @@
         return `${number > 0 ? "+" : ""}${Math.round(number)}°`;
       }
       if (id === "layoutPapRight") {
-        if (Math.abs(number) < 1 / 128) return "左右 0";
-        return `${number > 0 ? "右" : "左"} ${formatInch32(Math.abs(number))}`;
+        if (Math.abs(number) < 1 / 128) return "0";
+        return `${number > 0 ? "右" : "左"} ${formatInch(Math.abs(number))}`;
       }
       if (id === "layoutPapUp") {
-        if (Math.abs(number) < 1 / 128) return "上下 0";
-        return `${number > 0 ? "上" : "下"} ${formatInch32(Math.abs(number))}`;
+        if (Math.abs(number) < 1 / 128) return "0";
+        return `${number > 0 ? "上" : "下"} ${formatInch(Math.abs(number))}`;
       }
-      return formatInch32(number);
+      return formatInch(number);
     }
 
     function snap64(number) {
@@ -4487,8 +4952,8 @@
           usesBare: false,
           drillDepth: thumbDrillDepth,
           color: "#f1c75f",
-          lateral: pitchAxisValue("thumbLateralAxis"),
-          vertical: pitchAxisValue("thumbVerticalAxis"),
+          lateral: pitchAxisValue("thumbVerticalAxis"),
+          vertical: -pitchAxisValue("thumbLateralAxis"),
           verticalDisplay: pitchAxisValue("thumbVerticalAxis")
         } : null,
         middle: {
@@ -4506,8 +4971,8 @@
           usesBare: middleSize.usesBare,
           drillDepth: middleDrillDepth,
           color: "#69b8ff",
-          lateral: -pitchAxisValue("middleLateralAxis"),
-          vertical: pitchAxisValue("middleVerticalAxis"),
+          lateral: -pitchAxisValue("middleVerticalAxis"),
+          vertical: -pitchAxisValue("middleLateralAxis"),
           verticalDisplay: pitchAxisValue("middleVerticalAxis")
         },
         ring: {
@@ -4525,8 +4990,8 @@
           usesBare: ringSize.usesBare,
           drillDepth: ringDrillDepth,
           color: "#f179a5",
-          lateral: -pitchAxisValue("ringLateralAxis"),
-          vertical: pitchAxisValue("ringVerticalAxis"),
+          lateral: -pitchAxisValue("ringVerticalAxis"),
+          vertical: -pitchAxisValue("ringLateralAxis"),
           verticalDisplay: pitchAxisValue("ringVerticalAxis")
         },
         bridge,
@@ -4546,9 +5011,14 @@
       if (data.hasThumb) {
         solveFingerSpanPosition(data, data.middle, middleSpan);
         solveFingerSpanPosition(data, data.ring, ringSpan);
+        solveFingerBridgePosition(data);
+        solveFingerSpanPosition(data, data.middle, middleSpan);
+        solveFingerSpanPosition(data, data.ring, ringSpan);
+        solveFingerBridgePosition(data);
       } else {
         applyFingerCenterY(data.middle, value("middleNoThumbOffset"));
         applyFingerCenterY(data.ring, value("ringNoThumbOffset"));
+        solveFingerBridgePosition(data);
       }
       state.layoutOrigin = previousLayoutOrigin;
       state.layoutBasis = previousLayoutBasis;

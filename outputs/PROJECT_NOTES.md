@@ -130,9 +130,13 @@ The prototype is no longer only a single drilling calculator. The intended produ
 
 ## Current UI Organization Target
 
-- Top: integrated personal/measure-sheet section.
-- Middle: drill layout and ball/core modeling section.
-- Later: shelf-style ownership and usage management section.
+- Primary order: personal information, measure sheet, drill layout, modeling.
+- Personal information is the top-level owner of saved data.
+- A person should eventually own multiple measure sheets and multiple ball records.
+- Measure-sheet data is the main axis of this prototype and should remain prominent before layout/modeling details.
+- Ball records should eventually come from or synchronize with the shelf-style application.
+- Core metadata belongs to each ball record, not directly to a person or an isolated layout.
+- Drill layout records should attach to a specific ball record and use that ball's metadata, surface marks, and core assumptions.
 
 The next development focus is physical ball modeling, not further ad-hoc UI reshuffling.
 
@@ -146,3 +150,13 @@ The next work should refine the ball model itself:
 - stable calculation of virtual MB for symmetric cores
 - visual separation between actual ball marks and derived layout marks
 - validation that Dual Angle geometry is calculated from the intended physical reference points
+
+## Non-Negotiable Measurement Definitions
+
+These definitions are initial project constraints and must be preserved during implementation:
+
+- Finger bridge is the shortest distance between the outer-diameter drilled openings for the two finger grips.
+- Therefore, the two finger openings must remain separated by exactly the selected bridge value at their facing outer endpoints on the ball surface.
+- Finger span is measured from the thumb-hole inner endpoint to the corresponding finger-grip outer-diameter endpoint unless a grip-specific reference explicitly overrides it.
+- Pitch UI labels and pitch trajectory signs must be checked against the actual drilled-axis direction, not only the on-screen labels.
+- When changing layout, pitch, or opening geometry, re-check bridge and span definitions before treating the change as complete.
