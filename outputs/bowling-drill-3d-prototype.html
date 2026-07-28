@@ -201,13 +201,13 @@
 
     .data-section {
       min-height: 0;
-      position: sticky;
-      top: 0;
-      z-index: 40;
+      position: relative;
+      top: auto;
+      z-index: 1;
       background:
         linear-gradient(135deg, rgba(89,201,167,.10), transparent 42%),
         var(--panel-2);
-      box-shadow: 0 8px 14px rgba(4, 14, 18, .35);
+      box-shadow: none;
     }
 
     .measure-section {
@@ -230,8 +230,8 @@
     }
 
     .section.data-section {
-      position: sticky;
-      top: 0;
+      position: relative;
+      top: auto;
     }
 
     .section.measure-section {
@@ -564,14 +564,15 @@
       grid-area: viewer;
       min-height: 0;
       display: grid;
-      grid-template-rows: minmax(330px, 1fr) minmax(220px, 280px) 320px;
+      grid-template-rows: minmax(500px, 58vh) auto auto;
       gap: 10px;
-      overflow: hidden;
+      overflow: auto;
+      padding-right: 2px;
     }
 
     .right-workspace > .measure-section {
       min-height: 0;
-      overflow: hidden;
+      overflow: visible;
       padding: 8px;
     }
 
@@ -583,9 +584,11 @@
 
     .right-workspace > .measure-section .measure-diagram {
       width: 100%;
-      height: calc(100% - 25px);
+      max-width: 420px;
+      height: auto;
       min-height: 0;
-      aspect-ratio: auto;
+      aspect-ratio: 1100 / 760;
+      margin-inline: auto;
     }
 
     .right-workspace > .measure-section .measure-diagram .sheet-input {
@@ -600,7 +603,7 @@
       min-height: 0;
       display: grid;
       gap: 10px;
-      overflow: auto;
+      overflow: visible;
       padding-right: 2px;
     }
 
@@ -2777,7 +2780,7 @@
 
       .right-workspace {
         min-height: 760px;
-        grid-template-rows: minmax(320px, 48vh) minmax(260px, 36vh) auto;
+        grid-template-rows: minmax(420px, 55vh) auto auto;
         overflow: visible;
       }
 

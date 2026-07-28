@@ -108,6 +108,32 @@ Verification performed:
   - the moved measure diagram remained within the viewport width.
   - visible stepper button target remained 48px square.
 
+## 2026-07-28 Measure Diagram Fit And Viewer Priority Fix
+
+The user reported that the moved measure sheet diagram was visually broken and that the 3D model became too small to be useful. The user also asked why the personal information section was sticky.
+
+Corrections applied:
+
+- Restored the 3D viewer as the visual priority on the right side.
+  - Reason: the drilling model is the primary visual feedback and became too small after adding the measure sheet row.
+  - Change: right workspace rows now reserve a larger viewer area (`minmax(500px, 58vh)`) and allow the right workspace to scroll for lower panels.
+- Fixed the measure sheet diagram aspect ratio and fit.
+  - Reason: forcing the diagram into a short wide row distorted the absolute-positioned sheet fields.
+  - Change: the right-side measure diagram keeps its original `1100 / 760` aspect ratio and is capped at `420px` width so it fits inside the visible card without clipping.
+- Disabled personal information sticky behavior.
+  - Reason: the sticky behavior was introduced during the earlier request to make `個人情報` and `メジャーシート` follow while scrolling, but the working UI now needs left-side space for detailed inputs more than a persistent personal-data header.
+  - Change: `.data-section` and `.section.data-section` now use normal `position: relative`.
+
+Verification performed:
+
+- Desktop 1440x900:
+  - no page JavaScript errors.
+  - 3D viewer measured about `722 x 506`.
+  - right-side measure diagram measured about `420 x 290`.
+  - measure diagram aspect ratio measured `1.447`, matching `1100 / 760`.
+  - measure diagram did not overflow its card.
+  - personal information section computed as `position: relative` and scrolled away normally.
+
 ## Repository And Files
 
 - Main local workspace:

@@ -125,6 +125,12 @@ Correction after user clarification:
 
 Reason: the user wanted the existing measure sheet diagram itself to stay visible, not a separate summary screen.
 
+Follow-up correction:
+
+- The right-side measure sheet diagram was resized to preserve its original 1100:760 ratio and fit inside its card.
+- The 3D viewer was enlarged again so the model remains useful as the main visual feedback.
+- The personal information sticky behavior was removed because it was originally added for scroll-follow visibility, but it now takes space away from detailed editing.
+
 ## Application Direction
 
 The prototype is no longer only a single drilling calculator. The intended product direction is an integrated bowling-ball management application with three major layers.
