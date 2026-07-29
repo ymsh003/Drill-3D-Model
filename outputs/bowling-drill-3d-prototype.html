@@ -2859,6 +2859,635 @@
         min-height: 48px;
       }
     }
+
+    /* Final UI pass: keep cards, controls, and diagram labels visually consistent. */
+    body {
+      font-size: 16px;
+      line-height: 1.45;
+      font-family: "Segoe UI", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+    }
+
+    aside > * + *,
+    .right-modeling-controls,
+    .right-workspace {
+      gap: 8px;
+    }
+
+    aside > * + * {
+      margin-top: 8px;
+    }
+
+    .section,
+    .sheet-card {
+      padding: 9px 10px;
+      border-radius: 8px;
+    }
+
+    .section::before,
+    .sheet-card::before {
+      top: 8px;
+      bottom: 8px;
+    }
+
+    .section > h2,
+    .sheet-card > h2,
+    .sheet-card > h3,
+    .dual-layout-panel h2,
+    .personal-measure-data-panel h2,
+    .hole-modeling-panel > h2,
+    .pitch-pad h3 {
+      margin: 0 0 7px;
+      font-size: 16px;
+      line-height: 1.3;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .sheet-control-groups,
+    .pitch-pad,
+    .pitch-grid,
+    .pitch-depth-layout,
+    .save-controls,
+    .dual-layout-grid,
+    .pap-grid,
+    .drill-layout-grid,
+    .modeling-grid,
+    .material-grid {
+      gap: 8px;
+    }
+
+    .dual-layout-field,
+    .catalog-model-field,
+    .indicator-control,
+    .depth-panel,
+    .pitch-axis,
+    .saved-profile-box,
+    .save-field {
+      gap: 6px;
+    }
+
+    .dual-layout-field,
+    .catalog-model-field {
+      padding: 9px;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .dual-layout-field > span:first-child,
+    .catalog-model-field span,
+    .indicator-control label,
+    .depth-panel-label,
+    label {
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .range-list-control,
+    .range-adjust-input,
+    .save-controls input,
+    .save-controls select,
+    .save-controls textarea,
+    .save-controls button,
+    input[type="text"],
+    select,
+    button {
+      min-height: 42px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .range-adjust-button {
+      min-width: 42px;
+      min-height: 42px;
+      font-size: 18px;
+    }
+
+    .range-adjust-control,
+    .dual-layout-field .range-adjust-control,
+    .span-gauge-control .range-adjust-control {
+      grid-template-columns: 42px minmax(5.25rem, 1fr) 42px !important;
+      gap: 6px;
+    }
+
+    .pitch-axis .range-adjust-control,
+    .depth-panel .range-adjust-control {
+      grid-template-columns: 42px minmax(10.25rem, 1fr) 42px !important;
+    }
+
+    .drill-layout-panel .dual-layout-field:not(.wide) .range-adjust-control {
+      grid-template-columns: 34px minmax(3.9rem, 1fr) 34px !important;
+    }
+
+    .drill-layout-panel .dual-layout-field:not(.wide) .range-adjust-button,
+    .drill-layout-panel .dual-layout-field:not(.wide) .range-adjust-input {
+      min-height: 40px;
+      font-size: 14px;
+    }
+
+    .drill-layout-panel .dual-layout-field:not(.wide) .range-adjust-button {
+      min-width: 34px;
+    }
+
+    .right-workspace {
+      grid-template-rows: minmax(500px, 58vh) max-content max-content;
+    }
+
+    .right-workspace > .measure-section {
+      height: auto;
+      grid-template-rows: auto auto;
+      padding: 8px 9px;
+      overflow: visible;
+    }
+
+    .right-workspace > .measure-section .measure-diagram {
+      container-type: inline-size;
+      width: 100%;
+      max-width: 460px;
+      height: auto;
+      min-height: 0;
+      aspect-ratio: 1100 / 760;
+      overflow: hidden;
+    }
+
+    .measure-diagram .sheet-input {
+      width: 18%;
+      min-width: 58px;
+      max-width: 86px;
+      height: 8%;
+      padding: 0 5px;
+      border: 1px solid rgba(220, 246, 250, .36);
+      border-radius: 4px;
+      background: rgba(5, 12, 15, .72);
+      font-size: clamp(12px, 3.4cqw, 16px);
+      line-height: 1;
+      overflow: hidden;
+      text-overflow: clip;
+      white-space: nowrap;
+    }
+
+    .measure-diagram .sheet-input.small,
+    .measure-diagram .sheet-input.wide,
+    .measure-diagram .sheet-input.grip {
+      width: 18%;
+    }
+
+    .field-middle-grip,
+    .field-ring-grip {
+      top: 6.2%;
+    }
+
+    .field-middle-hole,
+    .field-ring-hole {
+      top: 29.8%;
+    }
+
+    .field-main-span,
+    .field-offset-span {
+      top: 48.8%;
+    }
+
+    .field-thumb-hole {
+      top: 74.2%;
+    }
+
+    .field-thumb-solid {
+      top: 93%;
+    }
+
+    .pitch-token {
+      max-width: 18%;
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .pitch-token strong {
+      min-height: 12px;
+      font-size: clamp(10px, 2.8cqw, 14px);
+      line-height: 1;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1200px) {
+      .right-workspace > .measure-section .measure-diagram {
+        height: auto;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body {
+        font-size: 17px;
+      }
+
+      .section,
+      .sheet-card {
+        padding: 10px;
+      }
+
+      .section > h2,
+      .sheet-card > h2,
+      .sheet-card > h3,
+      .dual-layout-panel h2,
+      .personal-measure-data-panel h2,
+      .hole-modeling-panel > h2,
+      .pitch-pad h3 {
+        font-size: 18px;
+      }
+
+      .dual-layout-field,
+      .catalog-model-field {
+        padding: 10px;
+        font-size: 15px;
+      }
+
+      .dual-layout-field > span:first-child,
+      .catalog-model-field span,
+      .indicator-control label,
+      .depth-panel-label,
+      label {
+        font-size: 15px;
+      }
+
+      .range-list-control,
+      .range-adjust-input,
+      .save-controls input,
+      .save-controls select,
+      .save-controls textarea,
+      .save-controls button,
+      input[type="text"],
+      select,
+      button {
+        min-height: 48px;
+        font-size: 16px;
+      }
+
+      .range-adjust-button {
+        min-width: 48px;
+        min-height: 48px;
+      }
+
+      .range-adjust-control,
+      .dual-layout-field .range-adjust-control,
+      .span-gauge-control .range-adjust-control {
+        grid-template-columns: 48px minmax(6rem, 1fr) 48px !important;
+      }
+
+      .span-gauge-section {
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-areas:
+          "main"
+          "offset" !important;
+      }
+
+      .span-gauge-section[data-hand="left"] {
+        grid-template-areas:
+          "offset"
+          "main" !important;
+      }
+
+      .span-gauge-control {
+        justify-items: stretch;
+      }
+
+      .span-gauge-control .range-adjust-control,
+      .pitch-axis .range-adjust-control,
+      .depth-panel .range-adjust-control {
+        grid-template-columns: 48px minmax(5rem, 1fr) 48px !important;
+        max-width: none;
+        width: 100%;
+      }
+
+      .physical-comparison-row,
+      .catalog-rg-field .catalog-rg-inputs,
+      .catalog-weight-inputs {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+
+      .measure-diagram .sheet-input {
+        min-width: 52px;
+        font-size: clamp(10px, 3.6cqw, 14px);
+      }
+    }
+
+    /* 2026-07-29 correction: explicit labels, full-width cards, readable helper text. */
+    .range-adjust-block {
+      display: grid;
+      gap: 5px;
+      width: 100%;
+      min-width: 0;
+      align-self: stretch;
+    }
+
+    .pitch-axis .range-adjust-block,
+    .depth-panel .range-adjust-block {
+      grid-column: 1 / -1;
+    }
+
+    .range-adjust-title {
+      color: rgba(238, 243, 245, .94);
+      font-size: 16px;
+      font-weight: 850;
+      line-height: 1.25;
+    }
+
+    .range-adjust-block .range-adjust-meta {
+      display: block !important;
+      min-height: 0;
+      color: rgba(213, 232, 238, .78);
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.25;
+      text-align: left;
+    }
+
+    .depth-panel > .depth-panel-label {
+      display: none !important;
+    }
+
+    .pitch-axis,
+    .depth-panel {
+      align-items: stretch !important;
+      justify-items: stretch !important;
+      gap: 0;
+    }
+
+    .pitch-depth-layout,
+    .pitch-depth-layout.depth-right {
+      grid-template-columns: minmax(0, 1fr) !important;
+      align-items: stretch;
+    }
+
+    .pitch-pad {
+      padding: 10px;
+      gap: 10px;
+    }
+
+    .finger-column h4,
+    .sheet-card h3,
+    .pitch-pad h3,
+    .span-gauge-control h3 {
+      font-size: 16px;
+      line-height: 1.3;
+      font-weight: 850;
+    }
+
+    .control-group-note,
+    .field-note,
+    .note,
+    .bridge-list-meta,
+    .catalog-weight-inputs label small,
+    .catalog-rg-field label small,
+    .layout-impact-card span,
+    .layout-impact-card em,
+    .physical-model-metric span {
+      font-size: 12px !important;
+      line-height: 1.35;
+      color: rgba(213, 232, 238, .82);
+    }
+
+    .span-gauge-section {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+      padding: 10px;
+    }
+
+    .span-gauge-control {
+      justify-items: stretch;
+      align-content: start;
+      width: 100%;
+      padding: 8px;
+      border: 1px solid rgba(134, 211, 255, .16);
+      border-radius: 8px;
+      background: rgba(4, 14, 18, .46);
+    }
+
+    .span-gauge-control .range-adjust-control {
+      width: 100%;
+      max-width: none;
+      grid-template-columns: 42px minmax(0, 1fr) 42px !important;
+    }
+
+    #thumbSettingsSection .material-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    #thumbSettingsSection .material-field,
+    #thumbSettingsSection .indicator-control {
+      width: 100%;
+    }
+
+    .material-field label,
+    .material-field select,
+    .indicator-wrap,
+    .indicator-wrap > select,
+    .indicator-wrap > input,
+    .indicator-wrap > .range-adjust-block {
+      width: 100%;
+    }
+
+    .catalog-model-field {
+      align-content: stretch;
+      gap: 8px;
+    }
+
+    .catalog-model-field span {
+      font-size: 14px;
+      line-height: 1.35;
+      color: rgba(238, 243, 245, .9);
+    }
+
+    .catalog-weight-inputs {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, .9fr);
+      align-items: end;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .catalog-weight-inputs label,
+    .catalog-rg-field label {
+      gap: 5px;
+    }
+
+    .catalog-weight-inputs select,
+    .catalog-weight-inputs input,
+    .catalog-rg-field input {
+      min-height: 42px;
+      font-size: 15px;
+    }
+
+    .catalog-derived-value {
+      justify-self: stretch;
+      width: 100%;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 6px 8px;
+      border: 1px solid rgba(134, 211, 255, .14);
+      border-radius: 7px;
+      background: rgba(4, 14, 18, .44);
+      font-size: 14px;
+      line-height: 1.25;
+      text-align: right;
+    }
+
+    .range-adjust-input,
+    .range-adjust-control > .range-adjust-input,
+    .range-list-control,
+    .save-controls input,
+    .save-controls select,
+    .save-controls textarea,
+    .save-controls button,
+    .catalog-model-field input,
+    .catalog-model-field select,
+    .material-field select,
+    input[type="text"],
+    select,
+    button {
+      font-size: 18px !important;
+      min-height: 46px;
+    }
+
+    .range-adjust-input {
+      font-size: 18px !important;
+    }
+
+    @media (max-width: 520px) {
+      .range-adjust-title {
+        font-size: 17px;
+      }
+
+      .range-adjust-block .range-adjust-meta {
+        font-size: 15px;
+      }
+
+      .span-gauge-section,
+      .span-gauge-section[data-hand="left"],
+      .catalog-weight-inputs,
+      .catalog-rg-field .catalog-rg-inputs {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+
+      .span-gauge-section {
+        grid-template-areas:
+          "main"
+          "offset" !important;
+      }
+
+      .span-gauge-section[data-hand="left"] {
+        grid-template-areas:
+          "offset"
+          "main" !important;
+      }
+    }
+
+    /* 2026-07-29 correction: remove remaining sub-12px readable UI text. */
+    .profile-empty-note,
+    .pitch-readout,
+    .modeling-column h4,
+    .modeling-subsection > h4,
+    .sheet-label,
+    .fixed-spec,
+    .field-note {
+      font-size: 13px !important;
+      line-height: 1.35;
+    }
+
+    svg text {
+      font-size: 12px !important;
+    }
+
+    .physical-comparison-row {
+      grid-template-columns: minmax(0, 1fr) minmax(82px, .35fr) minmax(0, 1fr);
+    }
+
+    .physical-delta-pill span {
+      font-size: 12px !important;
+      line-height: 1.25;
+    }
+
+    .layout-impact-card strong,
+    .physical-model-metric strong {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    @media (max-width: 520px) {
+      .span-gauge-control .range-adjust-control,
+      .span-gauge-control .range-adjust-block .range-adjust-control {
+        grid-template-columns: 48px minmax(0, 1fr) 48px !important;
+        gap: 6px;
+      }
+
+      .physical-comparison-row {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+    }
+
+    /* Final readable type floor. Keep this last so older compact rules cannot win. */
+    .range-adjust-title,
+    .depth-panel-label,
+    .finger-column h4,
+    .sheet-card h3,
+    .pitch-pad h3,
+    .span-gauge-control h3,
+    .catalog-model-field span,
+    .modeling-column h4,
+    .modeling-subsection > h4 {
+      font-size: 17px !important;
+      line-height: 1.32 !important;
+    }
+
+    .range-adjust-meta,
+    .profile-empty-note,
+    .pitch-readout,
+    .control-group-note,
+    .field-note,
+    .note,
+    .bridge-list-meta,
+    .catalog-weight-inputs label small,
+    .catalog-rg-field label small,
+    .layout-impact-card span,
+    .layout-impact-card em,
+    .physical-model-metric span,
+    .physical-delta-pill span,
+    .fixed-spec,
+    .catalog-derived-value,
+    svg text {
+      font-size: 14px !important;
+      line-height: 1.35 !important;
+    }
+
+    .range-adjust-input,
+    .range-list-control,
+    input[type="text"],
+    select,
+    textarea,
+    button,
+    .save-controls input,
+    .save-controls select,
+    .save-controls textarea,
+    .save-controls button,
+    .catalog-model-field input,
+    .catalog-model-field select,
+    .material-field select {
+      font-size: 18px !important;
+      min-height: 48px;
+    }
+
+    .zoom-hud,
+    .zoom-hud output,
+    .modeling-subsection > h3,
+    .modeling-column h3 {
+      font-size: 16px !important;
+      line-height: 1.35 !important;
+    }
+
+    .range-adjust-button {
+      font-size: 20px !important;
+    }
   </style>
 </head>
 <body>
@@ -4218,13 +4847,55 @@
           }
         });
 
+        const title = document.createElement("div");
+        title.className = "range-adjust-title";
+        title.textContent = rangeAdjustTitle(range);
+
         const meta = document.createElement("div");
         meta.className = "range-adjust-meta";
         meta.textContent = rangeListMeta(range);
-        anchor.insertAdjacentElement("afterend", meta);
-        anchor.insertAdjacentElement("afterend", control);
+
+        const block = document.createElement("div");
+        block.className = "range-adjust-block";
+        block.dataset.rangeAdjustBlock = range.id;
+        block.append(title, control, meta);
+        anchor.insertAdjacentElement("afterend", block);
         updateRangeListForRange(range);
       });
+    }
+
+    function rangeAdjustTitle(range) {
+      const label = range.getAttribute("aria-label") || "";
+      const titles = {
+        middleOuterDiameter: "中指グリップ外径",
+        middleInnerDiameter: "中指グリップ内径",
+        middleBareDiameter: "中指素掘り径",
+        middleNoThumbOffset: "中指基準線オフセット",
+        ringOuterDiameter: "薬指グリップ外径",
+        ringInnerDiameter: "薬指グリップ内径",
+        ringBareDiameter: "薬指素掘り径",
+        ringNoThumbOffset: "薬指基準線オフセット",
+        thumbDiameter: "サム内径",
+        thumbSolid: "サムソリッド外径",
+        thumbSolidWall: "サムソリッド肉厚",
+        middleSpan: "メインスパン",
+        ringSpanOffset: "薬指 +/-",
+        layoutPapRight: "PAP左右",
+        layoutPapUp: "PAP上下",
+        layoutPinPap: "PIN-PAP",
+        layoutDrillAngle: "ドリル角",
+        layoutValAngle: "VAL角",
+        layoutCoreEnvelopeRadius: "コア外接半径",
+        stampPinMbDistance: "PIN-MB 表面距離",
+        stampPinCgDistance: "PIN-CG 表面距離",
+        stampCgOffset: "CG横ずれ"
+      };
+      if (titles[range.id]) return titles[range.id];
+      if (range.id.endsWith("DrillDepth")) return "深さ";
+      if (range.id.endsWith("LateralAxis")) return "左右ピッチ";
+      if (range.id.endsWith("VerticalAxis")) return "前後ピッチ";
+      if (label.includes("PAP")) return label.replace(/^.*?PAP/, "PAP");
+      return label || range.id;
     }
 
     function rangeListAnchor(range) {

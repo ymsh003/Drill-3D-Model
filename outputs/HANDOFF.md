@@ -1,10 +1,113 @@
 # Drill 3D Model Handoff
 
-Last updated: 2026-07-28
+Last updated: 2026-07-29
 
 This document is the handoff record for the bowling-ball drilling 3D prototype. It is written for the next agent/developer who must continue without relying on prior chat context.
 
 The current implementation is not in a clean finished state. The user is dissatisfied with recent UI changes around pitch/stepper controls. Treat the current UI as a work in progress and verify every visual change in the browser before saying it is fixed.
+
+## 2026-07-29 Card Consistency And Readability Pass
+
+Repairs applied after the user reported inconsistent card interiors, excessive dead space, small typography, and measure-sheet values spilling out visually:
+
+- Added a final CSS consistency layer for cards.
+  - Reason: older section-specific rules used different padding, heading sizes, field gaps, and control heights. This made adjacent cards feel unrelated and wasted vertical space.
+  - Change: normalized `.section` / `.sheet-card` padding, heading scale, inner field spacing, label size, and control height while keeping the existing section colors and structure.
+- Raised the working typography scale.
+  - Reason: 12px field text was too small for repeated work and especially poor on small screens.
+  - Change: card field text is now generally 14px on desktop and 15px on mobile; inputs/buttons are 15px desktop and 16px mobile; body line-height is stabilized for Japanese text.
+- Reworked measure-sheet diagram labels.
+  - Reason: the values fit mathematically in many cases, but visually collided with the drawing frame/bracket lines and were too fragile for longer fractions.
+  - Change: the diagram now uses container-based label sizing, wider value boxes, subtle dark label backgrounds, and a larger max diagram width while preserving the 1100:760 aspect ratio.
+- Preserved 3D model priority.
+  - Reason: the previous measure-sheet enlargement risked shrinking the model again.
+  - Change: the right workspace uses a 500px minimum model row and lets the measure-sheet row size to its content below it.
+- Fixed narrow-card stepper overflow.
+  - Reason: larger touch targets made the three-column drill-layout steppers exceed their small cards.
+  - Change: only narrow drill-layout cards use compact 34px buttons; pitch/depth controls retain larger touch-friendly columns.
+- Fixed mobile-only overflow in span and catalog inputs.
+  - Reason: span controls and catalog RG inputs were still forced into multi-column layouts too narrow for touch controls.
+  - Change: small screens stack span controls, physical comparison rows, catalog weight inputs, and RG inputs into one column.
+
+Verification performed in headless Chrome:
+
+- Desktop 1440x900:
+  - no JavaScript errors.
+  - document/body horizontal scroll stayed at 1440px.
+  - 3D viewer measured about 722x500.
+  - measure sheet measured about 460x318.
+  - no visible horizontal overflow candidates.
+  - no measure-sheet value boxes were clipped or outside the diagram.
+- Mobile 390x844:
+  - document/body horizontal scroll stayed at 390px.
+  - 3D viewer measured about 368x500.
+  - measure sheet measured about 348x240.
+  - no visible horizontal overflow candidates.
+  - no measure-sheet value boxes were clipped or outside the diagram.
+
+## 2026-07-29 Follow-Up Correction: Labels, Card Widths, And Small Text
+
+The previous readability pass still failed the user's actual visual expectation. The user pointed out four concrete problems: pitch rows had no small headings, span controls had poor left/right balance and excessive dead space, thumb solid controls were half-width with an empty right side, and top/bottom weight contained tiny helper labels and unused space.
+
+Repairs applied:
+
+- Generated steppers now create a `.range-adjust-block` with a visible `.range-adjust-title`.
+  - Reason: depth, lateral pitch, and vertical pitch were visually identical rows, so users could not tell which number they were editing.
+  - Change: range controls now show labels such as `深さ`, `左右ピッチ`, `前後ピッチ`, `メインスパン`, `薬指 +/-`, `ドリル角`, `PIN-PAP`, and `VAL角`.
+- Span controls now fill their card columns.
+  - Reason: the previous controls were centered in small max-width islands, creating uneven left/right balance and wasted space.
+  - Change: each span control is a full-width sub-card, with the generated stepper stretched to its column.
+- Thumb solid selection now uses the full card width.
+  - Reason: a single control inside a two-column material grid left an empty right half.
+  - Change: `#thumbSettingsSection .material-grid` is forced to one full-width column.
+- Top/bottom weight card now uses balanced input columns and a full-width result row.
+  - Reason: `方向` and `oz` helper labels were too small and the result floated in dead space.
+  - Change: helper labels are at least 12px, inputs align to the card width, and the derived value is framed as a full-width readout.
+- Removed remaining sub-12px readable UI text.
+  - Reason: after the first pass, 10px/11px text remained in profile notes, meat-wall outputs, modeling subheads, SVG labels, and physical comparison deltas.
+  - Change: final overrides raise those readable labels to 12px or higher.
+
+Verification performed in headless Chrome after this correction:
+
+- Desktop 1440x900:
+  - no JavaScript syntax errors or page errors.
+  - no document/body horizontal overflow.
+  - no visible horizontal overflow candidates.
+  - no visible readable UI text below 12px.
+  - first three pitch cards expose `深さ`, `左右ピッチ`, and `前後ピッチ`.
+  - measure-sheet values remain unclipped and inside the diagram.
+- Mobile 390x844:
+  - no JavaScript syntax errors or page errors.
+  - no document/body horizontal overflow.
+  - no visible horizontal overflow candidates.
+  - no visible readable UI text below 12px.
+  - span controls stack into full-width mobile rows.
+  - measure-sheet values remain unclipped and inside the diagram.
+
+## 2026-07-29 Final Readability Correction
+
+The previous fix still exposed duplicate `深さ` labels and internal English IDs such as `thumbDiameter` / `layoutPinPap`. It also left mobile generated inputs at 16px because a stronger mobile CSS rule overrode the intended font size.
+
+Repairs applied:
+
+- Removed duplicate depth labeling by hiding the old `.depth-panel-label` once generated row titles are present.
+- Added explicit Japanese titles for range IDs, including `サム内径`, `PIN-PAP`, `PAP左右`, `PAP上下`, and stamp/core-related controls.
+- Added a final type floor at the end of the stylesheet:
+  - generated row titles: 17px
+  - helper/readout text: 14px or larger
+  - inputs/selects/buttons: 18px
+- Added stronger selectors for `.range-adjust-control > .range-adjust-input` so mobile rules cannot shrink generated inputs back to 16px.
+- Raised the zoom HUD and modeling subsection headings.
+
+Verification performed in headless Chrome:
+
+- Desktop 1440x900 and mobile 390x844 both reported:
+  - no JavaScript syntax errors or page errors.
+  - no horizontal overflow.
+  - no visible internal ID strings such as `thumbDiameter` or `layoutPinPap`.
+  - no duplicate `深さ` label in the first pitch depth control; visible labels are `深さ`, `左右ピッチ`, `前後ピッチ`.
+  - no readable text below the new checked floor.
+  - no generated input below 18px.
 
 ## 2026-07-28 High-Risk UI Repair Pass
 

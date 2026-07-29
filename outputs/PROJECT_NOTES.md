@@ -107,6 +107,37 @@ The right-hand control panel has been compacted:
 
 Reason for priority: these issues either made working controls look broken, made requested fixed sections fail, or kept removed controls alive as hidden UI debt.
 
+## 2026-07-29 UI Consistency And Readability Record
+
+- Card interiors were normalized with a final CSS layer for padding, gaps, headings, labels, inputs, and buttons.
+- Field text was raised from the earlier 12px baseline toward 14px desktop / 15px mobile, with inputs at 15px desktop / 16px mobile.
+- The measure-sheet diagram now uses wider, framed value labels with container-based font sizing so longer fractions stay inside the diagram.
+- The right-side layout keeps the 3D model at a 500px minimum height and sizes the measure-sheet row to its actual diagram height.
+- Narrow drill-layout steppers were compacted only inside the three small layout cards so the larger global touch targets do not overflow.
+- Mobile span controls, catalog weight inputs, catalog RG inputs, and physical comparison rows now stack to one column.
+
+Verification: headless Chrome at 1440x900 and 390x844 reported no JavaScript errors, no body/document horizontal overflow, and no clipped or outside measure-sheet value boxes.
+
+## 2026-07-29 Follow-Up UI Correction
+
+- Generated steppers now include visible row labels such as `深さ`, `左右ピッチ`, and `前後ピッチ`; identical rows must not rely on position alone to explain their meaning.
+- Span controls were changed from centered narrow islands to full-width sub-cards.
+- The thumb solid control now occupies the full card width instead of leaving an empty right column.
+- Top/bottom weight inputs and the derived readout now align to the card width, and helper labels such as `方向` / `oz` are no longer tiny.
+- Remaining readable 10px/11px UI text was raised to 12px or higher.
+
+Verification: 1440x900 and 390x844 headless Chrome checks reported no JavaScript errors, no horizontal overflow candidates, no readable visible text below 12px, and no clipped measure-sheet values.
+
+## 2026-07-29 Final Readability Correction
+
+- Duplicate `深さ` labels were removed by hiding the old depth label after generated row titles were added.
+- Internal IDs such as `thumbDiameter` and `layoutPinPap` are now mapped to Japanese labels such as `サム内径` and `PIN-PAP`.
+- The final readable type floor is now enforced at the end of the stylesheet:
+  - row titles: 17px
+  - helper/readout text: 14px or larger
+  - inputs/selects/buttons: 18px
+- Verification at 1440x900 and 390x844 reported no internal ID labels, no duplicate depth label in the first pitch block, no horizontal overflow, and no generated input below 18px.
+
 ## 2026-07-28 Measure Review And Mobile Usability Update
 
 - The large left-side measure sheet no longer follows scroll.
