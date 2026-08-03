@@ -3488,7 +3488,1141 @@
     .range-adjust-button {
       font-size: 20px !important;
     }
-  </style>
+/* Direct-entry measure sheet layout repair. Keep this late so older compact rules cannot shrink it again. */
+.right-workspace {
+  grid-template-rows: minmax(620px, 1fr) max-content !important;
+}
+
+.right-workspace > .measure-section {
+  display: none;
+}
+
+aside > .measure-section {
+  display: grid !important;
+  order: 1;
+  gap: 10px;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  padding: 10px;
+}
+
+aside > .measure-section h2 {
+  font-size: 18px !important;
+  line-height: 1.35 !important;
+}
+
+aside > .measure-section .measure-diagram {
+  width: 100%;
+  max-width: none !important;
+  min-height: 700px;
+  aspect-ratio: 1.55;
+}
+
+.measure-diagram .sheet-input {
+  min-width: 54px;
+  max-width: 96px;
+  min-height: 32px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: rgba(6, 17, 22, 0.88);
+  border: 1px solid rgba(190, 230, 232, 0.72);
+  color: #f6fbfc;
+  font-size: 17px !important;
+  line-height: 1.2 !important;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  cursor: text;
+}
+
+.measure-diagram .sheet-input:focus {
+  outline: 2px solid rgba(99, 214, 255, 0.95);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(39, 166, 207, 0.24);
+}
+
+.measure-diagram .sheet-input.input-error {
+  border-color: #ff8a8a;
+  box-shadow: 0 0 0 3px rgba(255, 138, 138, 0.22);
+}
+
+.measure-diagram .field-bridge {
+  display: inline-flex !important;
+}
+
+.bridge-gauge-control {
+  display: grid !important;
+  gap: 8px;
+}
+
+.bridge-gauge-control .bridge-list-card {
+  display: none !important;
+}
+
+.direct-bridge-control {
+  display: grid;
+  grid-template-columns: 48px minmax(96px, 1fr) 48px;
+  gap: 8px;
+  align-items: center;
+  max-width: 260px;
+}
+
+.direct-bridge-control .range-adjust-input {
+  width: 100%;
+}
+
+aside > .measure-section .hole-modeling-panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+aside > .measure-section .hole-modeling-panel > h2 {
+  display: none;
+}
+
+aside > .measure-section .sheet-control-groups {
+  gap: 10px;
+  margin-top: 2px;
+}
+
+aside > .measure-section .sheet-card,
+aside > .measure-section .pitch-pad,
+aside > .measure-section .span-gauge-control,
+aside > .measure-section .bridge-gauge-control,
+aside > .measure-section .change-log-section {
+  border-radius: 6px;
+}
+
+aside > .measure-section .measure-diagram .sheet-input {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.measure-sheet-control {
+  position: absolute;
+  z-index: 6;
+  display: grid !important;
+  grid-template-columns: 30px minmax(56px, 1fr) 30px;
+  align-items: stretch;
+  width: clamp(116px, 18%, 142px);
+  min-height: 38px;
+  border: 1px solid rgba(132, 188, 195, 0.9);
+  border-radius: 6px;
+  background: rgba(3, 14, 18, 0.94);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+
+.measure-sheet-control button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: rgba(6, 33, 42, 0.96);
+  color: #f5fbfc;
+  font-size: 18px !important;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.measure-sheet-control button:hover,
+.measure-sheet-control button:focus-visible {
+  background: rgba(10, 72, 91, 0.98);
+}
+
+.measure-sheet-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 5px;
+  color: #f7fbfc;
+  font-size: 17px !important;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.measure-sheet-control.field-middle-hole,
+.measure-sheet-control.field-ring-hole {
+  border-radius: 999px;
+}
+
+.measure-diagram .measure-sheet-control.field-bridge {
+  top: 18.5%;
+  display: grid !important;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip,
+.measure-diagram .measure-sheet-control.field-ring-grip {
+  top: 19%;
+  border-radius: 6px;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole,
+.measure-diagram .measure-sheet-control.field-ring-hole,
+.measure-diagram .measure-sheet-control.field-thumb-hole {
+  border-radius: 999px;
+}
+
+    .measure-diagram .measure-sheet-control.field-bridge {
+      top: 29.4%;
+      border-radius: 6px;
+    }
+
+.measure-diagram .measure-sheet-control.field-middle-hole,
+.measure-diagram .measure-sheet-control.field-ring-hole {
+  top: 42%;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole,
+.measure-diagram .measure-sheet-control.field-ring-hole {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 92px;
+  height: 92px;
+  min-height: 92px;
+  border: 3px solid rgba(199, 242, 246, 0.98);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 48%, rgba(5, 18, 22, 0.98) 0%, rgba(4, 14, 18, 0.98) 58%, rgba(9, 54, 66, 0.94) 100%);
+  box-shadow: 0 0 0 4px rgba(65, 204, 224, 0.18), 0 12px 26px rgba(0, 0, 0, 0.34);
+  overflow: hidden;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole::before,
+.measure-diagram .measure-sheet-control.field-ring-hole::before {
+  content: "外径";
+  position: absolute;
+  left: 50%;
+  top: -19px;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-size: 12px !important;
+  font-weight: 900;
+  line-height: 1.1;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.78);
+  pointer-events: none;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole button,
+.measure-diagram .measure-sheet-control.field-ring-hole button {
+  flex: 0 0 29px;
+  width: 100%;
+  min-height: 29px;
+  border: 0;
+  background: rgba(9, 78, 96, 0.92);
+  color: #f7fbfc;
+  font-size: 28px !important;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole button[data-step="1"],
+.measure-diagram .measure-sheet-control.field-ring-hole button[data-step="1"] {
+  order: 1;
+  border-bottom: 1px solid rgba(199, 242, 246, 0.42);
+  background: rgba(13, 99, 122, 0.95);
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-ring-hole .measure-sheet-value {
+  order: 2;
+  flex: 1 1 auto;
+  min-height: 36px;
+  padding: 0 4px;
+  font-size: 22px !important;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole button[data-step="-1"],
+.measure-diagram .measure-sheet-control.field-ring-hole button[data-step="-1"] {
+  order: 3;
+  border-top: 1px solid rgba(199, 242, 246, 0.42);
+  background: rgba(5, 49, 62, 0.95);
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole button:hover,
+.measure-diagram .measure-sheet-control.field-middle-hole button:focus-visible,
+.measure-diagram .measure-sheet-control.field-ring-hole button:hover,
+.measure-diagram .measure-sheet-control.field-ring-hole button:focus-visible {
+  background: rgba(24, 149, 178, 0.98);
+}
+
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span {
+  top: 58%;
+  border-radius: 6px;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-hole {
+  top: 73%;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-hole {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 112px;
+  height: 112px;
+  min-height: 112px;
+  border: 3px solid rgba(199, 242, 246, 0.98);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 48%, rgba(5, 18, 22, 0.98) 0%, rgba(4, 14, 18, 0.98) 58%, rgba(9, 54, 66, 0.94) 100%);
+  box-shadow: 0 0 0 4px rgba(65, 204, 224, 0.18), 0 12px 26px rgba(0, 0, 0, 0.36);
+  overflow: hidden;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-hole button {
+  flex: 0 0 32px;
+  width: 100%;
+  min-height: 32px;
+  border: 0;
+  background: rgba(9, 78, 96, 0.92);
+  color: #f7fbfc;
+  font-size: 32px !important;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-hole button[data-step="1"] {
+  order: 1;
+  border-bottom: 1px solid rgba(199, 242, 246, 0.42);
+  background: rgba(13, 99, 122, 0.95);
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-hole .measure-sheet-value {
+  order: 2;
+  flex: 1 1 auto;
+  min-height: 40px;
+  padding: 0 4px;
+  font-size: 26px !important;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-hole button[data-step="-1"] {
+  order: 3;
+  border-top: 1px solid rgba(199, 242, 246, 0.42);
+  background: rgba(5, 49, 62, 0.95);
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-hole button:hover,
+.measure-diagram .measure-sheet-control.field-thumb-hole button:focus-visible {
+  background: rgba(24, 149, 178, 0.98);
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-solid {
+  top: 92%;
+  border-radius: 6px;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip,
+.measure-diagram .measure-sheet-control.field-ring-grip,
+.measure-diagram .measure-sheet-control.field-bridge,
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span,
+.measure-diagram .measure-sheet-control.field-thumb-solid {
+  display: grid !important;
+  grid-template-columns: 46px minmax(74px, 1fr) 46px;
+  column-gap: 0;
+  align-items: stretch;
+  width: clamp(186px, 29%, 218px);
+  min-height: 64px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: rgba(4, 18, 23, 0.96);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(76, 190, 210, 0.18);
+  overflow: visible;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip::after,
+.measure-diagram .measure-sheet-control.field-ring-grip::after,
+.measure-diagram .measure-sheet-control.field-bridge::after,
+.measure-diagram .measure-sheet-control.field-main-span::after,
+.measure-diagram .measure-sheet-control.field-offset-span::after,
+.measure-diagram .measure-sheet-control.field-thumb-solid::after {
+  content: "";
+  position: absolute;
+  left: 46px;
+  right: 46px;
+  top: 0;
+  bottom: 0;
+  border-top: 3px solid rgba(93, 213, 232, 0.88);
+  border-bottom: 3px solid rgba(93, 213, 232, 0.88);
+  background:
+    linear-gradient(180deg, rgba(10, 30, 36, 0.98), rgba(6, 20, 25, 0.98));
+  pointer-events: none;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip::before,
+.measure-diagram .measure-sheet-control.field-ring-grip::before,
+.measure-diagram .measure-sheet-control.field-bridge::before,
+.measure-diagram .measure-sheet-control.field-main-span::before,
+.measure-diagram .measure-sheet-control.field-offset-span::before,
+.measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value::before,
+.measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip::before,
+.measure-diagram .measure-sheet-control.field-ring-grip::before,
+.measure-diagram .measure-sheet-control.field-bridge::before,
+.measure-diagram .measure-sheet-control.field-main-span::before,
+.measure-diagram .measure-sheet-control.field-offset-span::before {
+  display: none;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value::before,
+.measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value::after {
+  display: none;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip button,
+.measure-diagram .measure-sheet-control.field-ring-grip button,
+.measure-diagram .measure-sheet-control.field-bridge button,
+.measure-diagram .measure-sheet-control.field-main-span button,
+.measure-diagram .measure-sheet-control.field-offset-span button,
+.measure-diagram .measure-sheet-control.field-thumb-solid button {
+  position: relative;
+  z-index: 1;
+  width: 46px;
+  min-height: 64px;
+  border: 0;
+  border-radius: 0;
+  background: rgba(6, 48, 59, 0.96);
+  color: #f7fbfc;
+  font-size: 30px !important;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip button[data-step="1"],
+.measure-diagram .measure-sheet-control.field-ring-grip button[data-step="1"],
+.measure-diagram .measure-sheet-control.field-bridge button[data-step="1"],
+.measure-diagram .measure-sheet-control.field-main-span button[data-step="1"],
+.measure-diagram .measure-sheet-control.field-offset-span button[data-step="1"],
+.measure-diagram .measure-sheet-control.field-thumb-solid button[data-step="1"] {
+  background: rgba(12, 76, 92, 0.98);
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip button:hover,
+.measure-diagram .measure-sheet-control.field-middle-grip button:focus-visible,
+.measure-diagram .measure-sheet-control.field-ring-grip button:hover,
+.measure-diagram .measure-sheet-control.field-ring-grip button:focus-visible,
+.measure-diagram .measure-sheet-control.field-bridge button:hover,
+.measure-diagram .measure-sheet-control.field-bridge button:focus-visible,
+.measure-diagram .measure-sheet-control.field-main-span button:hover,
+.measure-diagram .measure-sheet-control.field-main-span button:focus-visible,
+.measure-diagram .measure-sheet-control.field-offset-span button:hover,
+.measure-diagram .measure-sheet-control.field-offset-span button:focus-visible,
+.measure-diagram .measure-sheet-control.field-thumb-solid button:hover,
+.measure-diagram .measure-sheet-control.field-thumb-solid button:focus-visible {
+  background: rgba(20, 132, 157, 0.98);
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-ring-grip .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-bridge .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-main-span .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-offset-span .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 64px;
+  padding: 0 8px;
+  color: #f7fbfc;
+  background: transparent;
+  font-size: 28px !important;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.72);
+}
+
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-middle-grip,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-ring-grip,
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-main-span,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-offset-span {
+  left: 23%;
+}
+
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-ring-grip,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-middle-grip,
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-offset-span,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-main-span {
+  left: 77%;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-solid::before {
+  content: "サムソリッド外径";
+  position: absolute;
+  left: 50%;
+  top: -20px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 150px;
+  color: var(--muted);
+  font-size: 12px !important;
+  font-weight: 900;
+  line-height: 1.1;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.78);
+  pointer-events: none;
+}
+
+.measure-section .hole-modeling-panel.is-replaced-by-measure-editor {
+  display: none !important;
+}
+
+#measureSheetIntegratedEditor {
+  display: none !important;
+}
+
+.measure-sheet-editor {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.measure-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.measure-editor-card {
+  display: grid;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(12, 20, 24, 0.82);
+}
+
+.measure-editor-card h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px !important;
+  line-height: 1.25 !important;
+}
+
+.measure-editor-row {
+  display: grid;
+  grid-template-columns: minmax(96px, 0.8fr) minmax(0, 1.2fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.measure-editor-row label {
+  color: var(--muted);
+  font-size: 15px !important;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.measure-editor-select,
+.measure-editor-value {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(79, 172, 197, 0.74);
+  border-radius: 6px;
+  background: rgba(3, 12, 16, 0.95);
+  color: var(--text);
+  font-size: 17px !important;
+  font-weight: 800;
+}
+
+.measure-editor-stepper {
+  display: grid;
+  grid-template-columns: 44px minmax(70px, 1fr) 44px;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.measure-editor-stepper button {
+  min-height: 44px;
+  padding: 0;
+  border-radius: 6px;
+  font-size: 19px !important;
+  font-weight: 900;
+}
+
+.measure-editor-stepper input {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 8px;
+  text-align: center;
+  font-size: 17px !important;
+  font-weight: 900;
+}
+
+.measure-editor-readout {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid rgba(89, 130, 140, 0.65);
+  border-radius: 6px;
+  background: rgba(7, 13, 17, 0.9);
+  color: var(--text);
+  font-size: 17px !important;
+  font-weight: 900;
+}
+
+.measure-shape-select {
+  position: absolute;
+  z-index: 7;
+  display: grid;
+  grid-template-columns: 58px minmax(86px, 1fr);
+  grid-template-rows: auto auto;
+  gap: 4px 6px;
+  width: clamp(178px, 28%, 220px);
+  transform: translate(-50%, -50%);
+  align-items: center;
+}
+
+.measure-shape-select label {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 12px !important;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.78);
+}
+
+.measure-shape-select select {
+  appearance: none;
+  grid-column: 2;
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid rgba(90, 200, 220, 0.82);
+  border-radius: 6px;
+  background: rgba(3, 14, 18, 0.95);
+  color: var(--text);
+  -webkit-text-fill-color: var(--text);
+  font-size: 14px !important;
+  font-weight: 900;
+  text-align: center;
+}
+
+.measure-shape-preview {
+  grid-row: 2;
+  grid-column: 1;
+  width: 58px;
+  height: 42px;
+  border: 1px solid rgba(132, 188, 195, 0.72);
+  border-radius: 6px;
+  background: rgba(3, 14, 18, 0.88);
+}
+
+.measure-pitch-chip {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 2px 7px;
+  width: clamp(178px, 27%, 238px);
+  min-height: 30px;
+  padding: 3px 7px;
+  border: 1px solid rgba(90, 200, 220, 0.72);
+  border-radius: 6px;
+  background: rgba(3, 14, 18, 0.9);
+  color: var(--text);
+  font-size: 12px !important;
+  font-weight: 900;
+  line-height: 1.16;
+  text-align: left;
+  transform: translate(-50%, -50%);
+}
+
+.measure-pitch-chip strong {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 11px !important;
+}
+
+.measure-pitch-chip span {
+  display: inline;
+  white-space: nowrap;
+}
+
+.measure-diagram .pitch-token,
+.measure-diagram .measure-pitch-chip {
+  display: none !important;
+}
+
+.measure-pitch-control {
+  position: absolute;
+  z-index: 7;
+  width: 210px;
+  height: 152px;
+  transform: translate(-50%, -50%);
+  color: #f7fbfc;
+}
+
+.measure-pitch-control::before,
+.measure-pitch-control::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: rgba(199, 242, 246, 0.92);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.measure-pitch-control::before {
+  width: 48px;
+  height: 3px;
+}
+
+.measure-pitch-control::after {
+  width: 3px;
+  height: 20px;
+}
+
+.measure-pitch-button {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  min-height: 0 !important;
+  padding: 0;
+  border: 1px solid rgba(96, 214, 235, 0.58);
+  border-radius: 6px;
+  background: rgba(8, 53, 66, 0.96);
+  color: #f7fbfc;
+  font-size: 30px !important;
+  font-weight: 500;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.measure-pitch-button:hover,
+.measure-pitch-button:focus-visible {
+  background: rgba(24, 149, 178, 0.98);
+}
+
+.measure-pitch-button.is-active {
+  background: rgba(13, 99, 122, 0.98);
+  border-color: rgba(199, 242, 246, 0.9);
+}
+
+.measure-pitch-button.top {
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.measure-pitch-button.right {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.measure-pitch-button.bottom {
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+}
+
+.measure-pitch-button.left {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.measure-pitch-value {
+  position: absolute;
+  z-index: 2;
+  display: none;
+  min-width: 0;
+  padding: 1px 3px;
+  border-radius: 5px;
+  background: transparent;
+  color: #f7fbfc;
+  font-size: 14px !important;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.92),
+    0 0 7px rgba(0, 0, 0, 0.86),
+    0 0 12px rgba(0, 0, 0, 0.76);
+  pointer-events: none;
+}
+
+.measure-pitch-value.is-active {
+  display: block;
+}
+
+.measure-pitch-value.top {
+  left: 50%;
+  top: 43px;
+  transform: translateX(-50%);
+}
+
+.measure-pitch-value.right {
+  left: 152.5px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.measure-pitch-value.bottom {
+  left: 50%;
+  bottom: 43px;
+  transform: translateX(-50%);
+}
+
+.measure-pitch-value.left {
+  left: 57.5px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 27.5%;
+}
+
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 72.5%;
+}
+
+.measure-pitch-control.measure-pitch-middle,
+.measure-pitch-control.measure-pitch-ring {
+  top: 42%;
+}
+
+.measure-pitch-control.measure-pitch-thumb {
+  left: 77.3%;
+  top: 73%;
+}
+
+.measure-diagram[data-hand="right"] .measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-ring {
+  left: 27.5%;
+}
+
+.measure-diagram[data-hand="right"] .measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-middle {
+  left: 72.5%;
+}
+
+.measure-pitch-middle,
+.measure-pitch-ring {
+  top: 67%;
+}
+
+.measure-pitch-thumb {
+  left: 25.455%;
+  top: 82%;
+}
+
+.measure-diagram[data-hand="right"] .measure-shape-middle,
+.measure-diagram[data-hand="left"] .measure-shape-ring {
+  left: 25.455%;
+}
+
+.measure-diagram[data-hand="right"] .measure-shape-ring,
+.measure-diagram[data-hand="left"] .measure-shape-middle {
+  left: 74.545%;
+}
+
+.measure-shape-middle,
+.measure-shape-ring {
+  top: 8%;
+}
+
+@media (max-width: 900px) {
+  .right-workspace {
+    grid-template-rows: minmax(420px, 62vh) max-content !important;
+  }
+
+  aside > .measure-section .measure-diagram {
+    min-height: 940px;
+  }
+
+  .measure-diagram .sheet-input {
+    font-size: 16px !important;
+    min-width: 48px;
+  }
+
+  .measure-sheet-control {
+    grid-template-columns: 26px minmax(44px, 1fr) 26px;
+    width: 108px;
+    min-height: 36px;
+  }
+
+  .measure-sheet-control button {
+    min-height: 36px;
+    font-size: 17px !important;
+  }
+
+  .measure-sheet-value {
+    font-size: 15px !important;
+    padding: 0 3px;
+  }
+
+  .measure-editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .measure-editor-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .measure-shape-select {
+    grid-template-columns: 42px minmax(76px, 1fr);
+    width: 152px;
+  }
+
+  .measure-shape-select select {
+    min-height: 34px;
+    font-size: 13px !important;
+  }
+
+  .measure-shape-preview {
+    width: 42px;
+    height: 34px;
+  }
+
+  .measure-shape-middle,
+  .measure-shape-ring {
+    top: 8%;
+  }
+
+  .measure-pitch-chip {
+    width: 120px;
+    min-height: 30px;
+    padding: 3px 5px;
+    font-size: 10px !important;
+    gap: 1px 4px;
+  }
+
+  .measure-pitch-chip strong {
+    font-size: 10px !important;
+  }
+
+  .measure-pitch-middle,
+  .measure-pitch-ring {
+    top: 64%;
+  }
+
+  .measure-pitch-thumb {
+    left: 18%;
+    top: 78%;
+  }
+
+  .measure-pitch-control {
+    width: 142px;
+    height: 108px;
+  }
+
+  .measure-pitch-control::before {
+    width: 34px;
+    height: 3px;
+  }
+
+  .measure-pitch-control::after {
+    width: 3px;
+    height: 18px;
+  }
+
+  .measure-pitch-button {
+    width: 22px;
+    height: 22px;
+    min-height: 0 !important;
+    font-size: 20px !important;
+  }
+
+  .measure-pitch-value {
+    min-width: 0;
+    font-size: 10px !important;
+    padding: 1px 2px;
+  }
+
+  .measure-pitch-value.top {
+    top: 29.5px;
+  }
+
+  .measure-pitch-value.right {
+    left: 104px;
+    top: 50%;
+  }
+
+  .measure-pitch-value.bottom {
+    bottom: 29.5px;
+  }
+
+  .measure-pitch-value.left {
+    left: 38px;
+    top: 50%;
+  }
+
+  .measure-pitch-control.measure-pitch-middle,
+  .measure-pitch-control.measure-pitch-ring {
+    top: 36%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-bridge {
+    top: 28%;
+  }
+
+  .measure-pitch-control.measure-pitch-thumb {
+    left: 77.3%;
+    top: 72%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-hole {
+    top: 77%;
+    width: 92px;
+    height: 92px;
+    min-height: 92px;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-hole button {
+    flex-basis: 26px;
+    min-height: 26px;
+    font-size: 25px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-hole .measure-sheet-value {
+    min-height: 34px;
+    font-size: 22px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-solid {
+    top: 96%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-solid::before {
+    top: -18px;
+    font-size: 11px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip,
+  .measure-diagram .measure-sheet-control.field-ring-grip,
+  .measure-diagram .measure-sheet-control.field-bridge,
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span,
+  .measure-diagram .measure-sheet-control.field-thumb-solid {
+    grid-template-columns: 38px minmax(64px, 1fr) 38px;
+    width: 158px;
+    min-height: 58px;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip::after,
+  .measure-diagram .measure-sheet-control.field-ring-grip::after,
+  .measure-diagram .measure-sheet-control.field-bridge::after,
+  .measure-diagram .measure-sheet-control.field-main-span::after,
+  .measure-diagram .measure-sheet-control.field-offset-span::after,
+  .measure-diagram .measure-sheet-control.field-thumb-solid::after {
+    left: 38px;
+    right: 38px;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip button,
+  .measure-diagram .measure-sheet-control.field-ring-grip button,
+  .measure-diagram .measure-sheet-control.field-bridge button,
+  .measure-diagram .measure-sheet-control.field-main-span button,
+  .measure-diagram .measure-sheet-control.field-offset-span button,
+  .measure-diagram .measure-sheet-control.field-thumb-solid button {
+    width: 38px;
+    min-height: 58px;
+    font-size: 27px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-ring-grip .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-bridge .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-main-span .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-offset-span .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value {
+    min-height: 58px;
+    font-size: 23px !important;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-middle-grip,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-ring-grip,
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-main-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-offset-span {
+    left: 25%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-ring-grip,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-middle-grip,
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-offset-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-main-span {
+    left: 75%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-middle-hole,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-ring-hole {
+    left: 31%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-ring-hole,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-middle-hole {
+    left: 69%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-hole,
+  .measure-diagram .measure-sheet-control.field-ring-hole {
+    top: 45%;
+    width: 72px;
+    height: 72px;
+    min-height: 72px;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-hole button,
+  .measure-diagram .measure-sheet-control.field-ring-hole button {
+    flex-basis: 22px;
+    min-height: 22px;
+    font-size: 21px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-hole .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-ring-hole .measure-sheet-value {
+    min-height: 28px;
+    font-size: 17px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .measure-sheet-control {
+    grid-template-columns: 24px minmax(40px, 1fr) 24px;
+    width: 98px;
+  }
+
+  .measure-sheet-value {
+    font-size: 14px !important;
+  }
+}
+</style>
 </head>
 <body>
   <main class="app">
@@ -3989,23 +5123,9 @@
       <div id="measureDiagram" class="measure-diagram" data-hand="right">
           <svg viewBox="0 0 1100 760" aria-hidden="true">
             <g fill="none" stroke="#0b0d0f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="430" cy="220" r="62"></circle>
-              <circle cx="670" cy="220" r="62"></circle>
-              <circle class="thumb-dependent" cx="550" cy="560" r="62"></circle>
               <line x1="495" y1="220" x2="605" y2="220"></line>
               <line class="thumb-dependent" x1="433" y1="285" x2="520" y2="498"></line>
               <line class="thumb-dependent" x1="667" y1="285" x2="580" y2="498"></line>
-              <path d="M390 10 H358 V76 H390 M470 10 H502 V76 H470"></path>
-              <path d="M630 10 H598 V76 H630 M710 10 H742 V76 H710"></path>
-              <path d="M510 100 H478 V142 H510 M590 100 H622 V142 H590"></path>
-              <path d="M240 332 H206 V396 H240 M320 332 H354 V396 H320"></path>
-              <path d="M780 332 H746 V396 H780 M860 332 H894 V396 H860"></path>
-              <path class="thumb-dependent" d="M510 680 H478 V738 H510 M590 680 H622 V738 H590"></path>
-            </g>
-            <g fill="none" stroke="#0b0d0f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M185 176 L185 264 M140 220 L230 220"></path>
-              <path d="M932.5 176 L932.5 264 M890 220 L975 220"></path>
-              <path class="thumb-dependent" d="M850 512 L850 604 M805 558 L895 558"></path>
             </g>
           </svg>
           <span class="pitch-token left left-cross-left" data-cross="left" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
@@ -8438,6 +9558,880 @@
 
     window.addEventListener("resize", draw);
     draw();
-  </script>
+(() => {
+  const parseSheetInch = (raw) => {
+    if (raw == null) return NaN;
+    const text = String(raw)
+      .replace(/[”″]/g, "\"")
+      .replace(/[’′]/g, "'")
+      .replace(/インチ|in\.?/gi, "")
+      .replace(/["']/g, "")
+      .trim();
+    if (!text) return NaN;
+    let sign = 1;
+    let source = text;
+    if (source.startsWith("-")) {
+      sign = -1;
+      source = source.slice(1).trim();
+    } else if (source.startsWith("+")) {
+      source = source.slice(1).trim();
+    }
+    const parts = source.split(/\s+/).filter(Boolean);
+    let total = 0;
+    for (const part of parts) {
+      if (part.includes("/")) {
+        const [num, den] = part.split("/").map(Number);
+        if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) return NaN;
+        total += num / den;
+      } else {
+        const number = Number(part);
+        if (!Number.isFinite(number)) return NaN;
+        total += number;
+      }
+    }
+    return sign * total;
+  };
+
+  const formatSheetInch = (value) => {
+    if (typeof formatInch === "function") return formatInch(value);
+    const rounded = Math.round(Number(value) * 32);
+    const sign = rounded < 0 ? "-" : "";
+    let whole = Math.floor(Math.abs(rounded) / 32);
+    let numerator = Math.abs(rounded) % 32;
+    if (numerator === 0) return `${sign}${whole}"`;
+    const gcd = (a, b) => b ? gcd(b, a % b) : a;
+    const div = gcd(numerator, 32);
+    numerator /= div;
+    const denominator = 32 / div;
+    return `${sign}${whole ? `${whole} ` : ""}${numerator}/${denominator}"`;
+  };
+
+  const clampToControl = (control, value) => {
+    const min = Number(control.min);
+    const max = Number(control.max);
+    const step = Number(control.step);
+    let next = value;
+    if (Number.isFinite(min)) next = Math.max(min, next);
+    if (Number.isFinite(max)) next = Math.min(max, next);
+    if (Number.isFinite(step) && step > 0) {
+      const base = Number.isFinite(min) ? min : 0;
+      next = base + Math.round((next - base) / step) * step;
+    }
+    return Number(next.toFixed(5));
+  };
+
+  const setRangeControl = (id, value) => {
+    const control = document.getElementById(id);
+    if (!control || !Number.isFinite(value)) return false;
+    const next = clampToControl(control, value);
+    if (typeof setRangeValue === "function") {
+      setRangeValue(control, next, true);
+    } else {
+      control.value = String(next);
+      control.dispatchEvent(new Event("input", { bubbles: true }));
+      control.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    return true;
+  };
+
+  const setClosestSelect = (id, value) => {
+    const select = document.getElementById(id);
+    if (!select || !Number.isFinite(value)) return false;
+    let bestValue = "";
+    let bestDistance = Infinity;
+    Array.from(select.options || []).forEach((option) => {
+      const optionValue = parseSheetInch(option.value || option.textContent);
+      const distance = Math.abs(optionValue - value);
+      if (Number.isFinite(distance) && distance < bestDistance) {
+        bestDistance = distance;
+        bestValue = option.value;
+      }
+    });
+    if (bestValue === "") return false;
+    select.value = bestValue;
+    select.dispatchEvent(new Event("input", { bubbles: true }));
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    if (typeof draw === "function") draw();
+    return true;
+  };
+
+  const bindings = {
+    middleGripIdValue: { type: "select", target: "middleGripId" },
+    ringGripIdValue: { type: "select", target: "ringGripId" },
+    middleDiameterValue: { type: "select", target: "middleBareDiameter" },
+    ringDiameterValue: { type: "select", target: "ringBareDiameter" },
+    bridgeValue: { type: "range", target: "bridge" },
+    middleSpanValue: { type: "range", target: "middleSpan" },
+    ringSpanOffsetValue: { type: "range", target: "ringSpanOffset" },
+    thumbDiameterValue: { type: "range", target: "thumbDiameter" },
+    thumbSolidValue: { type: "select", target: "thumbSolid" }
+  };
+
+  const markInvalid = (el) => {
+    el.classList.add("input-error");
+    window.setTimeout(() => el.classList.remove("input-error"), 700);
+  };
+
+  const commitSheetInput = (el) => {
+    const binding = bindings[el.id];
+    if (!binding) return;
+    const parsed = parseSheetInch(el.textContent);
+    const ok = binding.type === "select"
+      ? setClosestSelect(binding.target, parsed)
+      : setRangeControl(binding.target, parsed);
+    if (!ok) {
+      markInvalid(el);
+      if (el.dataset.previousValue) el.textContent = el.dataset.previousValue;
+      return;
+    }
+    el.dataset.previousValue = el.textContent.trim();
+    if (typeof draw === "function") draw();
+    refreshBridgeControl();
+  };
+
+  const setupDirectSheetInputs = () => {
+    Object.keys(bindings).forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el || el.dataset.directInputReady === "true") return;
+      el.dataset.directInputReady = "true";
+      el.setAttribute("contenteditable", "true");
+      el.setAttribute("inputmode", "decimal");
+      el.setAttribute("tabindex", "0");
+      el.dataset.previousValue = el.textContent.trim();
+      el.addEventListener("focus", () => {
+        el.dataset.previousValue = el.textContent.trim();
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      });
+      el.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          el.blur();
+        }
+        if (event.key === "Escape") {
+          event.preventDefault();
+          el.textContent = el.dataset.previousValue || el.textContent;
+          el.blur();
+        }
+      });
+      el.addEventListener("paste", (event) => {
+        event.preventDefault();
+        const text = event.clipboardData.getData("text/plain").slice(0, 16);
+        document.execCommand("insertText", false, text);
+      });
+      el.addEventListener("blur", () => commitSheetInput(el));
+    });
+  };
+
+  const placeMeasureSheet = () => {
+    const aside = document.querySelector("aside");
+    const detailPanel = document.querySelector(".hole-modeling-panel");
+    const measureSection = document.querySelector(".measure-section");
+    if (!aside || !detailPanel || !measureSection) return;
+    if (measureSection.parentElement !== aside) {
+      aside.insertBefore(measureSection, detailPanel);
+    }
+  };
+
+  function refreshBridgeControl() {
+    const bridge = document.getElementById("bridge");
+    const output = document.querySelector(".direct-bridge-control .range-adjust-input");
+    if (!bridge || !output || document.activeElement === output) return;
+    output.textContent = formatSheetInch(Number(bridge.value));
+  }
+
+  const setupBridgeControl = () => {
+    const bridge = document.getElementById("bridge");
+    const panel = document.querySelector(".bridge-gauge-control");
+    if (!bridge || !panel || panel.querySelector(".direct-bridge-control")) return;
+    const control = document.createElement("div");
+    control.className = "direct-bridge-control";
+    control.innerHTML = `
+      <button type="button" class="range-adjust-button" data-bridge-step="-1" aria-label="ブリッジを小さく">-</button>
+      <div class="range-adjust-input" contenteditable="true" inputmode="decimal" role="textbox" aria-label="ブリッジ">${formatSheetInch(Number(bridge.value))}</div>
+      <button type="button" class="range-adjust-button" data-bridge-step="1" aria-label="ブリッジを大きく">+</button>
+    `;
+    const title = panel.querySelector("h3, h4");
+    if (title && title.nextSibling) {
+      panel.insertBefore(control, title.nextSibling);
+    } else {
+      panel.prepend(control);
+    }
+    control.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const step = Number(bridge.step) || 0.03125;
+        const direction = Number(button.dataset.bridgeStep);
+        setRangeControl("bridge", Number(bridge.value) + step * direction);
+        refreshBridgeControl();
+      });
+    });
+    const input = control.querySelector(".range-adjust-input");
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        input.blur();
+      }
+    });
+    input.addEventListener("blur", () => {
+      const parsed = parseSheetInch(input.textContent);
+      if (!setRangeControl("bridge", parsed)) {
+        markInvalid(input);
+      }
+      refreshBridgeControl();
+    });
+    bridge.addEventListener("input", refreshBridgeControl);
+    bridge.addEventListener("change", refreshBridgeControl);
+    refreshBridgeControl();
+  };
+
+  placeMeasureSheet();
+  setupDirectSheetInputs();
+  setupBridgeControl();
+})();
+
+(() => {
+  const integrateMeasureDetail = () => {
+    const measureSection = document.querySelector(".measure-section");
+    const measureDiagram = document.getElementById("measureDiagram");
+    const detailPanel = document.querySelector(".hole-modeling-panel");
+    if (!measureSection || !measureDiagram || !detailPanel) return;
+
+    if (detailPanel.parentElement !== measureSection) {
+      measureSection.insertBefore(detailPanel, measureDiagram.nextSibling);
+    }
+    detailPanel.classList.add("is-integrated-measure-detail");
+  };
+
+  const makeDiagramValuesReadOnly = () => {
+    document.querySelectorAll("#measureDiagram .sheet-input").forEach((field) => {
+      field.removeAttribute("contenteditable");
+      field.setAttribute("aria-readonly", "true");
+      field.setAttribute("tabindex", "-1");
+      field.dataset.directInputReady = "display-only";
+    });
+  };
+
+  integrateMeasureDetail();
+  makeDiagramValuesReadOnly();
+})();
+
+(() => {
+  const bindings = {
+    middleGripIdValue: { target: "middleGripId", type: "select" },
+    ringGripIdValue: { target: "ringGripId", type: "select" },
+    middleDiameterValue: { target: "middleGripOuter", type: "select" },
+    ringDiameterValue: { target: "ringGripOuter", type: "select" },
+    bridgeValue: { target: "bridge", type: "range" },
+    middleSpanValue: { target: "middleSpan", type: "range" },
+    ringSpanOffsetValue: { target: "ringSpanOffset", type: "range" },
+    thumbDiameterValue: { target: "thumbDiameter", type: "range" },
+    thumbSolidValue: { target: "thumbSolid", type: "select" }
+  };
+
+  const labels = {
+    middleGripIdValue: "中指グリップ内径",
+    ringGripIdValue: "薬指グリップ内径",
+    middleDiameterValue: "中指グリップ外径",
+    ringDiameterValue: "薬指グリップ外径",
+    bridgeValue: "ブリッジ",
+    middleSpanValue: "メインスパン",
+    ringSpanOffsetValue: "薬指差分",
+    thumbDiameterValue: "サム内径",
+    thumbSolidValue: "サムソリッド外径"
+  };
+
+  const stepRange = (id, direction) => {
+    const control = document.getElementById(id);
+    if (!control) return;
+    const step = Number(control.step) || 0.03125;
+    const min = Number(control.min);
+    const max = Number(control.max);
+    let next = Number(control.value) + step * direction;
+    if (Number.isFinite(min)) next = Math.max(min, next);
+    if (Number.isFinite(max)) next = Math.min(max, next);
+    next = Number(next.toFixed(5));
+    if (typeof setRangeValue === "function") {
+      setRangeValue(control, next, true);
+    } else {
+      control.value = String(next);
+      control.dispatchEvent(new Event("input", { bubbles: true }));
+      control.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  };
+
+  const stepSelect = (id, direction) => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    const options = Array.from(select.options || []).filter((option) => !option.disabled);
+    const index = Math.max(0, options.findIndex((option) => option.value === select.value));
+    const next = options[Math.min(options.length - 1, Math.max(0, index + direction))];
+    if (!next) return;
+    select.value = next.value;
+    select.dispatchEvent(new Event("input", { bubbles: true }));
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    if (typeof draw === "function") draw();
+  };
+
+  const refresh = () => {
+    document.querySelectorAll(".measure-sheet-control").forEach((control) => {
+      const source = document.getElementById(control.dataset.sourceId);
+      const value = control.querySelector(".measure-sheet-value");
+      if (source && value) value.textContent = source.textContent.trim();
+    });
+  };
+
+  const setup = () => {
+    const diagram = document.getElementById("measureDiagram");
+    if (!diagram || diagram.dataset.measureControlsReady === "true") return;
+    diagram.dataset.measureControlsReady = "true";
+
+    Object.entries(bindings).forEach(([sourceId, binding]) => {
+      const source = document.getElementById(sourceId);
+      if (!source) return;
+      const control = document.createElement("div");
+      control.className = `measure-sheet-control ${Array.from(source.classList).filter((name) => name.startsWith("field-") || name === "thumb-dependent").join(" ")}`;
+      control.dataset.sourceId = sourceId;
+      control.dataset.targetId = binding.target;
+      control.dataset.controlType = binding.type;
+      control.setAttribute("role", "group");
+      control.setAttribute("aria-label", labels[sourceId] || source.getAttribute("aria-label") || binding.target);
+      control.innerHTML = `
+        <button type="button" data-step="-1" aria-label="${labels[sourceId] || binding.target}を小さく">-</button>
+        <span class="measure-sheet-value">${source.textContent.trim()}</span>
+        <button type="button" data-step="1" aria-label="${labels[sourceId] || binding.target}を大きく">+</button>
+      `;
+      control.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const direction = Number(button.dataset.step);
+          if (binding.type === "select") stepSelect(binding.target, direction);
+          else stepRange(binding.target, direction);
+          window.requestAnimationFrame(refresh);
+        });
+      });
+      diagram.appendChild(control);
+    });
+
+    const originalDraw = typeof draw === "function" ? draw : null;
+    if (originalDraw && !originalDraw.measureSheetControlRefresh) {
+      const wrappedDraw = function(...args) {
+        const result = originalDraw.apply(this, args);
+        window.requestAnimationFrame(refresh);
+        return result;
+      };
+      wrappedDraw.measureSheetControlRefresh = true;
+      window.draw = wrappedDraw;
+      try { draw = wrappedDraw; } catch (error) {}
+    }
+    refresh();
+  };
+
+  setup();
+})();
+
+(() => {
+  const inchIds = new Set([
+    "middleSpan", "ringSpanOffset", "bridge", "thumbDiameter",
+    "middleDrillDepth", "ringDrillDepth", "thumbDrillDepth",
+    "middleNoThumbOffset", "ringNoThumbOffset"
+  ]);
+  const axisIds = new Set(["middleLateralAxis", "middleVerticalAxis", "ringLateralAxis", "ringVerticalAxis", "thumbLateralAxis", "thumbVerticalAxis"]);
+
+  const sheetReadouts = {
+    middleGripId: "middleGripIdValue",
+    ringGripId: "ringGripIdValue",
+    middleBareDiameter: "middleDiameterValue",
+    ringBareDiameter: "ringDiameterValue",
+    bridge: "bridgeValue",
+    middleSpan: "middleSpanValue",
+    ringSpanOffset: "ringSpanOffsetValue",
+    thumbDiameter: "thumbDiameterValue",
+    thumbSolid: "thumbSolidValue"
+  };
+
+  const formatEditorValue = (id, raw) => {
+    const value = Number(raw);
+    if (axisIds.has(id)) return typeof pitchAxisLabel === "function" ? pitchAxisLabel(id, value) : String(value);
+    if (inchIds.has(id) || id === "thumbSolid") return typeof formatInch === "function" ? formatInch(value) : String(value);
+    return String(raw ?? "");
+  };
+
+  const parseEditorValue = (id, raw) => {
+    if (axisIds.has(id)) return typeof parseInch === "function" ? parseInch(raw) : Number(raw);
+    if (inchIds.has(id) || id === "thumbSolid") return typeof parseInch === "function" ? parseInch(raw) : Number(raw);
+    return Number(raw);
+  };
+
+  const applyRangeValue = (id, value) => {
+    const range = document.getElementById(id);
+    if (!range || !Number.isFinite(value)) return false;
+    const min = Number(range.min);
+    const max = Number(range.max);
+    const step = Number(range.step) || 0.03125;
+    let next = value;
+    if (Number.isFinite(min)) next = Math.max(min, next);
+    if (Number.isFinite(max)) next = Math.min(max, next);
+    next = Number((Number.isFinite(min) ? min : 0) + Math.round((next - (Number.isFinite(min) ? min : 0)) / step) * step);
+    next = Number(next.toFixed(5));
+    if (typeof setRangeValue === "function") setRangeValue(range, next, true);
+    else {
+      range.value = String(next);
+      range.dispatchEvent(new Event("input", { bubbles: true }));
+      range.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    window.requestAnimationFrame(refreshMeasureSheetEditor);
+    return true;
+  };
+
+  const applySelectValue = (id, value) => {
+    const select = document.getElementById(id);
+    if (!select) return false;
+    select.value = value;
+    select.dispatchEvent(new Event("input", { bubbles: true }));
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    if (typeof draw === "function") draw();
+    window.requestAnimationFrame(refreshMeasureSheetEditor);
+    return true;
+  };
+
+  const stepSelectValue = (id, direction) => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    const options = Array.from(select.options || []).filter((option) => !option.disabled);
+    const index = Math.max(0, options.findIndex((option) => option.value === select.value));
+    const next = options[Math.min(options.length - 1, Math.max(0, index + direction))];
+    if (next) applySelectValue(id, next.value);
+  };
+
+  const stepAnyControl = (id, direction) => {
+    const source = document.getElementById(id);
+    if (!source) return;
+    if (source.tagName === "SELECT") {
+      stepSelectValue(id, direction);
+      return;
+    }
+    const step = Number(source.step) || 0.03125;
+    applyRangeValue(id, Number(source.value) + step * direction);
+  };
+
+  function refreshMeasureSheetEditor() {
+    document.querySelectorAll("[data-measure-editor-for]").forEach((field) => {
+      const id = field.dataset.measureEditorFor;
+      const source = document.getElementById(id);
+      if (!source) return;
+      if (field.tagName === "SELECT") {
+        field.value = source.value;
+      } else if (document.activeElement !== field) {
+        field.value = formatEditorValue(id, source.value);
+      }
+    });
+    document.querySelectorAll(".measure-sheet-control").forEach((control) => {
+      const source = document.getElementById(control.dataset.sourceId);
+      const value = control.querySelector(".measure-sheet-value");
+      if (source && value) value.textContent = source.textContent.trim();
+    });
+    Object.entries(sheetReadouts).forEach(([sourceId, readoutId]) => {
+      const source = document.getElementById(sourceId);
+      const readout = document.getElementById(readoutId);
+      if (!source || !readout) return;
+      if (source.tagName === "SELECT") {
+        const numeric = Number(source.value);
+        readout.textContent = Number.isFinite(numeric) && typeof formatInch === "function" ? formatInch(numeric) : source.options[source.selectedIndex]?.textContent.trim() || source.value;
+      } else {
+        readout.textContent = formatEditorValue(sourceId, source.value);
+      }
+    });
+  }
+
+  const selectRow = (label, id) => {
+    const source = document.getElementById(id);
+    if (!source) return "";
+    const options = Array.from(source.options || []).map((option) => `<option value="${option.value.replace(/"/g, "&quot;")}">${option.textContent.trim()}</option>`).join("");
+    return `<div class="measure-editor-row"><label>${label}</label><select class="measure-editor-select" data-measure-editor-for="${id}">${options}</select></div>`;
+  };
+
+  const stepperRow = (label, id) => `
+    <div class="measure-editor-row">
+      <label>${label}</label>
+      <div class="measure-editor-stepper" data-editor-stepper="${id}">
+        <button type="button" data-step="-1" aria-label="${label}を小さく">-</button>
+        <input class="measure-editor-value" data-measure-editor-for="${id}" inputmode="decimal" aria-label="${label}" />
+        <button type="button" data-step="1" aria-label="${label}を大きく">+</button>
+      </div>
+    </div>`;
+
+  const readoutRow = (label, id) => `<div class="measure-editor-row"><label>${label}</label><span class="measure-editor-readout" data-measure-readout-for="${id}">${document.getElementById(id)?.textContent || "-"}</span></div>`;
+
+  const card = (title, rows) => `<section class="measure-editor-card"><h3>${title}</h3>${rows.filter(Boolean).join("")}</section>`;
+
+  const buildEditor = () => {
+    const measureSection = document.querySelector(".measure-section");
+    const diagram = document.getElementById("measureDiagram");
+    const detail = document.querySelector(".hole-modeling-panel");
+    if (!measureSection || !diagram || !detail) return;
+    detail.classList.add("is-replaced-by-measure-editor");
+    document.getElementById("measureSheetIntegratedEditor")?.remove();
+    const editor = document.createElement("div");
+    editor.id = "measureSheetIntegratedEditor";
+    editor.className = "measure-sheet-editor";
+    editor.innerHTML = `
+      <div class="measure-editor-grid">
+        ${card("中指", [
+          selectRow("グリップ形状", "middleGripType"),
+          selectRow("グリップ外径", "middleGripOuter"),
+          selectRow("グリップ内径", "middleGripId"),
+          selectRow("素掘り径", "middleBareDiameter"),
+          readoutRow("肉厚", "middleGripWall"),
+          stepperRow("深さ", "middleDrillDepth"),
+          stepperRow("左右ピッチ", "middleLateralAxis"),
+          stepperRow("前後ピッチ", "middleVerticalAxis"),
+          stepperRow("基準線オフセット", "middleNoThumbOffset")
+        ])}
+        ${card("薬指", [
+          selectRow("グリップ形状", "ringGripType"),
+          selectRow("グリップ外径", "ringGripOuter"),
+          selectRow("グリップ内径", "ringGripId"),
+          selectRow("素掘り径", "ringBareDiameter"),
+          readoutRow("肉厚", "ringGripWall"),
+          stepperRow("深さ", "ringDrillDepth"),
+          stepperRow("左右ピッチ", "ringLateralAxis"),
+          stepperRow("前後ピッチ", "ringVerticalAxis"),
+          stepperRow("基準線オフセット", "ringNoThumbOffset")
+        ])}
+        ${card("スパン・ブリッジ", [
+          stepperRow("メインスパン", "middleSpan"),
+          stepperRow("薬指 +/-", "ringSpanOffset"),
+          stepperRow("ブリッジ", "bridge")
+        ])}
+        ${card("サム", [
+          selectRow("サムソリッド", "thumbSolidMode"),
+          stepperRow("サム内径", "thumbDiameter"),
+          selectRow("ソリッド外径", "thumbSolid"),
+          readoutRow("ソリッド肉厚", "thumbSolidWall"),
+          stepperRow("深さ", "thumbDrillDepth"),
+          stepperRow("左右ピッチ", "thumbLateralAxis"),
+          stepperRow("前後ピッチ", "thumbVerticalAxis")
+        ])}
+      </div>`;
+    measureSection.insertBefore(editor, detail);
+
+    editor.querySelectorAll("select[data-measure-editor-for]").forEach((select) => {
+      select.addEventListener("change", () => applySelectValue(select.dataset.measureEditorFor, select.value));
+    });
+    editor.querySelectorAll(".measure-editor-stepper button").forEach((button) => {
+      button.addEventListener("click", () => stepAnyControl(button.closest("[data-editor-stepper]").dataset.editorStepper, Number(button.dataset.step)));
+    });
+    editor.querySelectorAll("input[data-measure-editor-for]").forEach((input) => {
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          input.blur();
+        }
+      });
+      input.addEventListener("change", () => {
+        const id = input.dataset.measureEditorFor;
+        applyRangeValue(id, parseEditorValue(id, input.value));
+      });
+      input.addEventListener("blur", () => refreshMeasureSheetEditor());
+    });
+    document.querySelectorAll("#measureDiagram .measure-sheet-control button").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const wrapper = button.closest(".measure-sheet-control");
+        if (!wrapper) return;
+        stepAnyControl(wrapper.dataset.targetId, Number(button.dataset.step));
+      }, true);
+    });
+    refreshMeasureSheetEditor();
+  };
+
+  buildEditor();
+})();
+
+(() => {
+  const makeOptions = (source) => Array.from(source.options || [])
+    .map((option) => `<option value="${option.value.replace(/"/g, "&quot;")}">${option.textContent.trim()}</option>`)
+    .join("");
+
+  const syncShapeSelect = (sourceId, mirror) => {
+    const source = document.getElementById(sourceId);
+    if (!source || !mirror) return;
+    mirror.value = source.value;
+  };
+
+  const setupSheetOnlyMeasureSurface = () => {
+    const diagram = document.getElementById("measureDiagram");
+    if (!diagram || diagram.dataset.sheetOnlyReady === "true") return;
+    diagram.dataset.sheetOnlyReady = "true";
+
+    [
+      { sourceId: "middleGripType", className: "measure-shape-middle", label: "中指グリップ形状" },
+      { sourceId: "ringGripType", className: "measure-shape-ring", label: "薬指グリップ形状" }
+    ].forEach(({ sourceId, className, label }) => {
+      const source = document.getElementById(sourceId);
+      if (!source) return;
+      const wrapper = document.createElement("div");
+      wrapper.className = `measure-shape-select ${className}`;
+      wrapper.innerHTML = `<label>${label}</label><svg class="measure-shape-preview" viewBox="0 0 90 64" aria-hidden="true"></svg><select aria-label="${label}">${makeOptions(source)}</select>`;
+      const mirror = wrapper.querySelector("select");
+      mirror.value = source.value;
+      const preview = wrapper.querySelector(".measure-shape-preview");
+      const renderPreview = () => {
+        if (!preview) return;
+        const value = mirror.value;
+        const inner = value === "tip"
+          ? '<path d="M26 48 C26 24 64 24 64 48 L64 54 C64 60 26 60 26 54 Z" fill="rgba(96,214,235,.28)" stroke="#bde8ee" stroke-width="4"/><path d="M44 32 L58 50" stroke="#f7fbfc" stroke-width="5" stroke-linecap="round"/>'
+          : value === "semi"
+            ? '<ellipse cx="45" cy="34" rx="28" ry="22" fill="rgba(96,214,235,.24)" stroke="#bde8ee" stroke-width="4"/><circle cx="34" cy="28" r="6" fill="#f7fbfc"/>'
+            : value === "powerNub"
+              ? '<ellipse cx="45" cy="34" rx="28" ry="22" fill="rgba(96,214,235,.24)" stroke="#bde8ee" stroke-width="4"/><circle cx="34" cy="27" r="4" fill="#f7fbfc"/><circle cx="45" cy="25" r="4" fill="#f7fbfc"/><circle cx="56" cy="27" r="4" fill="#f7fbfc"/>'
+              : value === "rubberSheet"
+                ? '<rect x="18" y="16" width="54" height="38" rx="8" fill="rgba(96,214,235,.22)" stroke="#bde8ee" stroke-width="4"/><line x1="26" y1="24" x2="64" y2="46" stroke="#f7fbfc" stroke-width="4"/>'
+                : value === "none"
+                  ? '<circle cx="45" cy="34" r="23" fill="rgba(96,214,235,.12)" stroke="#78949a" stroke-width="4" stroke-dasharray="7 6"/>'
+                  : '<ellipse cx="45" cy="34" rx="25" ry="22" fill="rgba(96,214,235,.24)" stroke="#bde8ee" stroke-width="4"/>';
+        preview.innerHTML = inner;
+      };
+      renderPreview();
+      mirror.addEventListener("change", () => {
+        source.value = mirror.value;
+        source.dispatchEvent(new Event("input", { bubbles: true }));
+        source.dispatchEvent(new Event("change", { bubbles: true }));
+        renderPreview();
+        if (typeof draw === "function") draw();
+      });
+      source.addEventListener("change", () => {
+        syncShapeSelect(sourceId, mirror);
+        renderPreview();
+      });
+      diagram.appendChild(wrapper);
+    });
+
+    [
+      { id: "middle", className: "measure-pitch-middle", title: "中指ピッチ", lateral: "middleLateralAxis", vertical: "middleVerticalAxis" },
+      { id: "ring", className: "measure-pitch-ring", title: "薬指ピッチ", lateral: "ringLateralAxis", vertical: "ringVerticalAxis" },
+      { id: "thumb", className: "measure-pitch-thumb thumb-dependent", title: "サムピッチ", lateral: "thumbLateralAxis", vertical: "thumbVerticalAxis" }
+    ].forEach(({ className, title, lateral, vertical }) => {
+      const chip = document.createElement("div");
+      chip.className = `measure-pitch-chip ${className}`;
+      chip.dataset.lateral = lateral;
+      chip.dataset.vertical = vertical;
+      chip.innerHTML = `<strong>${title}</strong><span data-axis="lateral">左右 0</span><span data-axis="vertical">前後 0</span>`;
+      diagram.appendChild(chip);
+    });
+
+    const refreshPitchChips = () => {
+      document.querySelectorAll(".measure-pitch-chip").forEach((chip) => {
+        const lateral = document.getElementById(chip.dataset.lateral);
+        const vertical = document.getElementById(chip.dataset.vertical);
+        const lateralText = chip.querySelector('[data-axis="lateral"]');
+        const verticalText = chip.querySelector('[data-axis="vertical"]');
+        if (lateral && lateralText) lateralText.textContent = `左右 ${typeof pitchAxisLabel === "function" ? pitchAxisLabel(lateral.id, Number(lateral.value)) : lateral.value}`;
+        if (vertical && verticalText) verticalText.textContent = `前後 ${typeof pitchAxisLabel === "function" ? pitchAxisLabel(vertical.id, Number(vertical.value)) : vertical.value}`;
+      });
+    };
+    ["middleLateralAxis", "middleVerticalAxis", "ringLateralAxis", "ringVerticalAxis", "thumbLateralAxis", "thumbVerticalAxis"].forEach((id) => {
+      const input = document.getElementById(id);
+      if (input) {
+        input.addEventListener("input", refreshPitchChips);
+        input.addEventListener("change", refreshPitchChips);
+      }
+    });
+    const originalDrawForPitch = typeof draw === "function" ? draw : null;
+    if (originalDrawForPitch && !originalDrawForPitch.measurePitchRefresh) {
+      const wrapped = function(...args) {
+        const result = originalDrawForPitch.apply(this, args);
+        window.requestAnimationFrame(refreshPitchChips);
+        return result;
+      };
+      wrapped.measurePitchRefresh = true;
+      window.draw = wrapped;
+      try { draw = wrapped; } catch (error) {}
+    }
+    refreshPitchChips();
+
+    const editor = document.getElementById("measureSheetIntegratedEditor");
+    if (editor) editor.setAttribute("aria-hidden", "true");
+  };
+
+  setupSheetOnlyMeasureSurface();
+})();
+
+(() => {
+  const outerBindings = {
+    middleDiameterValue: "middleGripOuter",
+    ringDiameterValue: "ringGripOuter"
+  };
+
+  const formatOuterValue = (select) => {
+    const numeric = Number(select.value);
+    if (Number.isFinite(numeric) && typeof formatInch === "function") return formatInch(numeric);
+    return select.options[select.selectedIndex]?.textContent.trim() || select.value;
+  };
+
+  const syncOuterControl = (sourceId, targetId) => {
+    const source = document.getElementById(sourceId);
+    const target = document.getElementById(targetId);
+    const control = document.querySelector(`#measureDiagram .measure-sheet-control[data-source-id="${sourceId}"]`);
+    const value = control?.querySelector(".measure-sheet-value");
+    if (!source || !target || !control || !value) return;
+    control.dataset.targetId = targetId;
+    value.textContent = formatOuterValue(target);
+    source.textContent = value.textContent;
+  };
+
+  const stepOuter = (targetId, direction) => {
+    const select = document.getElementById(targetId);
+    if (!select) return;
+    const options = Array.from(select.options || []).filter((option) => !option.disabled);
+    const index = Math.max(0, options.findIndex((option) => option.value === select.value));
+    const next = options[Math.min(options.length - 1, Math.max(0, index + direction))];
+    if (!next) return;
+    select.value = next.value;
+    select.dispatchEvent(new Event("input", { bubbles: true }));
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    if (typeof draw === "function") draw();
+    Object.entries(outerBindings).forEach(([sourceId, id]) => syncOuterControl(sourceId, id));
+  };
+
+  const setupFingerOuterDiameterControls = () => {
+    Object.entries(outerBindings).forEach(([sourceId, targetId]) => {
+      const control = document.querySelector(`#measureDiagram .measure-sheet-control[data-source-id="${sourceId}"]`);
+      if (!control || control.dataset.outerDiameterReady === "true") return;
+      control.dataset.outerDiameterReady = "true";
+      control.dataset.targetId = targetId;
+      control.setAttribute("aria-label", sourceId === "middleDiameterValue" ? "中指グリップ外径" : "薬指グリップ外径");
+      control.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          stepOuter(targetId, Number(button.dataset.step));
+        }, true);
+      });
+      const select = document.getElementById(targetId);
+      if (select) select.addEventListener("change", () => syncOuterControl(sourceId, targetId));
+      syncOuterControl(sourceId, targetId);
+    });
+  };
+
+  setupFingerOuterDiameterControls();
+})();
+
+(() => {
+  const pitchControls = [
+    { hole: "middle", className: "measure-pitch-middle", lateral: "middleLateralAxis", vertical: "middleVerticalAxis", label: "中指ピッチ" },
+    { hole: "ring", className: "measure-pitch-ring", lateral: "ringLateralAxis", vertical: "ringVerticalAxis", label: "薬指ピッチ" },
+    { hole: "thumb", className: "measure-pitch-thumb thumb-dependent", lateral: "thumbLateralAxis", vertical: "thumbVerticalAxis", label: "サムピッチ" }
+  ];
+
+  const directions = [
+    { key: "top", axis: "vertical", direction: -1, name: "リバース" },
+    { key: "right", axis: "lateral", direction: 1, name: "右" },
+    { key: "bottom", axis: "vertical", direction: 1, name: "フォワード" },
+    { key: "left", axis: "lateral", direction: -1, name: "左" }
+  ];
+
+  const formatPitchMagnitude = (number) => {
+    const value = Math.abs(Number(number) || 0);
+    if (value < 1 / 128) return "";
+    return typeof formatInch === "function" ? formatInch(value) : String(value);
+  };
+
+  const setPitchAxis = (range, next) => {
+    if (!range) return;
+    if (typeof setRangeValue === "function") {
+      setRangeValue(range, next, true);
+      return;
+    }
+    const min = Number(range.min);
+    const max = Number(range.max);
+    const step = Number(range.step) || 1 / 16;
+    const clamped = Math.max(min, Math.min(max, Math.round(next / step) * step));
+    range.value = String(clamped);
+    range.dispatchEvent(new Event("input", { bubbles: true }));
+    range.dispatchEvent(new Event("change", { bubbles: true }));
+    if (typeof draw === "function") draw();
+  };
+
+  const stepPitchDirection = (rangeId, direction) => {
+    const range = document.getElementById(rangeId);
+    if (!range) return;
+    const step = Number(range.step) || 1 / 16;
+    const current = Number(range.value) || 0;
+    setPitchAxis(range, current + step * direction);
+    window.requestAnimationFrame(refreshMeasurePitchControls);
+  };
+
+  function refreshMeasurePitchControls() {
+    document.querySelectorAll(".measure-pitch-control").forEach((control) => {
+      directions.forEach(({ key, axis, direction }) => {
+        const range = document.getElementById(control.dataset[axis]);
+        const value = Number(range?.value) || 0;
+        const magnitude = value * direction > 1 / 128 ? Math.abs(value) : 0;
+        const button = control.querySelector(`.measure-pitch-button.${key}`);
+        const readout = control.querySelector(`.measure-pitch-value.${key}`);
+        button?.classList.toggle("is-active", magnitude > 0);
+        if (readout) {
+          readout.textContent = formatPitchMagnitude(magnitude);
+          readout.classList.toggle("is-active", magnitude > 0);
+        }
+      });
+    });
+  }
+
+  const createPitchControl = ({ className, lateral, vertical, label }) => {
+    const control = document.createElement("div");
+    control.className = `measure-pitch-control ${className}`;
+    control.dataset.lateral = lateral;
+    control.dataset.vertical = vertical;
+    control.setAttribute("role", "group");
+    control.setAttribute("aria-label", label);
+    control.innerHTML = directions.map(({ key, axis, direction, name }) => `
+      <button type="button" class="measure-pitch-button ${key}" data-axis="${axis}" data-direction="${direction}" aria-label="${label} ${name}を増やす">+</button>
+      <span class="measure-pitch-value ${key}" aria-hidden="true"></span>
+    `).join("");
+    control.querySelectorAll(".measure-pitch-button").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        const axis = button.dataset.axis;
+        const rangeId = control.dataset[axis];
+        stepPitchDirection(rangeId, Number(button.dataset.direction));
+      });
+    });
+    return control;
+  };
+
+  const setupMeasurePitchControls = () => {
+    const diagram = document.getElementById("measureDiagram");
+    if (!diagram || diagram.dataset.pitchControlsReady === "true") return;
+    diagram.dataset.pitchControlsReady = "true";
+    pitchControls.forEach((config) => diagram.appendChild(createPitchControl(config)));
+    [...new Set(pitchControls.flatMap(({ lateral, vertical }) => [lateral, vertical]))].forEach((id) => {
+      const range = document.getElementById(id);
+      if (range) {
+        range.addEventListener("input", refreshMeasurePitchControls);
+        range.addEventListener("change", refreshMeasurePitchControls);
+      }
+    });
+    const originalDraw = typeof draw === "function" ? draw : null;
+    if (originalDraw && !originalDraw.measurePitchControlRefresh) {
+      const wrapped = function(...args) {
+        const result = originalDraw.apply(this, args);
+        window.requestAnimationFrame(refreshMeasurePitchControls);
+        return result;
+      };
+      wrapped.measurePitchControlRefresh = true;
+      window.draw = wrapped;
+      try { draw = wrapped; } catch (error) {}
+    }
+    refreshMeasurePitchControls();
+  };
+
+  setupMeasurePitchControls();
+})();
+</script>
 </body>
 </html>
