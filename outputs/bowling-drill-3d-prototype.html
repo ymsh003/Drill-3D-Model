@@ -4622,6 +4622,1235 @@ aside > .measure-section .measure-diagram .sheet-input {
     font-size: 14px !important;
   }
 }
+
+/* Final measure-sheet balance pass: keep every control in its own visual zone. */
+.measure-diagram {
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(16, 72, 80, 0.22), transparent 42%),
+    linear-gradient(180deg, rgba(8, 31, 35, 0.98), rgba(3, 13, 17, 0.99));
+}
+
+.measure-shape-select {
+  box-sizing: border-box;
+  grid-template-columns: 42px minmax(0, 1fr);
+  width: clamp(190px, 30%, 214px);
+  min-height: 68px;
+  padding: 7px 8px;
+  gap: 5px 8px;
+  border: 1px solid rgba(92, 174, 187, 0.55);
+  border-radius: 10px;
+  background: rgba(5, 21, 26, 0.92);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+}
+
+.measure-shape-select label {
+  font-size: 13px !important;
+}
+
+.measure-shape-select select {
+  min-width: 0;
+  min-height: 34px;
+  padding: 0 26px 0 8px;
+  border-radius: 7px;
+}
+
+.measure-diagram .measure-shape-preview {
+  position: static;
+  inset: auto;
+  width: 42px;
+  height: 34px;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip,
+.measure-diagram .measure-sheet-control.field-ring-grip,
+.measure-diagram .measure-sheet-control.field-bridge,
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span,
+.measure-diagram .measure-sheet-control.field-thumb-solid {
+  grid-template-columns: 42px minmax(82px, 1fr) 42px;
+  width: clamp(176px, 28%, 200px);
+  min-height: 56px;
+  overflow: hidden;
+  border: 1px solid rgba(73, 173, 191, 0.42);
+  border-radius: 10px;
+  background: rgba(4, 18, 23, 0.96);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.26);
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip::after,
+.measure-diagram .measure-sheet-control.field-ring-grip::after,
+.measure-diagram .measure-sheet-control.field-bridge::after,
+.measure-diagram .measure-sheet-control.field-main-span::after,
+.measure-diagram .measure-sheet-control.field-offset-span::after,
+.measure-diagram .measure-sheet-control.field-thumb-solid::after {
+  display: none;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip button,
+.measure-diagram .measure-sheet-control.field-ring-grip button,
+.measure-diagram .measure-sheet-control.field-bridge button,
+.measure-diagram .measure-sheet-control.field-main-span button,
+.measure-diagram .measure-sheet-control.field-offset-span button,
+.measure-diagram .measure-sheet-control.field-thumb-solid button {
+  width: 42px;
+  min-height: 56px;
+  font-size: 26px !important;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-ring-grip .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-bridge .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-main-span .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-offset-span .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value {
+  min-height: 56px;
+  padding: 0 6px;
+  background: linear-gradient(180deg, rgba(9, 31, 37, 0.98), rgba(5, 19, 24, 0.98));
+  font-size: 24px !important;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip,
+.measure-diagram .measure-sheet-control.field-ring-grip {
+  top: 20.5%;
+}
+
+.measure-diagram .measure-sheet-control.field-bridge {
+  top: 31%;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole,
+.measure-diagram .measure-sheet-control.field-ring-hole {
+  top: 44%;
+}
+
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span {
+  top: 61%;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-hole {
+  top: 75%;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-solid {
+  top: 94%;
+}
+
+.measure-pitch-control {
+  box-sizing: border-box;
+  width: 168px;
+  height: 144px;
+  border: 1px solid rgba(89, 181, 197, 0.42);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(7, 29, 35, 0.94), rgba(4, 17, 22, 0.94));
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+}
+
+.measure-pitch-label {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 7px;
+  color: rgba(224, 244, 247, 0.82);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  pointer-events: none;
+}
+
+.measure-pitch-control::before,
+.measure-pitch-control::after {
+  top: 62%;
+  opacity: 0.72;
+}
+
+.measure-pitch-control::before {
+  width: 34px;
+  height: 2px;
+}
+
+.measure-pitch-control::after {
+  width: 2px;
+  height: 24px;
+}
+
+.measure-pitch-button {
+  width: 70px;
+  height: 30px;
+  border-radius: 7px;
+  font-size: 13px !important;
+  font-weight: 900;
+  letter-spacing: 0;
+  white-space: nowrap;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.24);
+}
+
+.measure-pitch-button.top,
+.measure-pitch-button.bottom {
+  width: 82px;
+}
+
+.measure-pitch-button.top {
+  top: 27px;
+}
+
+.measure-pitch-button.right {
+  right: 7px;
+  top: 62%;
+}
+
+.measure-pitch-button.bottom {
+  bottom: 7px;
+}
+
+.measure-pitch-button.left {
+  left: 7px;
+  top: 62%;
+}
+
+.measure-pitch-value {
+  display: none !important;
+}
+
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 14%;
+}
+
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 86%;
+}
+
+.measure-pitch-control.measure-pitch-middle,
+.measure-pitch-control.measure-pitch-ring {
+  top: 44%;
+}
+
+.measure-pitch-control.measure-pitch-thumb {
+  left: 82%;
+  top: 77%;
+}
+
+@media (max-width: 900px) {
+  .measure-shape-select {
+    width: 148px;
+    min-height: 62px;
+    padding: 6px;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 4px 6px;
+  }
+
+  .measure-diagram .measure-shape-preview {
+    width: 38px;
+    height: 32px;
+  }
+
+  .measure-shape-select select {
+    padding-inline: 5px;
+    font-size: 11px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip,
+  .measure-diagram .measure-sheet-control.field-ring-grip,
+  .measure-diagram .measure-sheet-control.field-bridge,
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span,
+  .measure-diagram .measure-sheet-control.field-thumb-solid {
+    grid-template-columns: 36px minmax(72px, 1fr) 36px;
+    width: 152px;
+    min-height: 52px;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip button,
+  .measure-diagram .measure-sheet-control.field-ring-grip button,
+  .measure-diagram .measure-sheet-control.field-bridge button,
+  .measure-diagram .measure-sheet-control.field-main-span button,
+  .measure-diagram .measure-sheet-control.field-offset-span button,
+  .measure-diagram .measure-sheet-control.field-thumb-solid button {
+    width: 36px;
+    min-height: 52px;
+    font-size: 23px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-ring-grip .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-bridge .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-main-span .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-offset-span .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value {
+    min-height: 52px;
+    font-size: 21px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip,
+  .measure-diagram .measure-sheet-control.field-ring-grip {
+    top: 18%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-bridge {
+    top: 29%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-hole,
+  .measure-diagram .measure-sheet-control.field-ring-hole {
+    top: 41%;
+  }
+
+  .measure-pitch-control {
+    width: 108px;
+    height: 108px;
+    border-radius: 10px;
+  }
+
+  .measure-pitch-label {
+    top: 5px;
+    font-size: 11px;
+  }
+
+  .measure-pitch-button,
+  .measure-pitch-button.top,
+  .measure-pitch-button.bottom {
+    width: 54px;
+    height: 24px;
+    font-size: 11px !important;
+  }
+
+  .measure-pitch-button.top {
+    top: 21px;
+  }
+
+  .measure-pitch-button.right {
+    right: 4px;
+  }
+
+  .measure-pitch-button.bottom {
+    bottom: 4px;
+  }
+
+  .measure-pitch-button.left {
+    left: 4px;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+    left: 20%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+    left: 80%;
+  }
+
+  .measure-pitch-control.measure-pitch-middle,
+  .measure-pitch-control.measure-pitch-ring {
+    top: 52%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span {
+    top: 64%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-hole {
+    top: 78%;
+  }
+
+  .measure-pitch-control.measure-pitch-thumb {
+    left: 83%;
+    top: 78%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-solid {
+    top: 94%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .app {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Classic measure-sheet reconstruction based on the original paper layout. */
+aside > .measure-section .measure-diagram {
+  height: 920px;
+  min-height: 920px;
+  aspect-ratio: auto;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(95, 190, 202, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(95, 190, 202, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 50% 35%, rgba(17, 81, 88, 0.2), transparent 45%),
+    linear-gradient(180deg, rgba(7, 29, 33, 0.99), rgba(3, 13, 17, 0.99));
+  background-size: 34px 34px, 34px 34px, auto, auto;
+}
+
+.measure-diagram::before {
+  content: "右投げ";
+  position: absolute;
+  z-index: 5;
+  left: 14px;
+  top: 12px;
+  padding: 5px 9px;
+  border: 1px solid rgba(112, 195, 206, 0.45);
+  border-radius: 7px;
+  background: rgba(4, 18, 23, 0.88);
+  color: rgba(225, 245, 247, 0.82);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.measure-diagram[data-hand="left"]::before {
+  content: "左投げ";
+}
+
+.measure-diagram > svg:first-child {
+  z-index: 1;
+}
+
+.measure-diagram > svg:first-child g {
+  stroke: rgba(191, 231, 235, 0.86) !important;
+  stroke-width: 3.5;
+}
+
+.measure-shape-select {
+  z-index: 7;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 82px 32px;
+  width: 210px;
+  min-height: 154px;
+  padding: 6px 7px;
+  gap: 4px;
+  border: 1px solid rgba(105, 194, 205, 0.48);
+  border-radius: 9px;
+  background: rgba(4, 19, 24, 0.94);
+  box-shadow: 0 7px 16px rgba(0, 0, 0, 0.24);
+}
+
+.measure-shape-select label {
+  grid-column: 1;
+  grid-row: 1;
+  color: rgba(226, 246, 248, 0.88);
+  font-size: 12px !important;
+}
+
+.measure-diagram .measure-shape-preview {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  height: 82px;
+  border: 1px solid rgba(105, 194, 205, 0.34);
+  border-radius: 7px;
+  background: rgba(2, 10, 14, 0.72);
+}
+
+.measure-shape-select select {
+  grid-column: 1;
+  grid-row: 3;
+  min-height: 32px;
+  padding: 0 6px;
+  font-size: 12px !important;
+}
+
+.measure-diagram[data-hand="right"] .measure-shape-middle,
+.measure-diagram[data-hand="left"] .measure-shape-ring {
+  left: 32%;
+}
+
+.measure-diagram[data-hand="right"] .measure-shape-ring,
+.measure-diagram[data-hand="left"] .measure-shape-middle {
+  left: 68%;
+}
+
+.measure-shape-middle,
+.measure-shape-ring {
+  top: 8.5%;
+}
+
+.measure-sheet-caption {
+  position: absolute;
+  z-index: 8;
+  display: block;
+  transform: translate(-50%, -50%);
+  color: rgba(225, 245, 247, 0.82);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.92);
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(3, 15, 19, 0.82);
+  pointer-events: none;
+}
+
+.measure-diagram .measure-sheet-control::before,
+.measure-diagram .measure-sheet-control::after {
+  display: none !important;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip,
+.measure-diagram .measure-sheet-control.field-ring-grip,
+.measure-diagram .measure-sheet-control.field-bridge,
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span,
+.measure-diagram .measure-sheet-control.field-thumb-solid {
+  grid-template-columns: 36px minmax(76px, 1fr) 36px;
+  gap: 6px;
+  width: 166px;
+  min-height: 52px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip button,
+.measure-diagram .measure-sheet-control.field-ring-grip button,
+.measure-diagram .measure-sheet-control.field-bridge button,
+.measure-diagram .measure-sheet-control.field-main-span button,
+.measure-diagram .measure-sheet-control.field-offset-span button,
+.measure-diagram .measure-sheet-control.field-thumb-solid button {
+  width: 36px;
+  min-height: 52px;
+  border: 1px solid rgba(77, 184, 201, 0.52);
+  border-radius: 7px;
+  background: rgba(7, 55, 67, 0.94);
+  font-size: 23px !important;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-ring-grip .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-bridge .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-main-span .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-offset-span .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value {
+  min-height: 52px;
+  padding: 0 5px;
+  border: 1px solid rgba(156, 218, 225, 0.72);
+  border-radius: 7px;
+  background: rgba(4, 17, 22, 0.96);
+  font-size: 22px !important;
+}
+
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-middle-grip,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-ring-grip,
+.measure-diagram[data-hand="right"] .measure-sheet-caption.field-middle-grip,
+.measure-diagram[data-hand="left"] .measure-sheet-caption.field-ring-grip {
+  left: 32%;
+}
+
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-ring-grip,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-middle-grip,
+.measure-diagram[data-hand="right"] .measure-sheet-caption.field-ring-grip,
+.measure-diagram[data-hand="left"] .measure-sheet-caption.field-middle-grip {
+  left: 68%;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-grip,
+.measure-diagram .measure-sheet-control.field-ring-grip {
+  top: 22%;
+}
+
+.measure-diagram .measure-sheet-caption.field-middle-grip,
+.measure-diagram .measure-sheet-caption.field-ring-grip {
+  top: 18%;
+}
+
+.measure-diagram .measure-sheet-control.field-bridge {
+  left: 50%;
+  top: 29.5%;
+  width: 152px;
+}
+
+.measure-diagram .measure-sheet-caption.field-bridge {
+  left: 50%;
+  top: 26%;
+}
+
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-middle-hole,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-ring-hole,
+.measure-diagram[data-hand="right"] .measure-sheet-caption.field-middle-hole,
+.measure-diagram[data-hand="left"] .measure-sheet-caption.field-ring-hole {
+  left: 39.091%;
+}
+
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-ring-hole,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-middle-hole,
+.measure-diagram[data-hand="right"] .measure-sheet-caption.field-ring-hole,
+.measure-diagram[data-hand="left"] .measure-sheet-caption.field-middle-hole {
+  left: 60.909%;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole,
+.measure-diagram .measure-sheet-control.field-ring-hole {
+  top: 40%;
+  width: 104px;
+  height: 104px;
+  min-height: 104px;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole button,
+.measure-diagram .measure-sheet-control.field-ring-hole button {
+  flex-basis: 30px;
+  min-height: 30px;
+  font-size: 24px !important;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole .measure-sheet-value,
+.measure-diagram .measure-sheet-control.field-ring-hole .measure-sheet-value {
+  min-height: 38px;
+  font-size: 20px !important;
+}
+
+.measure-diagram .measure-sheet-caption.field-middle-hole,
+.measure-diagram .measure-sheet-caption.field-ring-hole {
+  top: 46.5%;
+}
+
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-main-span,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-offset-span,
+.measure-diagram[data-hand="right"] .measure-sheet-caption.field-main-span,
+.measure-diagram[data-hand="left"] .measure-sheet-caption.field-offset-span {
+  left: 31%;
+}
+
+.measure-diagram[data-hand="right"] .measure-sheet-control.field-offset-span,
+.measure-diagram[data-hand="left"] .measure-sheet-control.field-main-span,
+.measure-diagram[data-hand="right"] .measure-sheet-caption.field-offset-span,
+.measure-diagram[data-hand="left"] .measure-sheet-caption.field-main-span {
+  left: 69%;
+}
+
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span {
+  top: 58%;
+}
+
+.measure-diagram .measure-sheet-caption.field-main-span,
+.measure-diagram .measure-sheet-caption.field-offset-span {
+  top: 54%;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-hole {
+  left: 50%;
+  top: 72.5%;
+  width: 116px;
+  height: 116px;
+  min-height: 116px;
+}
+
+.measure-diagram .measure-sheet-caption.field-thumb-hole {
+  left: 50%;
+  top: 62.5%;
+}
+
+.measure-diagram .measure-sheet-control.field-thumb-solid {
+  left: 50%;
+  top: 92%;
+  width: 166px;
+}
+
+.measure-diagram .measure-sheet-caption.field-thumb-solid {
+  left: 50%;
+  top: 87.5%;
+}
+
+.measure-pitch-control {
+  width: 140px;
+  height: 132px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.measure-pitch-label {
+  top: 0;
+  color: rgba(225, 245, 247, 0.82);
+  font-size: 12px;
+}
+
+.measure-pitch-control::before,
+.measure-pitch-control::after {
+  top: 58%;
+  background: rgba(191, 231, 235, 0.9);
+  opacity: 1;
+}
+
+.measure-pitch-control::before {
+  width: 40px;
+  height: 2px;
+}
+
+.measure-pitch-control::after {
+  width: 2px;
+  height: 30px;
+}
+
+.measure-pitch-button,
+.measure-pitch-button.top,
+.measure-pitch-button.bottom {
+  width: 60px;
+  height: 28px;
+  border: 1px solid rgba(81, 192, 208, 0.58);
+  border-radius: 6px;
+  background: rgba(6, 47, 58, 0.94);
+  font-size: 12px !important;
+}
+
+.measure-pitch-button.top {
+  top: 22px;
+}
+
+.measure-pitch-button.right {
+  right: 0;
+  top: 58%;
+}
+
+.measure-pitch-button.bottom {
+  bottom: 0;
+}
+
+.measure-pitch-button.left {
+  left: 0;
+  top: 58%;
+}
+
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 13%;
+}
+
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 87%;
+}
+
+.measure-pitch-control.measure-pitch-middle,
+.measure-pitch-control.measure-pitch-ring {
+  top: 40%;
+}
+
+.measure-pitch-control.measure-pitch-thumb {
+  left: 82%;
+  top: 72.5%;
+}
+
+@media (max-width: 900px) {
+  aside > .measure-section .measure-diagram {
+    height: 1150px;
+    min-height: 1150px;
+  }
+
+  .measure-shape-select {
+    width: 140px;
+    min-height: 124px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 62px 30px;
+  }
+
+  .measure-diagram .measure-shape-preview {
+    width: 100%;
+    height: 62px;
+  }
+
+  .measure-shape-select select {
+    padding-inline: 4px;
+    font-size: 10px !important;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-shape-middle,
+  .measure-diagram[data-hand="left"] .measure-shape-ring,
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-middle-grip,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-ring-grip,
+  .measure-diagram[data-hand="right"] .measure-sheet-caption.field-middle-grip,
+  .measure-diagram[data-hand="left"] .measure-sheet-caption.field-ring-grip,
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-main-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-offset-span,
+  .measure-diagram[data-hand="right"] .measure-sheet-caption.field-main-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-caption.field-offset-span {
+    left: 26%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-shape-ring,
+  .measure-diagram[data-hand="left"] .measure-shape-middle,
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-ring-grip,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-middle-grip,
+  .measure-diagram[data-hand="right"] .measure-sheet-caption.field-ring-grip,
+  .measure-diagram[data-hand="left"] .measure-sheet-caption.field-middle-grip,
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-offset-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-main-span,
+  .measure-diagram[data-hand="right"] .measure-sheet-caption.field-offset-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-caption.field-main-span {
+    left: 74%;
+  }
+
+  .measure-shape-middle,
+  .measure-shape-ring {
+    top: 9%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip,
+  .measure-diagram .measure-sheet-control.field-ring-grip,
+  .measure-diagram .measure-sheet-control.field-bridge,
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span,
+  .measure-diagram .measure-sheet-control.field-thumb-solid {
+    grid-template-columns: 30px minmax(68px, 1fr) 30px;
+    gap: 5px;
+    width: 140px;
+    min-height: 48px;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip button,
+  .measure-diagram .measure-sheet-control.field-ring-grip button,
+  .measure-diagram .measure-sheet-control.field-bridge button,
+  .measure-diagram .measure-sheet-control.field-main-span button,
+  .measure-diagram .measure-sheet-control.field-offset-span button,
+  .measure-diagram .measure-sheet-control.field-thumb-solid button {
+    width: 30px;
+    min-height: 48px;
+    font-size: 20px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-ring-grip .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-bridge .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-main-span .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-offset-span .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-thumb-solid .measure-sheet-value {
+    min-height: 48px;
+    font-size: 19px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip,
+  .measure-diagram .measure-sheet-control.field-ring-grip {
+    top: 19.5%;
+  }
+
+  .measure-diagram .measure-sheet-caption.field-middle-grip,
+  .measure-diagram .measure-sheet-caption.field-ring-grip {
+    top: 16%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-bridge {
+    top: 27%;
+    width: 136px;
+  }
+
+  .measure-diagram .measure-sheet-caption.field-bridge {
+    top: 23.5%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-middle-hole,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-ring-hole,
+  .measure-diagram[data-hand="right"] .measure-sheet-caption.field-middle-hole,
+  .measure-diagram[data-hand="left"] .measure-sheet-caption.field-ring-hole {
+    left: 31%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-ring-hole,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-middle-hole,
+  .measure-diagram[data-hand="right"] .measure-sheet-caption.field-ring-hole,
+  .measure-diagram[data-hand="left"] .measure-sheet-caption.field-middle-hole {
+    left: 69%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-hole,
+  .measure-diagram .measure-sheet-control.field-ring-hole {
+    top: 39%;
+    width: 82px;
+    height: 82px;
+    min-height: 82px;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-hole button,
+  .measure-diagram .measure-sheet-control.field-ring-hole button {
+    flex-basis: 24px;
+    min-height: 24px;
+    font-size: 19px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-hole .measure-sheet-value,
+  .measure-diagram .measure-sheet-control.field-ring-hole .measure-sheet-value {
+    min-height: 32px;
+    font-size: 16px !important;
+  }
+
+  .measure-diagram .measure-sheet-caption.field-middle-hole,
+  .measure-diagram .measure-sheet-caption.field-ring-hole {
+    top: 44%;
+  }
+
+  .measure-pitch-control {
+    width: 116px;
+    height: 108px;
+  }
+
+  .measure-pitch-button,
+  .measure-pitch-button.top,
+  .measure-pitch-button.bottom {
+    width: 52px;
+    height: 24px;
+    font-size: 11px !important;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+    left: 24%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+    left: 76%;
+  }
+
+  .measure-pitch-control.measure-pitch-middle,
+  .measure-pitch-control.measure-pitch-ring {
+    top: 50%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span {
+    top: 59%;
+  }
+
+  .measure-diagram .measure-sheet-caption.field-main-span,
+  .measure-diagram .measure-sheet-caption.field-offset-span {
+    top: 55.5%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-hole {
+    top: 70%;
+    width: 96px;
+    height: 96px;
+    min-height: 96px;
+  }
+
+  .measure-diagram .measure-sheet-caption.field-thumb-hole {
+    top: 62.5%;
+  }
+
+  .measure-pitch-control.measure-pitch-thumb {
+    left: 83%;
+    top: 70%;
+    width: 100px;
+  }
+
+  .measure-pitch-control.measure-pitch-thumb .measure-pitch-button,
+  .measure-pitch-control.measure-pitch-thumb .measure-pitch-button.top,
+  .measure-pitch-control.measure-pitch-thumb .measure-pitch-button.bottom {
+    width: 46px;
+    font-size: 10px !important;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-solid {
+    top: 90%;
+  }
+
+  .measure-diagram .measure-sheet-caption.field-thumb-solid {
+    top: 86.5%;
+  }
+}
+
+/* Final layout pass: keep the three drill inputs balanced and prevent long inch values from escaping. */
+.drill-layout-panel .drill-layout-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 12px;
+  row-gap: 12px;
+}
+
+.drill-layout-panel .drill-layout-grid > .dual-layout-field:not(.wide) {
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  min-height: 142px;
+  padding: 12px;
+  gap: 9px;
+}
+
+.drill-layout-panel .drill-layout-grid > .dual-layout-field:not(.wide) .range-adjust-control {
+  grid-template-columns: 38px minmax(76px, 1fr) 38px !important;
+  gap: 6px;
+}
+
+.measure-shape-select {
+  grid-template-rows: auto 82px 32px;
+}
+
+.measure-shape-visual {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  height: 82px;
+  padding: 4px 7px;
+  border: 1px solid rgba(105, 194, 205, 0.34);
+  border-radius: 7px;
+  background: rgba(2, 10, 14, 0.72);
+  overflow: hidden;
+}
+
+.measure-shape-visual .measure-shape-preview {
+  grid-column: auto;
+  grid-row: auto;
+  width: 82px;
+  height: 72px;
+  border: 0;
+  background: transparent;
+}
+
+.measure-shape-visual .measure-shape-preview text {
+  display: none;
+}
+
+.measure-shape-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  align-content: center;
+}
+
+.measure-shape-copy strong,
+.measure-shape-copy span {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
+.measure-shape-copy strong {
+  color: #f2fbfc;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.measure-shape-copy span {
+  color: rgba(191, 231, 235, 0.78);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.measure-sheet-value {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+}
+
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span {
+  grid-template-columns: 36px minmax(114px, 1fr) 36px;
+  width: 198px;
+}
+
+.measure-depth-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+}
+
+.measure-depth-card {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: grid;
+  gap: 3px;
+  width: 126px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.measure-depth-card > span {
+  display: block;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgba(3, 15, 19, 0.82);
+  color: rgba(230, 248, 250, 0.88);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.measure-depth-stepper {
+  display: grid;
+  grid-template-columns: 30px minmax(58px, 1fr) 30px;
+  gap: 4px;
+}
+
+.measure-depth-stepper button,
+.measure-depth-stepper output {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 34px;
+  margin: 0;
+  border: 1px solid rgba(77, 184, 201, 0.52);
+  border-radius: 7px;
+  box-sizing: border-box;
+}
+
+.measure-depth-stepper button {
+  padding: 0;
+  background: rgba(7, 55, 67, 0.94);
+  color: #f5fdff;
+  font-size: 17px !important;
+  font-weight: 900;
+}
+
+.measure-depth-stepper output {
+  background: rgba(3, 12, 16, 0.96);
+  color: #f5fdff;
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.measure-diagram[data-hand="right"] .measure-depth-middle,
+.measure-diagram[data-hand="left"] .measure-depth-ring {
+  left: 23%;
+}
+
+.measure-diagram[data-hand="right"] .measure-depth-ring,
+.measure-diagram[data-hand="left"] .measure-depth-middle {
+  left: 77%;
+}
+
+.measure-depth-middle,
+.measure-depth-ring {
+  top: 50%;
+}
+
+.measure-depth-thumb {
+  left: 18%;
+  top: 72.5%;
+}
+
+@media (max-width: 900px) {
+  .drill-layout-panel .drill-layout-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .measure-shape-visual {
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 5px;
+    height: 62px;
+    padding: 3px 5px;
+  }
+
+  .measure-shape-visual .measure-shape-preview {
+    width: 58px;
+    height: 56px;
+  }
+
+  .measure-shape-copy strong {
+    font-size: 11px;
+  }
+
+  .measure-shape-copy span {
+    font-size: 9px;
+  }
+
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span {
+    grid-template-columns: 30px minmax(88px, 1fr) 30px;
+    width: 158px;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-main-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-offset-span,
+  .measure-diagram[data-hand="right"] .measure-sheet-caption.field-main-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-caption.field-offset-span {
+    left: 25%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-sheet-control.field-offset-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-control.field-main-span,
+  .measure-diagram[data-hand="right"] .measure-sheet-caption.field-offset-span,
+  .measure-diagram[data-hand="left"] .measure-sheet-caption.field-main-span {
+    left: 75%;
+  }
+
+  .measure-depth-card {
+    width: 110px;
+  }
+
+  .measure-depth-stepper {
+    grid-template-columns: 26px minmax(50px, 1fr) 26px;
+    gap: 4px;
+  }
+
+  .measure-depth-stepper button,
+  .measure-depth-stepper output {
+    min-height: 32px;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-depth-middle,
+  .measure-diagram[data-hand="left"] .measure-depth-ring {
+    left: 18%;
+  }
+
+  .measure-diagram[data-hand="right"] .measure-depth-ring,
+  .measure-diagram[data-hand="left"] .measure-depth-middle {
+    left: 82%;
+  }
+
+  .measure-depth-middle,
+  .measure-depth-ring {
+    top: 58%;
+  }
+
+  .measure-depth-thumb {
+    left: 17%;
+    top: 75%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span {
+    top: 64%;
+  }
+
+  .measure-diagram .measure-sheet-caption.field-main-span,
+  .measure-diagram .measure-sheet-caption.field-offset-span {
+    top: 60.5%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-hole,
+  .measure-pitch-control.measure-pitch-thumb {
+    top: 75%;
+  }
+
+  .measure-diagram .measure-sheet-caption.field-thumb-hole {
+    top: 68.5%;
+  }
+
+  .measure-diagram .measure-sheet-control.field-thumb-solid {
+    top: 92%;
+  }
+
+  .measure-diagram .measure-sheet-caption.field-thumb-solid {
+    top: 88.5%;
+  }
+}
 </style>
 </head>
 <body>
@@ -4802,7 +6031,7 @@ aside > .measure-section .measure-diagram .sheet-input {
                     <span class="axis-label left">0"</span>
                     <output id="middleDrillDepthValue" class="pitch-readout">1 1/2"</output>
                     <span class="axis-label right">3 1/2"</span>
-                    <input id="middleDrillDepth" type="range" min="0" max="3.5" step="0.0625" value="1.5" aria-label="中指 ドリル深さ" />
+                    <input id="middleDrillDepth" type="range" min="0" max="3.5" step="0.03125" value="1.5" aria-label="中指 ドリル深さ" />
                     <div class="indicator-scale" data-range="middleDrillDepth"></div>
                   </div>
                 </div>
@@ -4904,7 +6133,7 @@ aside > .measure-section .measure-diagram .sheet-input {
                     <span class="axis-label left">0"</span>
                     <output id="ringDrillDepthValue" class="pitch-readout">1 1/2"</output>
                     <span class="axis-label right">3 1/2"</span>
-                    <input id="ringDrillDepth" type="range" min="0" max="3.5" step="0.0625" value="1.5" aria-label="薬指 ドリル深さ" />
+                    <input id="ringDrillDepth" type="range" min="0" max="3.5" step="0.03125" value="1.5" aria-label="薬指 ドリル深さ" />
                     <div class="indicator-scale" data-range="ringDrillDepth"></div>
                   </div>
                 </div>
@@ -4988,7 +6217,7 @@ aside > .measure-section .measure-diagram .sheet-input {
                   <span class="axis-label left">0"</span>
                   <output id="thumbDrillDepthValue" class="pitch-readout">1 1/2"</output>
                   <span class="axis-label right">3 1/2"</span>
-                  <input id="thumbDrillDepth" type="range" min="0" max="3.5" step="0.0625" value="1.5" aria-label="サム深さ" />
+                  <input id="thumbDrillDepth" type="range" min="0" max="3.5" step="0.03125" value="1.5" aria-label="サム深さ" />
                   <div class="indicator-scale" data-range="thumbDrillDepth"></div>
                 </div>
               </div>
@@ -5121,11 +6350,16 @@ aside > .measure-section .measure-diagram .sheet-input {
       <section class="section sheet-section measure-section personal-measure-panel">
       <h2>メジャーシート情報</h2>
       <div id="measureDiagram" class="measure-diagram" data-hand="right">
-          <svg viewBox="0 0 1100 760" aria-hidden="true">
+          <svg viewBox="0 0 1100 760" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <marker id="measureArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0 0 L8 4 L0 8 Z" fill="#bfe7eb"></path>
+              </marker>
+            </defs>
             <g fill="none" stroke="#0b0d0f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="495" y1="220" x2="605" y2="220"></line>
-              <line class="thumb-dependent" x1="433" y1="285" x2="520" y2="498"></line>
-              <line class="thumb-dependent" x1="667" y1="285" x2="580" y2="498"></line>
+              <line x1="520" y1="304" x2="580" y2="304" marker-start="url(#measureArrow)" marker-end="url(#measureArrow)"></line>
+              <line class="thumb-dependent" x1="433" y1="285" x2="520" y2="498" marker-end="url(#measureArrow)"></line>
+              <line class="thumb-dependent" x1="667" y1="285" x2="580" y2="498" marker-end="url(#measureArrow)"></line>
             </g>
           </svg>
           <span class="pitch-token left left-cross-left" data-cross="left" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
@@ -6037,6 +7271,7 @@ aside > .measure-section .measure-diagram .sheet-input {
     function rangeListStep(range) {
       if (range.id === "layoutDrillAngle" || range.id === "layoutValAngle") return 1;
       if (range.id.endsWith("Axis")) return 1 / 16;
+      if (["middleSpan", "ringSpanOffset", "middleDrillDepth", "ringDrillDepth", "thumbDrillDepth"].includes(range.id)) return 1 / 32;
       return 1 / 64;
     }
 
@@ -6609,7 +7844,7 @@ aside > .measure-section .measure-diagram .sheet-input {
     function nudgeDepthGauge(gauge, key) {
       const range = document.querySelector(`#${gauge.dataset.depthRange}`);
       if (!range) return;
-      const step = Number(range.step) || 1 / 64;
+      const step = Number(range.step) || 1 / 32;
       const min = Number(range.min);
       const max = Number(range.max);
       let next = Number(range.value) || min;
@@ -6959,8 +8194,11 @@ aside > .measure-section .measure-diagram .sheet-input {
           usesBare: false,
           drillDepth: thumbDrillDepth,
           color: "#f1c75f",
+          // Pitch axis contract: see outputs/PROJECT_NOTES.md and outputs/HANDOFF.md.
+          // Do not remap these from the UI labels alone; the model basis is intentionally rotated.
           lateral: pitchAxisValue("thumbVerticalAxis"),
           vertical: -pitchAxisValue("thumbLateralAxis"),
+          lateralDisplay: pitchAxisValue("thumbLateralAxis"),
           verticalDisplay: pitchAxisValue("thumbVerticalAxis")
         } : null,
         middle: {
@@ -6978,8 +8216,10 @@ aside > .measure-section .measure-diagram .sheet-input {
           usesBare: middleSize.usesBare,
           drillDepth: middleDrillDepth,
           color: "#69b8ff",
+          // Finger Forward bites inward; Reverse opens outward in the saved geometry convention.
           lateral: -pitchAxisValue("middleVerticalAxis"),
           vertical: -pitchAxisValue("middleLateralAxis"),
+          lateralDisplay: pitchAxisValue("middleLateralAxis"),
           verticalDisplay: pitchAxisValue("middleVerticalAxis")
         },
         ring: {
@@ -6999,6 +8239,7 @@ aside > .measure-section .measure-diagram .sheet-input {
           color: "#f179a5",
           lateral: -pitchAxisValue("ringVerticalAxis"),
           vertical: -pitchAxisValue("ringLateralAxis"),
+          lateralDisplay: pitchAxisValue("ringLateralAxis"),
           verticalDisplay: pitchAxisValue("ringVerticalAxis")
         },
         bridge,
@@ -8743,7 +9984,7 @@ aside > .measure-section .measure-diagram .sheet-input {
       const cylinderLength = Math.max(0, drillDepth - pointLength);
       const cylinderEnd = addScaled(start, axis, cylinderLength);
       const tip = addScaled(start, axis, drillDepth);
-      return { start, cylinderEnd, tip, axis, radius, pointLength, cylinderLength, hole };
+      return { start, cylinderEnd, tip, axis, radius, pointLength, cylinderLength, ballRadius: data.ballRadius, hole };
     }
 
     function drawTrajectory(hole, data, cx, cy, scale) {
@@ -8762,10 +10003,20 @@ aside > .measure-section .measure-diagram .sheet-input {
         const angle = i / sides * Math.PI * 2;
         const radial = addScaled(scalePoint(basis.u, Math.cos(angle)), basis.v, Math.sin(angle));
         const roots = sphereCylinderRoots(segment.start, segment.axis, radial, openingRadius, data.ballRadius);
-        const t = roots.reduce((best, root) => Math.abs(root) < Math.abs(best) ? root : best, roots[0] ?? 0);
+        const t = nearestSphereRoot(roots);
         points.push(addScaled(addScaled(segment.start, segment.axis, t), radial, openingRadius));
       }
       return points;
+    }
+
+    function nearestSphereRoot(roots) {
+      return roots.reduce((best, root) => Math.abs(root) < Math.abs(best) ? root : best, roots[0] ?? 0);
+    }
+
+    function constrainPointToBall(point, ballRadius, inset = 0.001) {
+      const length = Math.hypot(point.x, point.y, point.z);
+      if (!Number.isFinite(length) || length <= ballRadius) return point;
+      return scalePoint(point, Math.max(0, ballRadius - inset) / length);
     }
 
     function sphereCylinderRoots(start, axis, radial, openingRadius, ballRadius) {
@@ -8808,8 +10059,23 @@ aside > .measure-section .measure-diagram .sheet-input {
           basis.v,
           Math.sin(angle)
         );
-        startRing.push(addScaled(segment.start, radial, segment.radius));
-        cylinderRing.push(addScaled(segment.cylinderEnd, radial, segment.radius));
+        const roots = sphereCylinderRoots(
+          segment.start,
+          segment.axis,
+          radial,
+          segment.radius,
+          segment.ballRadius
+        );
+        const surfacePoint = addScaled(
+          addScaled(segment.start, segment.axis, nearestSphereRoot(roots)),
+          radial,
+          segment.radius
+        );
+        startRing.push(constrainPointToBall(surfacePoint, segment.ballRadius, 0));
+        cylinderRing.push(constrainPointToBall(
+          addScaled(segment.cylinderEnd, radial, segment.radius),
+          segment.ballRadius
+        ));
       }
       const faces = [];
       for (let i = 0; i < sides; i++) {
@@ -9012,8 +10278,9 @@ aside > .measure-section .measure-diagram .sheet-input {
     function pitchTokenValue(hole, axis, side) {
       const epsilon = 1 / 128;
       if (axis === "lateral") {
-        if (side === "left" && hole.lateral < -epsilon) return Math.abs(hole.lateral);
-        if (side === "right" && hole.lateral > epsilon) return Math.abs(hole.lateral);
+        const lateral = hole.lateralDisplay ?? hole.lateral;
+        if (side === "left" && lateral < -epsilon) return Math.abs(lateral);
+        if (side === "right" && lateral > epsilon) return Math.abs(lateral);
         return 0;
       }
       const vertical = hole.verticalDisplay;
@@ -9843,6 +11110,18 @@ aside > .measure-section .measure-diagram .sheet-input {
     thumbSolidValue: "サムソリッド外径"
   };
 
+  const displayLabels = {
+    middleGripIdValue: "中指フィンガーサイズ",
+    ringGripIdValue: "薬指フィンガーサイズ",
+    middleDiameterValue: "ホールサイズ",
+    ringDiameterValue: "ホールサイズ",
+    bridgeValue: "ブリッジ",
+    middleSpanValue: "中指スパン",
+    ringSpanOffsetValue: "薬指スパン差分",
+    thumbDiameterValue: "サムホールサイズ",
+    thumbSolidValue: "サムソリッド外径"
+  };
+
   const stepRange = (id, direction) => {
     const control = document.getElementById(id);
     if (!control) return;
@@ -9879,7 +11158,9 @@ aside > .measure-section .measure-diagram .sheet-input {
     document.querySelectorAll(".measure-sheet-control").forEach((control) => {
       const source = document.getElementById(control.dataset.sourceId);
       const value = control.querySelector(".measure-sheet-value");
-      if (source && value) value.textContent = source.textContent.trim();
+      if (source && value) {
+        value.textContent = source.textContent.trim();
+      }
     });
   };
 
@@ -9912,6 +11193,11 @@ aside > .measure-section .measure-diagram .sheet-input {
         });
       });
       diagram.appendChild(control);
+      const caption = document.createElement("span");
+      caption.className = `measure-sheet-caption ${Array.from(source.classList).filter((name) => name.startsWith("field-") || name === "thumb-dependent").join(" ")}`;
+      caption.textContent = displayLabels[sourceId] || labels[sourceId] || "";
+      caption.setAttribute("aria-hidden", "true");
+      diagram.appendChild(caption);
     });
 
     const originalDraw = typeof draw === "function" ? draw : null;
@@ -10030,7 +11316,9 @@ aside > .measure-section .measure-diagram .sheet-input {
     document.querySelectorAll(".measure-sheet-control").forEach((control) => {
       const source = document.getElementById(control.dataset.sourceId);
       const value = control.querySelector(".measure-sheet-value");
-      if (source && value) value.textContent = source.textContent.trim();
+      if (source && value) {
+        value.textContent = source.textContent.trim();
+      }
     });
     Object.entries(sheetReadouts).forEach(([sourceId, readoutId]) => {
       const source = document.getElementById(sourceId);
@@ -10162,6 +11450,17 @@ aside > .measure-section .measure-diagram .sheet-input {
     mirror.value = source.value;
   };
 
+  const gripShapeDetail = (type) => ({
+    none: "素掘り",
+    rubberSheet: "シート形状",
+    oval: "下側オーバル",
+    powerOval: "下側 +1/8",
+    tip: "フラットリフト",
+    powerLift: "フラットリフト",
+    semi: "下側バンプ",
+    powerNub: "ナブ配置"
+  })[type] || "形状プレビュー";
+
   const setupSheetOnlyMeasureSurface = () => {
     const diagram = document.getElementById("measureDiagram");
     if (!diagram || diagram.dataset.sheetOnlyReady === "true") return;
@@ -10175,25 +11474,21 @@ aside > .measure-section .measure-diagram .sheet-input {
       if (!source) return;
       const wrapper = document.createElement("div");
       wrapper.className = `measure-shape-select ${className}`;
-      wrapper.innerHTML = `<label>${label}</label><svg class="measure-shape-preview" viewBox="0 0 90 64" aria-hidden="true"></svg><select aria-label="${label}">${makeOptions(source)}</select>`;
+      wrapper.innerHTML = `<label>${label}</label><div class="measure-shape-visual"><svg class="grip-shape-preview measure-shape-preview" viewBox="40 8 140 132" aria-hidden="true"></svg><div class="measure-shape-copy"><strong></strong><span></span></div></div><select aria-label="${label}">${makeOptions(source)}</select>`;
       const mirror = wrapper.querySelector("select");
       mirror.value = source.value;
       const preview = wrapper.querySelector(".measure-shape-preview");
+      const previewName = wrapper.querySelector(".measure-shape-copy strong");
+      const previewDetail = wrapper.querySelector(".measure-shape-copy span");
       const renderPreview = () => {
         if (!preview) return;
         const value = mirror.value;
-        const inner = value === "tip"
-          ? '<path d="M26 48 C26 24 64 24 64 48 L64 54 C64 60 26 60 26 54 Z" fill="rgba(96,214,235,.28)" stroke="#bde8ee" stroke-width="4"/><path d="M44 32 L58 50" stroke="#f7fbfc" stroke-width="5" stroke-linecap="round"/>'
-          : value === "semi"
-            ? '<ellipse cx="45" cy="34" rx="28" ry="22" fill="rgba(96,214,235,.24)" stroke="#bde8ee" stroke-width="4"/><circle cx="34" cy="28" r="6" fill="#f7fbfc"/>'
-            : value === "powerNub"
-              ? '<ellipse cx="45" cy="34" rx="28" ry="22" fill="rgba(96,214,235,.24)" stroke="#bde8ee" stroke-width="4"/><circle cx="34" cy="27" r="4" fill="#f7fbfc"/><circle cx="45" cy="25" r="4" fill="#f7fbfc"/><circle cx="56" cy="27" r="4" fill="#f7fbfc"/>'
-              : value === "rubberSheet"
-                ? '<rect x="18" y="16" width="54" height="38" rx="8" fill="rgba(96,214,235,.22)" stroke="#bde8ee" stroke-width="4"/><line x1="26" y1="24" x2="64" y2="46" stroke="#f7fbfc" stroke-width="4"/>'
-                : value === "none"
-                  ? '<circle cx="45" cy="34" r="23" fill="rgba(96,214,235,.12)" stroke="#78949a" stroke-width="4" stroke-dasharray="7 6"/>'
-                  : '<ellipse cx="45" cy="34" rx="25" ry="22" fill="rgba(96,214,235,.24)" stroke="#bde8ee" stroke-width="4"/>';
-        preview.innerHTML = inner;
+        const shapeLabel = typeof gripTypeLabel === "function" ? gripTypeLabel(value) : value;
+        preview.innerHTML = typeof gripShapePreviewSvg === "function"
+          ? gripShapePreviewSvg(value, "")
+          : "";
+        if (previewName) previewName.textContent = shapeLabel;
+        if (previewDetail) previewDetail.textContent = gripShapeDetail(value);
       };
       renderPreview();
       mirror.addEventListener("change", () => {
@@ -10327,12 +11622,21 @@ aside > .measure-section .measure-diagram .sheet-input {
     { hole: "thumb", className: "measure-pitch-thumb thumb-dependent", lateral: "thumbLateralAxis", vertical: "thumbVerticalAxis", label: "サムピッチ" }
   ];
 
-  const directions = [
-    { key: "top", axis: "vertical", direction: -1, name: "リバース" },
-    { key: "right", axis: "lateral", direction: 1, name: "右" },
-    { key: "bottom", axis: "vertical", direction: 1, name: "フォワード" },
-    { key: "left", axis: "lateral", direction: -1, name: "左" }
+  const fingerDirections = [
+    { key: "top", axis: "vertical", direction: -1, name: "リバース", short: "後" },
+    { key: "right", axis: "lateral", direction: 1, name: "右", short: "右" },
+    { key: "bottom", axis: "vertical", direction: 1, name: "フォワード", short: "前" },
+    { key: "left", axis: "lateral", direction: -1, name: "左", short: "左" }
   ];
+
+  const thumbDirections = [
+    { key: "top", axis: "vertical", direction: 1, name: "フォワード", short: "前" },
+    { key: "right", axis: "lateral", direction: 1, name: "右", short: "右" },
+    { key: "bottom", axis: "vertical", direction: -1, name: "リバース", short: "後" },
+    { key: "left", axis: "lateral", direction: -1, name: "左", short: "左" }
+  ];
+
+  const directionsForHole = (hole) => hole === "thumb" ? thumbDirections : fingerDirections;
 
   const formatPitchMagnitude = (number) => {
     const value = Math.abs(Number(number) || 0);
@@ -10367,13 +11671,18 @@ aside > .measure-section .measure-diagram .sheet-input {
 
   function refreshMeasurePitchControls() {
     document.querySelectorAll(".measure-pitch-control").forEach((control) => {
-      directions.forEach(({ key, axis, direction }) => {
+      directionsForHole(control.dataset.hole).forEach(({ key, axis, direction, short }) => {
         const range = document.getElementById(control.dataset[axis]);
         const value = Number(range?.value) || 0;
         const magnitude = value * direction > 1 / 128 ? Math.abs(value) : 0;
         const button = control.querySelector(`.measure-pitch-button.${key}`);
         const readout = control.querySelector(`.measure-pitch-value.${key}`);
         button?.classList.toggle("is-active", magnitude > 0);
+        if (button) {
+          button.textContent = magnitude > 0
+            ? `${short} ${formatPitchMagnitude(magnitude)}`
+            : `${short} ＋`;
+        }
         if (readout) {
           readout.textContent = formatPitchMagnitude(magnitude);
           readout.classList.toggle("is-active", magnitude > 0);
@@ -10382,15 +11691,16 @@ aside > .measure-section .measure-diagram .sheet-input {
     });
   }
 
-  const createPitchControl = ({ className, lateral, vertical, label }) => {
+  const createPitchControl = ({ hole, className, lateral, vertical, label }) => {
     const control = document.createElement("div");
     control.className = `measure-pitch-control ${className}`;
+    control.dataset.hole = hole;
     control.dataset.lateral = lateral;
     control.dataset.vertical = vertical;
     control.setAttribute("role", "group");
     control.setAttribute("aria-label", label);
-    control.innerHTML = directions.map(({ key, axis, direction, name }) => `
-      <button type="button" class="measure-pitch-button ${key}" data-axis="${axis}" data-direction="${direction}" aria-label="${label} ${name}を増やす">+</button>
+    control.innerHTML = `<span class="measure-pitch-label" aria-hidden="true">${label}</span>` + directionsForHole(hole).map(({ key, axis, direction, name, short }) => `
+      <button type="button" class="measure-pitch-button ${key}" data-axis="${axis}" data-direction="${direction}" aria-label="${label} ${name}を増やす">${short} ＋</button>
       <span class="measure-pitch-value ${key}" aria-hidden="true"></span>
     `).join("");
     control.querySelectorAll(".measure-pitch-button").forEach((button) => {
@@ -10431,6 +11741,77 @@ aside > .measure-section .measure-diagram .sheet-input {
   };
 
   setupMeasurePitchControls();
+})();
+
+(() => {
+  const depthControls = [
+    { id: "middleDrillDepth", label: "中指深さ", className: "measure-depth-middle" },
+    { id: "ringDrillDepth", label: "薬指深さ", className: "measure-depth-ring" },
+    { id: "thumbDrillDepth", label: "サム深さ", className: "measure-depth-thumb thumb-dependent" }
+  ];
+
+  const setDepth = (range, next) => {
+    const min = Number(range.min);
+    const max = Number(range.max);
+    const step = Number(range.step) || 1 / 32;
+    const base = Number.isFinite(min) ? min : 0;
+    const clamped = Math.max(min, Math.min(max, base + Math.round((next - base) / step) * step));
+    if (typeof setRangeValue === "function") setRangeValue(range, Number(clamped.toFixed(5)), true);
+    else {
+      range.value = String(clamped);
+      range.dispatchEvent(new Event("input", { bubbles: true }));
+      range.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    if (typeof draw === "function") draw();
+  };
+
+  const refreshDepthControls = () => {
+    document.querySelectorAll("[data-visible-depth]").forEach((control) => {
+      const range = document.getElementById(control.dataset.visibleDepth);
+      const output = control.querySelector("output");
+      if (range && output) output.textContent = typeof formatInch === "function" ? formatInch(Number(range.value)) : range.value;
+    });
+  };
+
+  const setupVisibleDepthControls = () => {
+    const diagram = document.getElementById("measureDiagram");
+    if (!diagram || document.getElementById("measureDepthControls")) return;
+    const layer = document.createElement("div");
+    layer.id = "measureDepthControls";
+    layer.className = "measure-depth-layer";
+    layer.setAttribute("role", "group");
+    layer.setAttribute("aria-label", "ホール深さ調整");
+    layer.innerHTML = depthControls.map(({ id, label, className = "" }) => `
+      <div class="measure-depth-card ${className}" data-visible-depth="${id}">
+        <span>${label}</span>
+        <div class="measure-depth-stepper">
+          <button type="button" data-step="-1" aria-label="${label}を浅くする">−</button>
+          <output aria-live="polite"></output>
+          <button type="button" data-step="1" aria-label="${label}を深くする">＋</button>
+        </div>
+      </div>`).join("");
+    diagram.appendChild(layer);
+
+    layer.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const control = button.closest("[data-visible-depth]");
+        const range = document.getElementById(control?.dataset.visibleDepth);
+        if (!range) return;
+        setDepth(range, Number(range.value) + (Number(range.step) || 1 / 32) * Number(button.dataset.step));
+        window.requestAnimationFrame(refreshDepthControls);
+      });
+    });
+    depthControls.forEach(({ id }) => {
+      const range = document.getElementById(id);
+      if (range) {
+        range.addEventListener("input", refreshDepthControls);
+        range.addEventListener("change", refreshDepthControls);
+      }
+    });
+    refreshDepthControls();
+  };
+
+  setupVisibleDepthControls();
 })();
 </script>
 </body>

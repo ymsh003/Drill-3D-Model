@@ -381,6 +381,7 @@ Recent attempted fixes:
 - `rangeListStep(range)` now returns:
   - `1` for `layoutDrillAngle` and `layoutValAngle`
   - `1/16` for `range.id.endsWith("Axis")`
+  - `1/32` for `middleSpan`, `ringSpanOffset`, and all three `*DrillDepth` controls
   - `1/64` for other range-derived length controls
 - `setRangeValue()` now sets `range.step = String(step)` before assigning `range.value`.
 - `updateRangeListForRange(range, true)` is used to force visible text update.
@@ -736,7 +737,8 @@ Important expectations:
    - consider using a shorter display label only if the user agrees; do not silently change terminology
 4. Confirm `+/-` changes pitch by exactly `1/16"`.
 5. Confirm other length steppers still use the correct increment:
-   - span/PAP/PIN-PAP/depth may use `1/64"` unless domain-specific exceptions are identified
+   - span and all three hole depths must use `1/32"`
+   - PAP/PIN-PAP and other length controls keep their separately defined increments
    - pitch must not use `1/64"`
 6. Confirm sticky behavior:
    - `個人情報・保存データ` sticks at top of left scroll
@@ -774,7 +776,7 @@ If a fix cannot be visually verified from this environment, report that limitati
 - The measure diagram values are read-only display values. Editing happens through the existing detailed input style inside the same measure sheet section.
 - Bridge input has been restored in the integrated controls, and the diagram readout follows the updated bridge value.
 - The right workspace no longer reserves a row for the measure sheet, so the 3D viewer gets the main right-side space again.
-- Verified with Playwright/Chrome at 1440x920 and 390x844. Stepper tests: main span `4"` to `4 1/64"` updated the diagram; bridge `1/4"` to `17/64"` updated the diagram.
+- Historical 2026-07-31 verification (superseded for span by the 2026-08-24 invariant below): main span `4"` to `4 1/64"` and bridge `1/4"` to `17/64"` updated the diagram at that time.
 - The measure diagram now shows direct `- / value / +` controls at the visible measurement positions. These controls drive the existing range/select inputs; they are not raw contenteditable text fields.
 - The visible lower `メジャーシート詳細` panel is hidden and replaced by `#measureSheetIntegratedEditor` inside `メジャーシート情報`.
 - The integrated editor includes grip shape selects for both fingers plus the detailed measurement controls. Reverify any future edits against both diagram controls and editor controls to avoid duplicate event handlers.
@@ -791,3 +793,61 @@ If a fix cannot be visually verified from this environment, report that limitati
 - Latest pitch readability fix: do not move horizontal pitch values to the opposite side of the cross just to avoid overlap. The value must appear between the active direction's plus button and the cross center. Current CSS widens `.measure-pitch-control` horizontally (`152px` desktop, `108px` narrow) so `1/8"` can fit between the button and the cross without collision. Verification must include left/right/top/bottom direction placement, not just overlap absence.
 - Pitch cross preservation: do not use an opaque background on `.measure-pitch-value`; it makes the cross line look erased. Horizontal pitch values should stay between the direction button and cross center, but slightly off the stroke so the cross format remains visible. Current verification includes a line-hit check for left/right values at 1280px and 390px.
 - Latest pitch placement correction: values must be in the gap between the active plus button and the nearest cross-line edge, not above/on top of the line. Current CSS shortens the pitch cross strokes to create that gap and positions the paired finger pitch controls at 27.5%/72.5% to keep all visible buttons inside the frame. Verification should check left/right/top/bottom values for: between button and line, no line intersection, no button overlap, no visible out-of-frame controls at 1280px and 390px.
+
+## 2026-08-24 Current Measurement Invariants
+
+- Span and ring span offset increment: `1/32"`.
+- Middle, ring, and thumb hole-depth increment: `1/32"`.
+- Pitch increment remains `1/16"`.
+- Do not shrink a measurement value based on its character count. Widen the control while keeping typography constant.
+- Depth controls are part of the measure diagram itself (`#measureDepthControls` is a child of `#measureDiagram`), not a separate section.
+- Keep depth controls beside their holes: middle on the outer-left, ring on the outer-right, and thumb on the left. Do not stack the finger depth labels and steppers directly under the hole-size circles.
+- Current visible verification: `4"` minus once is `3 31/32"`; `1 1/2"` depth plus once is `1 17/32"`; `3 29/32"` fits at the same `22px` font size; 17 visible measure controls have no bounding-box overlaps at the current desktop viewport.
+
+## 2026-08-25 Drill-Machine Animation and Pitch Mechanism
+
+- Added `outputs/drill-machine-operation-3d.html` and the rendered `outputs/drill-machine-operation-3d.webm`.
+- The animation is intentionally based on the user-confirmed machine sequence, not on the different machine shown in the reference YouTube video.
+- Fixed sequence for each hole:
+  - surface grip-center zero;
+  - layout-direction base rotation;
+  - planar base translation;
+  - independent Forward/Reverse and side rotations;
+  - base lock;
+  - fixed vertical spindle down/up;
+  - return to the grip-center reference.
+- The grip-center point is a surface layout mark. Keep it separate from the internal sphere center in future code and labels.
+- Two pitch axes are independent:
+  - thumb/finger direction controls Forward/Reverse;
+  - the perpendicular direction controls side pitch.
+- Each lever is linked to its scale and the displayed pitch increment is `1/16"`.
+- Pitch direction must be independent of hole depth. Depth changes drill travel only.
+
+## 2026-08-26 Machine Model Rebuild
+
+- Video development is paused while machine geometry is corrected.
+- Added a standalone WebGL inspection page: `outputs/drill-machine-model-viewer.html`.
+- Added importable millimeter-unit geometry: `outputs/drill-machine-reference-model.obj` plus its `.mtl` material file.
+- Current Rev. 02 validated geometry: 453 named objects, 19,956 vertices, 16,516 faces, no invalid face indices, and all required machine assemblies present.
+- The spindle and ball zero reference share the same X/Z axis; the inspection pose leaves `5.8435 mm` clearance between the drill point and ball surface.
+- Browser checks passed for isometric, front, right, top, fixture close-up, and ball-hidden views.
+- Do not treat the approximate `1795 mm` model height, `520 mm` cabinet width, or `±90 mm` table travel as measured real-machine dimensions. They are explicit photo-proportion assumptions awaiting user dimensions.
+- Rev. 02 is based on the same-machine video `https://www.youtube.com/watch?v=Dg0FsAFY8Wc`; useful fixture frames were visually inspected around 10:07, 11:13, and 11:23.
+- The former three articulated clamp arms and tall vertical gimbal arch were removed. Preserve the revised low C-yoke, upper horseshoe holder, two radial shoes, left/front graduated collars, and yaw-base graduations unless stronger reference evidence is supplied.
+- `drill-machine-reference-model.js` contains the OBJ payload for direct local viewing; keep it next to the HTML viewer.
+
+## 2026-08-26 Pitch Consistency Audit — Open Defect
+
+- The machine study confirmed the conceptual definition but exposed that the current hole-axis implementation is still wrong. Do not describe pitch as complete.
+- `drillSegment()` currently divides the effective pitch by drill depth by building the direction from `inward * drillDepth + lateral/vertical offset`. The same `1/4"` pitch therefore changes angle when depth changes, violating the machine contract.
+- The current `layout()` mappings interchange Forward/Reverse and side pitch before geometry calculation. This was previously preserved as a regression guard, but it is not consistent with the machine's grip-line and perpendicular axes.
+- The local pitch basis also uses a fixed world Y vector instead of the active grip/layout basis, which is incorrect when the Dual Angle layout rotates the grip on the sphere.
+- Required future correction:
+  - form an aim point in the plane through the ball center using independent side and Forward/Reverse inch offsets;
+  - derive the axis from the surface hole center to that aim point;
+  - apply depth only as travel along the resulting normalized axis;
+  - add tests proving zero pitch intersects the center, depth does not change direction, the two pitch axes do not cross-couple, and rotated layouts preserve grip-relative directions.
+- Browser verification for the rendered WebM:
+  - `1280x720` video;
+  - approximately `24.297` seconds;
+  - the video plays through to the final `3ホールの加工完了` frame without a media error.

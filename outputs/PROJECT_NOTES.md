@@ -24,7 +24,7 @@ This is a standalone HTML prototype with no external library dependency.
 - Regulation range recorded in UI:
   - circumference: `26.704"` to `27.002"`
   - diameter: `8.500"` to `8.595"`
-- All working inch values are displayed in `1/64"` fraction format.
+- Working increments are domain-specific: span and hole depth use `1/32"`; pitch uses `1/16"`. Readouts display reduced inch fractions.
 - Span is interpreted as edge-to-edge distance:
   - thumb hole edge to finger hole edge.
 - Bridge is the gap between the two finger holes.
@@ -43,6 +43,30 @@ This is a standalone HTML prototype with no external library dependency.
 - Internally, this is handled by storing display pitch separately from geometry pitch:
   - `verticalDisplay` keeps the UI/readout value.
   - `vertical` is inverted for middle/ring geometry.
+
+### Pitch Mapping Regression Guard
+
+The 3D model basis is rotated relative to the UI cross. Do not rename or remap the axes from their labels alone. The saved, user-approved geometry contract is:
+
+```js
+middle/ring:
+  lateral = -pitchAxisValue("...VerticalAxis")
+  vertical = -pitchAxisValue("...LateralAxis")
+
+thumb:
+  lateral = pitchAxisValue("thumbVerticalAxis")
+  vertical = -pitchAxisValue("thumbLateralAxis")
+```
+
+The UI/readout values remain the original signed `LateralAxis` and `VerticalAxis` inputs. If the hole mesh protrudes through the shell, fix the sphere/cylinder intersection used for the mesh opening; do not change this pitch mapping to compensate for a rendering problem.
+
+The visible pitch cross also has a hole-specific vertical orientation:
+
+- Middle/ring: top is Reverse, bottom is Forward.
+- Thumb: top is Forward, bottom is Reverse.
+- All holes: left is Left, right is Right.
+
+Do not reuse one top/bottom direction table for all three holes.
 
 ## Drill Trajectory
 
@@ -111,7 +135,7 @@ Reason for priority: these issues either made working controls look broken, made
 
 - Card interiors were normalized with a final CSS layer for padding, gaps, headings, labels, inputs, and buttons.
 - Field text was raised from the earlier 12px baseline toward 14px desktop / 15px mobile, with inputs at 15px desktop / 16px mobile.
-- The measure-sheet diagram now uses wider, framed value labels with container-based font sizing so longer fractions stay inside the diagram.
+- The measure-sheet diagram uses fixed-size value typography. Longer span fractions are accommodated by wider controls, not by shrinking the font according to character count.
 - The right-side layout keeps the 3D model at a 500px minimum height and sizes the measure-sheet row to its actual diagram height.
 - Narrow drill-layout steppers were compacted only inside the three small layout cards so the larger global touch targets do not overflow.
 - Mobile span controls, catalog weight inputs, catalog RG inputs, and physical comparison rows now stack to one column.
@@ -248,3 +272,61 @@ These definitions are initial project constraints and must be preserved during i
 - Follow-up repair: restored pitch direction readability. The active pitch value now sits on the same side as the active plus button, between that plus button and the cross center, instead of drifting to the opposite side for collision avoidance. The pitch control was widened horizontally to create enough room for `+ / value / cross / value / +`. Verified left/right/top/bottom at desktop 1280px and mobile 390px: each value is on the intended side and no visible child elements overlap.
 - Follow-up repair: preserved the pitch cross as part of the visual format. Pitch values no longer use an opaque label background that visually erases the cross line. Horizontal pitch values were nudged just off the horizontal stroke while staying between the active plus button and the cross center. Verified at 1280px and 390px that left/right pitch values do not cover the horizontal cross line and do not overlap plus buttons.
 - Follow-up repair: corrected pitch value placement from "above the line" to "between the plus button and the cross line edge." The cross lines were shortened to reserve a real gap for the value instead of moving the number onto the line or hiding the line behind a label. Middle/ring pitch controls were repositioned at 27.5%/72.5% so widened pitch controls stay inside the measure-sheet frame and do not collide on mobile. Verified at 1280px and 390px: left/right/top/bottom values are between button and line, do not intersect the line, do not overlap buttons, and visible controls stay inside the frame.
+
+## 2026-08-24 Measurement Control Contract
+
+- `middleSpan` and `ringSpanOffset` use exactly `1/32"` increments.
+- `middleDrillDepth`, `ringDrillDepth`, and `thumbDrillDepth` use exactly `1/32"` increments.
+- Long measurement values must retain the same font size as short values. Increase the control width instead of applying character-count-based font classes.
+- The three depth controls belong inside `#measureDiagram`, adjacent to their hole layout. Do not create a separate depth section below the measure sheet.
+- Finger depth controls use the same side-by-side relationship as the thumb: middle depth is placed on the outer-left side of the middle hole and ring depth on the outer-right side of the ring hole, rather than directly underneath either circle.
+- Browser verification: one span decrement changed `4"` to `3 31/32"`; one depth increment changed `1 1/2"` to `1 17/32"`; `3 29/32"` remained at `22px` and fit inside the widened span control.
+
+## 2026-08-25 Drill-Machine Kinematic Contract
+
+- The red grip-center marker is a layout marker on the ball surface, not the geometric center inside the sphere.
+- Before drilling, the surface grip-center marker is placed directly below the fixed vertical spindle and the planar/rotational controls are zeroed.
+- Per-hole operation order is fixed for the animation and modeling contract:
+  1. rotate from the grip center along the straight layout direction toward the target hole;
+  2. translate the base in its plane so the target opening is below the fixed spindle;
+  3. apply the additional pitch rotations;
+  4. lock the base and lower the fixed spindle along one straight drill axis.
+- Pitch uses two independent rotational controls:
+  - thumb-to-finger direction: Forward/Reverse pitch;
+  - the perpendicular direction: side pitch.
+- The red operating levers and the `1/16"` scales are mechanically linked. Moving a lever moves its scale indication.
+- Forward/Reverse and side pitch remain independent input values and are combined only for the final ball/base pose.
+- Hole depth changes only travel along the already determined straight drill axis. It must not change pitch angle.
+- The explanatory deliverables are:
+  - `outputs/drill-machine-operation-3d.html`
+  - `outputs/drill-machine-operation-3d.webm`
+- The current video is a simplified kinematic model, not a dimensionally exact reproduction of the machine casing or linkage lengths.
+
+## 2026-08-26 Drill-Machine Reference Model Contract
+
+- The simplified operation video is not the geometry source for future animation. Use `drill-machine-reference-model.obj` as the machine reference and correct that model first.
+- Model units are millimeters. The bowling-ball diameter is fixed at `218.313 mm` (`8.595 in`). Machine casing dimensions remain photo-derived provisional values until measured dimensions are supplied.
+- The spindle axis and the zero-position surface grip-center share `X=45 mm / Z=10 mm` in the reference model. At the inspection pose the drill point is `5.8435 mm` above the ball surface.
+- Required separately identifiable assemblies: pedestal, column, drill head, vertical spindle, cross-slide table, lower yaw base, orthogonal F/R and side trunnions, lower ball cup, equatorial C-yoke, upper horseshoe holder, radial clamp shoes, both graduated collars/handles, and bit rack.
+- The inspection deliverable is `drill-machine-model-viewer.html`. It must retain front/right/top/isometric presets, close fixture and fixture-top views, and ball visibility control.
+- The importable source deliverables are `drill-machine-reference-model.obj` and `drill-machine-reference-model.mtl`. `drill-machine-reference-model.js` is the local-file-safe viewer payload.
+- Rev. 02 uses the additional same-machine reference video `https://www.youtube.com/watch?v=Dg0FsAFY8Wc`, especially the fixture views around 10:07, 11:13, and 11:23.
+- Rev. 02 removed the incorrect three-arm clamp and the incorrect tall vertical arch. The observed fixture is represented by the low cast C-yoke, two radial shoes, side/front orthogonal hubs, large engraved collars, and the graduated yaw base.
+
+## 2026-08-26 Pitch Audit After Machine Study
+
+- The machine model was created to reconcile the user's and developer's understanding. Rev. 02 is sufficient for that purpose; do not continue exterior-detail modeling unless it becomes necessary for a later kinematic question.
+- Confirmed pitch contract:
+  - zero pitch aims the hole axis at the ball's geometric center;
+  - Forward/Reverse follows the grip centerline and side pitch is perpendicular to it;
+  - the two pitch components are independent and expressed as inch offsets from the zero axis;
+  - hole depth is travel along the already-fixed drill axis and must never alter that axis.
+- The current prototype does **not** yet satisfy this contract:
+  - `drillSegment()` constructs its direction from `inward * drillDepth + pitch offsets`, so changing depth changes the pitch angle;
+  - the saved `layout()` mapping swaps the UI Forward/Reverse and lateral axes before passing them to the hole geometry;
+  - the local drill basis is derived from a fixed world Y axis rather than the transported grip-centerline/layout basis, so a rotated Dual Angle grip can rotate the meaning of pitch.
+- Correct geometry target for a surface hole center `S`, ball center `C`, local side unit vector `u`, local Forward/Reverse unit vector `v`, and pitch values `pSide`/`pFR`:
+  - `aim = C + u * pSide + v * pFR`;
+  - `axis = normalize(aim - S)`;
+  - `tip = S + axis * drillDepth`.
+- Do not restore the historical sign/swap mapping merely because it was marked as a regression guard. It must be replaced by explicit grip-basis tests for middle, ring, and thumb holes.

@@ -1,0 +1,112 @@
+# Drill machine material library
+newmtl machine_green
+Ka 0.0560 0.0784 0.0672
+Kd 0.2000 0.2800 0.2400
+Ks 0.34 0.34 0.34
+Ns 28
+d 1.000
+illum 2
+
+newmtl machine_green_light
+Ka 0.0868 0.1120 0.0952
+Kd 0.3100 0.4000 0.3400
+Ks 0.34 0.34 0.34
+Ns 34
+d 1.000
+illum 2
+
+newmtl machine_green_dark
+Ka 0.0308 0.0476 0.0420
+Kd 0.1100 0.1700 0.1500
+Ks 0.34 0.34 0.34
+Ns 22
+d 1.000
+illum 2
+
+newmtl steel
+Ka 0.1708 0.1876 0.1904
+Kd 0.6100 0.6700 0.6800
+Ks 0.34 0.34 0.34
+Ns 80
+d 1.000
+illum 2
+
+newmtl steel_light
+Ka 0.2296 0.2436 0.2436
+Kd 0.8200 0.8700 0.8700
+Ks 0.34 0.34 0.34
+Ns 96
+d 1.000
+illum 2
+
+newmtl steel_dark
+Ka 0.0756 0.0896 0.0924
+Kd 0.2700 0.3200 0.3300
+Ks 0.34 0.34 0.34
+Ns 46
+d 1.000
+illum 2
+
+newmtl cast_iron
+Ka 0.0504 0.0616 0.0588
+Kd 0.1800 0.2200 0.2100
+Ks 0.34 0.34 0.34
+Ns 20
+d 1.000
+illum 2
+
+newmtl black
+Ka 0.0098 0.0126 0.0126
+Kd 0.0350 0.0450 0.0450
+Ks 0.34 0.34 0.34
+Ns 18
+d 1.000
+illum 2
+
+newmtl red_knob
+Ka 0.2464 0.0224 0.0252
+Kd 0.8800 0.0800 0.0900
+Ks 0.34 0.34 0.34
+Ns 64
+d 1.000
+illum 2
+
+newmtl scale_white
+Ka 0.2408 0.2436 0.2296
+Kd 0.8600 0.8700 0.8200
+Ks 0.34 0.34 0.34
+Ns 42
+d 1.000
+illum 2
+
+newmtl scale_black
+Ka 0.0140 0.0140 0.0126
+Kd 0.0500 0.0500 0.0450
+Ks 0.34 0.34 0.34
+Ns 22
+d 1.000
+illum 2
+
+newmtl brass
+Ka 0.1540 0.1176 0.0504
+Kd 0.5500 0.4200 0.1800
+Ks 0.34 0.34 0.34
+Ns 62
+d 1.000
+illum 2
+
+newmtl ball
+Ka 0.0098 0.0924 0.1344
+Kd 0.0350 0.3300 0.4800
+Ks 0.34 0.34 0.34
+Ns 78
+d 0.720
+illum 2
+
+newmtl layout_red
+Ka 0.2800 0.0280 0.0336
+Kd 1.0000 0.1000 0.1200
+Ks 0.34 0.34 0.34
+Ns 64
+d 1.000
+illum 2

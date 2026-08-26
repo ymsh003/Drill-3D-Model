@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ボウリング用ドリルマシン｜3D構造確認</title>
+  <style>
+    :root{color-scheme:dark;--bg:#071016;--panel:rgba(9,23,30,.93);--line:#294650;--text:#eef7f8;--muted:#91a9b0;--cyan:#52d6e8;--red:#ff4d57;--amber:#ffc86b}
+    *{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);font-family:"Yu Gothic UI","Hiragino Sans",sans-serif;color:var(--text)}
+    canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}
+    .topbar{position:fixed;top:18px;left:18px;right:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;pointer-events:none}
+    .brand,.panel,.viewbar,.help{pointer-events:auto;background:var(--panel);border:1px solid var(--line);box-shadow:0 18px 48px #0008;backdrop-filter:blur(14px)}
+    .brand{padding:14px 17px;border-radius:13px;max-width:435px}.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--cyan);font-weight:800}.brand h1{font-size:20px;margin:3px 0 3px;line-height:1.25}.brand p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+    .viewbar{border-radius:12px;padding:6px;display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;max-width:650px}
+    button{border:1px solid #355a65;background:#102a34;color:#eaf9fb;border-radius:8px;padding:9px 12px;font:700 12px inherit;cursor:pointer;white-space:nowrap}button:hover{border-color:var(--cyan);background:#153641}button.active{background:var(--cyan);color:#061217;border-color:var(--cyan)}button.toggle-off{opacity:.55}
+    .panel{position:fixed;right:18px;top:94px;width:306px;max-height:calc(100vh - 132px);overflow:auto;border-radius:13px;padding:16px}.panel h2{font-size:14px;margin:0 0 11px}.panel h3{font-size:12px;letter-spacing:.08em;color:var(--cyan);margin:18px 0 8px}.panel p,.panel li{font-size:12px;line-height:1.65;color:#c6d6da}.panel ul{margin:0;padding-left:18px}.status{display:flex;gap:8px;align-items:center;padding:9px 10px;border-radius:9px;background:#0c2028;margin-bottom:12px;font-size:11px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 13px var(--amber)}.ready .dot{background:#52e6ad;box-shadow:0 0 13px #52e6ad}.ready .loadText{color:#cffff0}
+    .spec{display:grid;grid-template-columns:1fr auto;gap:0;border-top:1px solid var(--line)}.spec div{font-size:11px;padding:7px 0;border-bottom:1px solid #1d343c}.spec div:nth-child(2n){text-align:right;color:#dff9fc;font-weight:700}.tag{font-size:9px;border-radius:5px;padding:2px 5px;margin-left:4px;vertical-align:1px}.fixed{background:#124738;color:#9df2ce}.draft{background:#4b3a16;color:#ffe09a}
+    .legend{display:grid;grid-template-columns:auto 1fr;gap:7px 9px;align-items:center}.axis{width:22px;height:3px;border-radius:3px}.x{background:#ff5d66}.y{background:#65e496}.z{background:#64b5ff}.legend span{font-size:11px;color:#bfd0d5}
+    .help{position:fixed;left:18px;bottom:18px;padding:9px 12px;border-radius:10px;color:var(--muted);font-size:11px}.help b{color:#e9f8fa}
+    .warning{border-left:3px solid var(--amber);padding:8px 9px;background:#261f11;color:#f6deae!important;border-radius:4px;margin:8px 0 0!important}
+    @media(max-width:850px){.topbar{left:10px;right:10px;top:10px}.brand{max-width:280px}.brand p{display:none}.viewbar{max-width:300px}.panel{right:10px;top:auto;bottom:10px;width:min(330px,calc(100vw - 20px));max-height:38vh}.help{display:none}.brand h1{font-size:16px}button{padding:8px 9px}}
+  </style>
+</head>
+<body>
+  <canvas id="gl"></canvas>
+  <div class="topbar">
+    <section class="brand">
+      <div class="eyebrow">REFERENCE MODEL / REV. 02</div>
+      <h1>ボウリング用ドリルマシン</h1>
+      <p>同型機の追加写真・作業動画と機構説明を基に、台座と目盛周辺を再構築した検査モデルです。</p>
+    </section>
+    <nav class="viewbar" aria-label="表示方向">
+      <button data-view="iso" class="active">斜め</button><button data-view="front">正面</button><button data-view="right">右側面</button><button data-view="top">上面</button><button data-view="fixture">治具拡大</button><button data-view="fixtureTop">治具上面</button><button id="ballToggle">ボールを隠す</button>
+    </nav>
+  </div>
+  <aside class="panel">
+    <div id="status" class="status"><i class="dot"></i><span class="loadText">3Dデータを読み込み中…</span></div>
+    <h2>この段階で再現した構造</h2>
+    <ul>
+      <li>固定コラム／ドリルヘッド／垂直主軸</li>
+      <li>前後・左右に動くクロステーブル</li>
+      <li>ボール中心で直交するF/R軸とサイド軸</li>
+      <li>下受け・前面保持帯・上部馬蹄形保持枠</li>
+      <li>大型目盛環、ゼロ指針、連動ハンドル</li>
+      <li>工具ラック、送りハンドル、操作盤</li>
+    </ul>
+    <h3>寸法の扱い</h3>
+    <div class="spec">
+      <div>ボール直径 <span class="tag fixed">確定</span></div><div>218.313 mm</div>
+      <div>モデル全高 <span class="tag draft">暫定</span></div><div>約 1795 mm</div>
+      <div>架台幅 <span class="tag draft">暫定</span></div><div>約 520 mm</div>
+      <div>テーブル可動域 <span class="tag draft">暫定</span></div><div>±90 mm</div>
+      <div>ピッチ目盛 <span class="tag fixed">仕様</span></div><div>1/16 in</div>
+    </div>
+    <p class="warning">隠れている内部リンクと正確な実機寸法は未確定です。写真比率による寸法は暫定値として管理します。</p>
+    <h3>モデル座標</h3>
+    <div class="legend"><i class="axis x"></i><span>X：左右／サイド</span><i class="axis y"></i><span>Y：上下／主軸</span><i class="axis z"></i><span>Z：サム―フィンガー</span></div>
+  </aside>
+  <div class="help"><b>ドラッグ</b> 回転　<b>ホイール</b> 拡大・縮小　<b>ダブルクリック</b> 斜め表示へ戻す</div>
+<script src="drill-machine-reference-model.js"></script>
+<script>
+const canvas=document.querySelector('#gl'),gl=canvas.getContext('webgl',{antialias:true,alpha:false});
+const statusEl=document.querySelector('#status');
+if(!gl){statusEl.querySelector('.loadText').textContent='この環境ではWebGLを使用できません';throw new Error('WebGL unavailable')}
+const vs=`attribute vec3 p;attribute vec3 n;uniform mat4 vp;varying vec3 N;varying float H;void main(){N=n;H=p.y;gl_Position=vp*vec4(p,1.0);}`;
+const fs=`precision mediump float;varying vec3 N;varying float H;uniform vec4 color;void main(){vec3 nn=normalize(N);float key=max(dot(nn,normalize(vec3(.45,.75,.6))),0.0);float fill=max(dot(nn,normalize(vec3(-.55,.28,-.5))),0.0);float lit=.25+key*.62+fill*.18;float heightGlow=clamp((H-30.0)/1900.0,0.0,1.0)*.08;gl_FragColor=vec4(color.rgb*(lit+heightGlow),color.a);}`;
+function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}
+const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vs));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(program);gl.useProgram(program);
+const loc={p:gl.getAttribLocation(program,'p'),n:gl.getAttribLocation(program,'n'),vp:gl.getUniformLocation(program,'vp'),color:gl.getUniformLocation(program,'color')};
+const colors={machine_green:[.20,.28,.24,1],machine_green_light:[.31,.40,.34,1],machine_green_dark:[.11,.17,.15,1],steel:[.61,.67,.68,1],steel_light:[.82,.87,.87,1],steel_dark:[.27,.32,.33,1],cast_iron:[.18,.22,.21,1],black:[.035,.045,.045,1],red_knob:[.88,.08,.09,1],scale_white:[.86,.87,.82,1],scale_black:[.05,.05,.045,1],brass:[.55,.42,.18,1],ball:[.035,.33,.48,.76],layout_red:[1,.1,.12,1]};
+let meshes=[],ballVisible=true,upperVisible=true,azimuth=.73,elevation=.34,distance=2580,target=[50,900,0],drag=null;
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>{const l=Math.hypot(...a)||1;return a.map(v=>v/l)};
+function perspective(fov,aspect,near,far){const f=1/Math.tan(fov/2),nf=1/(near-far);return[f/aspect,0,0,0,0,f,0,0,0,0,(far+near)*nf,-1,0,0,2*far*near*nf,0]}
+function lookAt(e,t,u){const z=norm(sub(e,t)),x=norm(cross(u,z)),y=cross(z,x);return[x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,e),-dot(y,e),-dot(z,e),1]}
+function mul(a,b){const o=new Array(16).fill(0);for(let c=0;c<4;c++)for(let r=0;r<4;r++)for(let k=0;k<4;k++)o[c*4+r]+=a[k*4+r]*b[c*4+k];return o}
+function buf(data){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);return b}
+function parseOBJ(text){const v=[[0,0,0]],sets={},objectNames=new Set(),upperPattern=/^(column|head_|motor_|control_|switch_|speed_|quill|spindle|chuck|drill_|feed_|bit_rack|rack_bit)/;let material='machine_green',objectName='part';for(const raw of text.split(/\r?\n/)){const line=raw.trim();if(line.startsWith('v ')){const a=line.split(/\s+/);v.push([+a[1],+a[2],+a[3]])}else if(line.startsWith('usemtl ')){material=line.slice(7).trim()}else if(line.startsWith('o ')){objectName=line.slice(2).trim();objectNames.add(objectName)}else if(line.startsWith('f ')){const category=upperPattern.test(objectName)?'upper':'lower',key=material+'|'+category,ids=line.slice(2).trim().split(/\s+/).map(s=>+s.split('/')[0]);for(let q=1;q<ids.length-1;q++){const tri=[v[ids[0]],v[ids[q]],v[ids[q+1]]],nn=norm(cross(sub(tri[1],tri[0]),sub(tri[2],tri[0]))),s=sets[key]||(sets[key]={p:[],n:[],material,category});for(const pt of tri){s.p.push(...pt);s.n.push(...nn)}}}}for(const s of Object.values(sets))meshes.push({name:s.material,category:s.category,p:buf(s.p),n:buf(s.n),count:s.p.length/3,color:colors[s.material]||[.7,.7,.7,1]});return{vertices:v.length-1,faces:text.match(/^f /gm)?.length||0,objects:objectNames.size}}
+function bind(mesh){gl.bindBuffer(gl.ARRAY_BUFFER,mesh.p);gl.vertexAttribPointer(loc.p,3,gl.FLOAT,false,0,0);gl.enableVertexAttribArray(loc.p);gl.bindBuffer(gl.ARRAY_BUFFER,mesh.n);gl.vertexAttribPointer(loc.n,3,gl.FLOAT,false,0,0);gl.enableVertexAttribArray(loc.n)}
+function draw(){const dpr=Math.min(devicePixelRatio,2),w=Math.round(innerWidth*dpr),h=Math.round(innerHeight*dpr);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h)}gl.clearColor(.025,.055,.072,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);const ce=Math.cos(elevation),eye=[target[0]+distance*ce*Math.sin(azimuth),target[1]+distance*Math.sin(elevation),target[2]+distance*ce*Math.cos(azimuth)],up=Math.abs(elevation)>1.53?[0,0,-1]:[0,1,0],vp=mul(perspective(Math.PI/4,w/h,2,7000),lookAt(eye,target,up));gl.uniformMatrix4fv(loc.vp,false,new Float32Array(vp));for(const m of meshes.filter(x=>x.name!=='ball'&&(upperVisible||x.category!=='upper'))){bind(m);gl.uniform4fv(loc.color,m.color);gl.drawArrays(gl.TRIANGLES,0,m.count)}if(ballVisible){const m=meshes.find(x=>x.name==='ball');if(m){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);gl.disable(gl.CULL_FACE);bind(m);gl.uniform4fv(loc.color,m.color);gl.drawArrays(gl.TRIANGLES,0,m.count);gl.enable(gl.CULL_FACE);gl.depthMask(true);gl.disable(gl.BLEND)}}requestAnimationFrame(draw)}
+function setView(name){document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));upperVisible=name!=='fixtureTop';target=[50,900,0];distance=name==='top'?2600:2580;if(name==='front'){azimuth=0;elevation=.08}else if(name==='right'){azimuth=Math.PI/2;elevation=.08}else if(name==='top'){azimuth=0;elevation=1.555}else if(name==='fixture'){target=[45,995,10];distance=720;azimuth=.78;elevation=.28}else if(name==='fixtureTop'){target=[45,1010,10];distance=820;azimuth=0;elevation=1.555}else{azimuth=.73;elevation=.34}}
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.querySelector('#ballToggle').onclick=e=>{ballVisible=!ballVisible;e.currentTarget.textContent=ballVisible?'ボールを隠す':'ボールを表示';e.currentTarget.classList.toggle('toggle-off',!ballVisible)};
+canvas.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY,azimuth,elevation];canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!drag)return;azimuth=drag[2]+(e.clientX-drag[0])*.006;elevation=Math.max(-1.45,Math.min(1.555,drag[3]+(e.clientY-drag[1])*.005));document.querySelectorAll('[data-view]').forEach(b=>b.classList.remove('active'))});canvas.addEventListener('pointerup',()=>drag=null);canvas.addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(700,Math.min(5000,distance*Math.exp(e.deltaY*.001)))},{passive:false});canvas.ondblclick=()=>setView('iso');
+const modelSource=window.__DRILL_MACHINE_OBJ_BASE64__?Promise.resolve(atob(window.__DRILL_MACHINE_OBJ_BASE64__)):fetch('drill-machine-reference-model.obj').then(r=>{if(!r.ok)throw new Error('OBJ '+r.status);return r.text()});
+modelSource.then(t=>{const s=parseOBJ(t);statusEl.classList.add('ready');statusEl.querySelector('.loadText').textContent=`読込完了｜${s.objects}部品・${s.vertices.toLocaleString()}頂点・${s.faces.toLocaleString()}面`;draw()}).catch(e=>{statusEl.querySelector('.loadText').textContent='3Dデータを読み込めません：'+e.message;console.error(e)});
+</script>
+</body>
+</html>
