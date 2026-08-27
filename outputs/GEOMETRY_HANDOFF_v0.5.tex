@@ -1,0 +1,81 @@
+% !TeX program = lualatex
+\documentclass[a4paper,11pt]{ltjsarticle}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,bm,booktabs,hyperref}
+\usepackage{luatexja-fontspec}
+\setmainjfont{Noto Serif JP}
+\setsansjfont{Noto Sans JP}
+\newcommand{\vect}[1]{\bm{#1}}
+\title{ボウリング・ドリルレイアウト3Dモデル\\引き継ぎ資料 v0.5}
+\date{2026年8月27日}
+\begin{document}
+\maketitle
+
+\section{目的と処理境界}
+本アプリケーションは，メジャーリング値から数学的に一貫した球面レイアウトと穴軸を構成し，スパン，ホール径，ピッチ，穴深さおよびドリルレイアウトを三次元表示する。処理は，メジャーシート入力，理想幾何，機械運動学，加工後実測の四層に分離する。
+
+\section{座標系と穴軸}
+ボール中心を\(\vect c=\vect 0\)，半径を\(r_{\mathrm B}\)，穴\(i\)の球面上の基準点を\(\vect q_i\)とする。外向き法線は
+\begin{equation}
+\vect n_i=\frac{\vect q_i-\vect c}{r_{\mathrm B}}
+\end{equation}
+である。グリップ中心で定義した基底を各穴位置の接平面へ射影して正規直交化し，横方向単位ベクトル\(\vect e_i^{\mathrm L}\)とフォワード／リバース方向単位ベクトル\(\vect e_i^{\mathrm V}\)を得る。
+
+ピッチベクトル，中心深さ平面上の照準点および穴軸を
+\begin{align}
+\vect p_i&=p_i^{\mathrm L}\vect e_i^{\mathrm L}+p_i^{\mathrm V}\vect e_i^{\mathrm V},\\
+\vect a_i&=\vect c+\vect p_i,\\
+\vect d_i&=\frac{\vect a_i-\vect q_i}{\lVert\vect a_i-\vect q_i\rVert}
+\end{align}
+と定義する。穴深さ\(h_i\)に対する終点は
+\begin{equation}
+\vect t_i=\vect q_i+h_i\vect d_i
+\end{equation}
+である。したがって，穴深さだけを変更しても穴軸は変化しない。総ピッチ量と中心方向からの傾斜角は
+\begin{align}
+\rho_i&=\sqrt{\left(p_i^{\mathrm L}\right)^2+\left(p_i^{\mathrm V}\right)^2},\\
+\theta_i&=\arctan\left(\frac{\rho_i}{r_{\mathrm B}}\right)
+\end{align}
+である。
+
+\subsection{Forward／Reverseの恒久仕様}
+UIでは親指・フィンガーともに正値をForward，負値をReverseとする。親指のForward基底は親指からフィンガー対へ向かう方向，フィンガーホールのForward基底はフィンガー対からグリップ中心へ向かう方向である。したがって，フィンガーホールではグリップ中心からフィンガー対へ向かう局所上方向の反対がForwardとなる。入力値を表示層や穴ごとの例外処理で反転してはならず，ホール種別から解剖学的基底の向きを決定する。この仕様は自動回帰テストで固定する。
+
+\section{入口輪郭と実効スパン}
+半径\(a_i\)の穴円筒を
+\begin{equation}
+\mathcal C_i=
+\left\{\vect x\in\mathbb R^3\ \middle|\
+\left\|\left(\vect I-\vect d_i\vect d_i^{\mathsf T}\right)
+\left(\vect x-\vect q_i\right)\right\|=a_i\right\}
+\end{equation}
+とし，球面との交線を
+\begin{equation}
+\Gamma_i=\mathcal C_i\cap\mathcal S_{\mathrm B}
+\end{equation}
+とする。ホール\(j\)側のグリッピングエッジを
+\begin{equation}
+\vect g_{i\to j}=\underset{\vect x\in\Gamma_i}{\operatorname{argmin}}\ d_{\mathrm S}(\vect x,\vect q_j)
+\end{equation}
+と定義すれば，測地距離による実効スパンは
+\begin{equation}
+S_{ij}=d_{\mathrm S}(\vect g_{i\to j},\vect g_{j\to i})
+\end{equation}
+である。弦長または投影距離を用いる場合は，測定規約を別途指定する。
+
+\section{今回の実装修正}
+\begin{itemize}
+\item UIの横ピッチと垂直ピッチを内部で入れ替える処理を廃止した。
+\item 中指・薬指に固有の符号反転を廃止した。
+\item 穴深さを用いて穴軸を決める処理を廃止した。
+\item 回転したグリップ基底を穴位置へ移送する\texttt{transportedPitchBasis()}を追加した。
+\item 中心深さ平面上の照準点を返す\texttt{pitchAimPoint()}を追加した。
+\end{itemize}
+
+\section{必須の不変条件}
+ゼロピッチは中心軸と一致すること，深さが穴軸を変えないこと，二つのピッチ成分が局所基底へ直接対応すること，回転後も基底が正規直交系を保つこと，入口輪郭点が球面と円筒の双方を満たすことを自動テストで保証する。
+
+\section{次の実装順序}
+数値計算を単一HTMLのDOM・Canvas処理から分離し，単体テスト，入口輪郭診断，複数のスパン定義，メジャーシートJSONスキーマ，機械運動学の校正の順に実装する。実機目盛から穴軸への変換UIは，校正データが得られるまで確定機能として扱わない。
+
+\end{document}

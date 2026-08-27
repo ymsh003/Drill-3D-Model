@@ -828,14 +828,153 @@
     .profile-editor {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      padding-top: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 14px;
+      padding-top: 12px;
       border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .profile-editor > .control-group-note,
+    .profile-editor > .wide,
+    .profile-form-heading,
+    .profile-registration-actions { grid-column: 1 / -1; }
+
+    .profile-editor .name-field,
+    .profile-editor .hand-field { grid-column: auto; }
+
+    .profile-editor > .control-group-note {
+      margin: 0;
+      padding: 10px 12px;
+      border-left: 3px solid var(--accent);
+      border-radius: 5px;
+      background: rgba(89,201,167,.07);
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .profile-form-heading {
+      margin: 4px 0 -2px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 800;
     }
 
     .profile-editor.is-hidden,
     .profile-save-area.is-hidden { display: none; }
+
+    .profile-registration-actions,
+    .profile-context-actions {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 8px;
+    }
+
+    .profile-registration-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .profile-context-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .profile-registration-actions button { width: 100%; }
+    .profile-registration-actions #registerProfile {
+      border-color: rgba(89,201,167,.58);
+      background: linear-gradient(180deg, rgba(37,91,75,.98), rgba(25,65,54,.98));
+      font-weight: 800;
+    }
+
+    .profile-context-bar {
+      grid-column: 1 / -1;
+      display: none;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .profile-context-person {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px;
+      border: 1px solid rgba(125,235,255,.28);
+      border-radius: 7px;
+      background: rgba(125,235,255,.08);
+    }
+
+    .profile-context-person strong { display: block; font-size: 16px; }
+    .profile-context-person span { color: var(--muted); font-size: 12px; text-align: right; }
+    .profile-context-actions button {
+      min-width: 0;
+      min-height: 40px;
+      white-space: nowrap;
+    }
+
+    body[data-profile-view="lookup"],
+    body[data-profile-view="register"] {
+      display: block;
+      min-height: 100vh;
+      overflow: auto;
+      background: #0f1114;
+    }
+
+    body[data-profile-view="lookup"] .app,
+    body[data-profile-view="register"] .app {
+      display: block;
+      width: min(820px, 100%);
+      height: auto;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 28px 20px;
+      overflow: visible;
+    }
+
+    body[data-profile-view="lookup"] aside,
+    body[data-profile-view="register"] aside {
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+      background: transparent;
+    }
+
+    body[data-profile-view="lookup"] .data-section,
+    body[data-profile-view="register"] .data-section {
+      width: 100%;
+      margin: 0;
+    }
+
+    body[data-profile-view="lookup"] aside > :not(.data-section),
+    body[data-profile-view="register"] aside > :not(.data-section),
+    body[data-profile-view="lookup"] .right-workspace,
+    body[data-profile-view="register"] .right-workspace { display: none; }
+
+    body[data-profile-view="lookup"] .profile-editor,
+    body[data-profile-view="lookup"] .profile-context-bar { display: none; }
+
+    body[data-profile-view="register"] .saved-profile-box,
+    body[data-profile-view="register"] .profile-start-actions,
+    body[data-profile-view="register"] .profile-context-bar { display: none; }
+
+    body[data-profile-view="register"] .profile-editor { display: grid; }
+
+    @media (max-width: 620px) {
+      body[data-profile-view="lookup"] .app,
+      body[data-profile-view="register"] .app { padding: 12px; }
+      .profile-editor { grid-template-columns: minmax(0, 1fr); }
+      .profile-editor .name-field,
+      .profile-editor .hand-field,
+      .profile-editor > .wide,
+      .profile-form-heading,
+      .profile-registration-actions { grid-column: 1; }
+      .profile-registration-actions { grid-template-columns: minmax(0, 1fr); }
+      .profile-context-actions { grid-template-columns: minmax(0, 1fr); }
+      .profile-context-person { align-items: flex-start; flex-direction: column; gap: 4px; }
+      .profile-context-person span { text-align: left; }
+    }
+
+    body[data-profile-view="measure"] .saved-profile-box,
+    body[data-profile-view="measure"] .profile-start-actions,
+    body[data-profile-view="measure"] .profile-editor { display: none; }
+
+    body[data-profile-view="measure"] .profile-context-bar { display: grid; }
 
     .thumb-use-field.is-hidden,
     body[data-thumb-enabled="false"] .thumb-dependent,
@@ -880,9 +1019,29 @@
 
     .profile-results {
       display: grid;
-      gap: 6px;
-      max-height: 190px;
+      gap: 4px;
+      max-height: 280px;
       overflow: auto;
+      padding: 2px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 7px;
+      background: rgba(0,0,0,.14);
+    }
+
+    .profile-roster-head,
+    .profile-result-item {
+      display: grid;
+      grid-template-columns: minmax(9rem, 1.5fr) minmax(4.6rem, .62fr) minmax(4.6rem, .68fr) minmax(7.5rem, .9fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .profile-roster-head {
+      padding: 4px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .03em;
     }
 
     .profile-result-item {
@@ -897,6 +1056,17 @@
       cursor: pointer;
     }
 
+    .profile-result-item > span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .profile-result-name { font-weight: 800; }
+    .profile-result-meta,
+    .profile-result-date { color: var(--muted); font-size: 12px; }
+
     .profile-result-item:hover,
     .profile-result-item.is-selected {
       border-color: rgba(125,235,255,.55);
@@ -904,8 +1074,30 @@
     }
 
     .profile-result-item.is-create {
+      display: block;
       border-color: rgba(89,201,167,.38);
       background: rgba(89,201,167,.10);
+    }
+
+    .profile-roster-toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .profile-roster-title { font-weight: 800; }
+    .profile-roster-count { color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 700px) {
+      .profile-roster-head { display: none; }
+      .profile-result-item {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 3px 8px;
+      }
+      .profile-result-name { grid-column: 1; }
+      .profile-result-date { grid-column: 2; grid-row: 1; }
+      .profile-result-meta { grid-column: auto; }
     }
 
     .profile-list-field {
@@ -5851,24 +6043,283 @@ aside > .measure-section .measure-diagram {
     top: 88.5%;
   }
 }
+
+/* Entry boundary: only the personal-information panel may exist before authentication/selection. */
+body[data-profile-view="lookup"] .app > aside > :not(.data-section),
+body[data-profile-view="register"] .app > aside > :not(.data-section),
+body[data-profile-view="lookup"] .right-workspace,
+body[data-profile-view="register"] .right-workspace {
+  display: none !important;
+}
+
+/* Readable measure-sheet hierarchy: connectors stay subordinate to controls and labels. */
+aside > .measure-section .measure-diagram svg {
+  opacity: .34;
+}
+
+.measure-hole-connectors line {
+  stroke: rgba(125, 190, 200, .72);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole button,
+.measure-diagram .measure-sheet-control.field-ring-hole button,
+.measure-diagram .measure-sheet-control.field-thumb-hole button {
+  display: grid;
+  place-items: center;
+  font-size: 0 !important;
+  line-height: 1;
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole button::after,
+.measure-diagram .measure-sheet-control.field-ring-hole button::after,
+.measure-diagram .measure-sheet-control.field-thumb-hole button::after {
+  display: block !important;
+  color: inherit;
+  font-family: Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.measure-diagram .measure-sheet-control.field-middle-hole button[data-step="1"]::after,
+.measure-diagram .measure-sheet-control.field-ring-hole button[data-step="1"]::after,
+.measure-diagram .measure-sheet-control.field-thumb-hole button[data-step="1"]::after { content: "+"; }
+
+.measure-diagram .measure-sheet-control.field-middle-hole button[data-step="-1"]::after,
+.measure-diagram .measure-sheet-control.field-ring-hole button[data-step="-1"]::after,
+.measure-diagram .measure-sheet-control.field-thumb-hole button[data-step="-1"]::after { content: "−"; }
+
+.thumb-accessory-group {
+  position: absolute;
+  z-index: 14;
+  left: 50%;
+  top: 86%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: 190px 166px 190px;
+  grid-template-rows: 22px 64px 62px;
+  column-gap: 14px;
+  row-gap: 6px;
+  justify-content: center;
+  align-items: center;
+  width: min(574px, 96%);
+}
+
+.thumb-accessory-group .measure-thumb-solid-mode,
+.thumb-accessory-group .measure-sheet-control.field-thumb-solid,
+.thumb-accessory-group .measure-sheet-caption.field-thumb-solid,
+.thumb-accessory-group .measure-depth-thumb {
+  position: relative !important;
+  inset: auto !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  margin: 0;
+}
+
+.thumb-accessory-group .measure-thumb-solid-mode {
+  grid-column: 1;
+  grid-row: 2;
+  width: 190px;
+}
+
+.thumb-accessory-group .measure-sheet-caption.field-thumb-solid {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+}
+
+.thumb-accessory-group .measure-sheet-control.field-thumb-solid {
+  grid-column: 2;
+  grid-row: 2;
+  width: 166px;
+}
+
+.thumb-accessory-group .measure-depth-thumb {
+  grid-column: 2;
+  grid-row: 3;
+  align-self: start;
+  justify-self: center;
+}
+
+@media (max-width: 560px) {
+  .thumb-accessory-group {
+    grid-template-columns: 150px 150px 150px;
+    width: min(478px, 98%);
+  }
+
+  .thumb-accessory-group .measure-thumb-solid-mode {
+    width: 150px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+    padding: 5px 7px;
+  }
+
+  .thumb-accessory-group .measure-sheet-control.field-thumb-solid {
+    width: 150px;
+  }
+}
+
+.measure-diagram .measure-sheet-control,
+.measure-diagram .measure-pitch-control,
+.measure-diagram .measure-shape-select,
+.measure-diagram .measure-thumb-solid-mode {
+  z-index: 12;
+}
+
+.measure-diagram .measure-sheet-caption,
+.measure-diagram .measure-pitch-label {
+  z-index: 13;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(2, 13, 17, .88);
+}
+
+.measure-thumb-solid-mode {
+  position: absolute;
+  left: 20%;
+  top: 91%;
+  width: 190px;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(89, 201, 167, .52);
+  border-radius: 8px;
+  background: rgba(3, 20, 24, .96);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.measure-thumb-solid-mode select {
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  border: 1px solid rgba(125, 235, 255, .42);
+  border-radius: 6px;
+  background: #081419;
+  color: var(--text);
+  padding: 4px 7px;
+  font: inherit;
+}
+
+aside > .measure-section .measure-diagram {
+  height: 1300px;
+  min-height: 1300px;
+}
+
+.measure-diagram[data-hand="right"] .measure-depth-middle,
+.measure-diagram[data-hand="left"] .measure-depth-ring,
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 15%;
+}
+
+.measure-diagram[data-hand="right"] .measure-depth-ring,
+.measure-diagram[data-hand="left"] .measure-depth-middle,
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 85%;
+}
+
+.measure-depth-middle,
+.measure-depth-ring {
+  top: 31%;
+}
+
+.measure-pitch-control.measure-pitch-middle,
+.measure-pitch-control.measure-pitch-ring {
+  top: 40%;
+}
+
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span { top: 65%; }
+.measure-diagram .measure-sheet-caption.field-main-span,
+.measure-diagram .measure-sheet-caption.field-offset-span { top: 61%; }
+.measure-diagram .measure-sheet-control.field-thumb-hole { top: 78%; }
+.measure-diagram .measure-sheet-caption.field-thumb-hole { top: 70%; }
+
+.measure-depth-thumb {
+  left: 50%;
+  top: 97%;
+}
+
+.measure-pitch-control.measure-pitch-thumb {
+  top: 78%;
+}
+
+@media (max-width: 900px) {
+  aside > .measure-section .measure-diagram {
+    height: 1450px;
+    min-height: 1450px;
+  }
+
+  .measure-diagram .measure-sheet-control.field-middle-grip,
+  .measure-diagram .measure-sheet-control.field-ring-grip { top: 18.5%; }
+  .measure-diagram .measure-sheet-caption.field-middle-grip,
+  .measure-diagram .measure-sheet-caption.field-ring-grip { top: 15.5%; }
+  .measure-diagram .measure-sheet-control.field-bridge { top: 26%; }
+  .measure-diagram .measure-sheet-caption.field-bridge { top: 22.8%; }
+  .measure-diagram .measure-sheet-control.field-middle-hole,
+  .measure-diagram .measure-sheet-control.field-ring-hole { top: 37%; }
+  .measure-diagram .measure-sheet-caption.field-middle-hole,
+  .measure-diagram .measure-sheet-caption.field-ring-hole { top: 42%; }
+  .measure-diagram[data-hand="right"] .measure-depth-middle,
+  .measure-diagram[data-hand="left"] .measure-depth-ring,
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring { left: 18%; }
+  .measure-diagram[data-hand="right"] .measure-depth-ring,
+  .measure-diagram[data-hand="left"] .measure-depth-middle,
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle { left: 82%; }
+  .measure-depth-middle,
+  .measure-depth-ring { top: 28.5%; }
+  .measure-pitch-control.measure-pitch-middle,
+  .measure-pitch-control.measure-pitch-ring { top: 37%; }
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span { top: 63.5%; }
+  .measure-diagram .measure-sheet-caption.field-main-span,
+  .measure-diagram .measure-sheet-caption.field-offset-span { top: 59.5%; }
+  .measure-diagram .measure-sheet-control.field-thumb-hole { top: 76%; }
+  .measure-diagram .measure-sheet-caption.field-thumb-hole { top: 69%; }
+  .measure-depth-thumb { left: 50%; top: 97%; }
+  .measure-pitch-control.measure-pitch-thumb { top: 76%; }
+  .measure-diagram .measure-sheet-control.field-thumb-solid { top: 91%; }
+  .measure-diagram .measure-sheet-caption.field-thumb-solid { top: 87%; }
+  .measure-thumb-solid-mode { left: 20%; top: 91%; }
+}
 </style>
 </head>
-<body>
+<body data-profile-view="lookup">
   <main class="app">
     
 
     <aside>
 <section class="section save-panel data-section personal-measure-data-panel">
-        <h2>個人情報・保存データ</h2>
+        <h2 id="profileScreenTitle">登録者を選択</h2>
         <div class="save-controls">
           <div class="saved-profile-box">
+            <div class="profile-roster-toolbar">
+              <span class="profile-roster-title">登録者名簿</span>
+              <span id="profileRosterCount" class="profile-roster-count">0名</span>
+            </div>
             <div class="save-field">
-              <label for="profileSearch">保存データ検索</label>
+              <label for="profileSearch">名簿を絞り込む</label>
               <div class="profile-search-row">
-                <input id="profileSearch" type="text" placeholder="名前・利き手・投球タイプで検索" aria-label="保存データ検索" />
+                <input id="profileSearch" type="text" placeholder="氏名・ふりがな・登録番号" aria-label="登録者名簿を検索" />
                 <button id="clearProfileSearch" type="button">クリア</button>
               </div>
-            <div id="profileResults" class="profile-results" role="listbox" aria-label="保存データ検索結果"></div>
+            <div class="profile-roster-head" aria-hidden="true">
+              <span>氏名</span><span>利き手</span><span>投球</span><span>更新日</span>
+            </div>
+            <div id="profileResults" class="profile-results" role="listbox" aria-label="登録者名簿"></div>
             <div class="save-field profile-list-field" aria-hidden="true">
               <label for="profileList">保存データ</label>
               <select id="profileList" aria-label="保存データ一覧"></select>
@@ -5881,12 +6332,14 @@ aside > .measure-section .measure-diagram {
             <button id="deleteProfile" class="danger-action" type="button">削除</button>
           </div>
           <div id="profileEditor" class="profile-editor is-hidden">
+            <p class="control-group-note wide">この画面では個人情報のみを登録します。必須項目は氏名です。</p>
+            <h3 class="profile-form-heading">基本情報</h3>
             <div class="save-field name-field">
               <label for="familyName">苗字</label>
               <input id="familyName" type="text" placeholder="例: 山田" aria-label="苗字" />
             </div>
             <div class="save-field name-field">
-              <label for="givenName">氏名</label>
+              <label for="givenName">名前</label>
               <input id="givenName" type="text" placeholder="例: 太郎" aria-label="氏名" />
             </div>
             <div class="save-field hand-field">
@@ -5905,20 +6358,53 @@ aside > .measure-section .measure-diagram {
               </select>
             </div>
             <div id="twoHandThumbUseField" class="save-field hand-field thumb-use-field is-hidden">
-              <label for="twoHandThumbUse">両手サム</label>
+              <label for="twoHandThumbUse">両手投球時のサム</label>
               <select id="twoHandThumbUse">
                 <option value="yes" selected>使用する</option>
                 <option value="no">使用しない</option>
               </select>
             </div>
+            <div class="save-field name-field">
+              <label for="nameKana">ふりがな</label>
+              <input id="nameKana" type="text" placeholder="例: やまだ たろう" />
+            </div>
+            <div class="save-field name-field">
+              <label for="profileCode">登録番号</label>
+              <input id="profileCode" type="text" placeholder="任意" />
+            </div>
+            <h3 class="profile-form-heading">連絡情報</h3>
+            <div class="save-field name-field">
+              <label for="profilePhone">電話番号</label>
+              <input id="profilePhone" type="tel" placeholder="任意" />
+            </div>
+            <div class="save-field name-field">
+              <label for="profileEmail">メールアドレス</label>
+              <input id="profileEmail" type="email" placeholder="任意" />
+            </div>
+            <h3 class="profile-form-heading">メモ</h3>
+            <div class="save-field wide">
+              <label for="profileNotes">個人情報メモ</label>
+              <textarea id="profileNotes" placeholder="希望、注意事項、連絡メモなど"></textarea>
+            </div>
+            <div class="profile-registration-actions">
+              <button id="cancelProfileRegistration" type="button">名簿へ戻る</button>
+              <button id="registerProfile" type="button">登録</button>
+            </div>
+          </div>
+          <div id="profileContextBar" class="profile-context-bar">
+            <div class="profile-context-person">
+              <strong id="activeProfileName">未選択</strong>
+              <span id="activeProfileMeta"></span>
+            </div>
+            <div class="profile-context-actions">
+              <button id="backToProfileLookup" type="button">名簿へ戻る</button>
+              <button id="editActiveProfile" type="button">個人情報を編集</button>
+              <button id="quickSaveProfile" type="button">メジャーシートを保存</button>
+            </div>
           </div>
         </div>
         <p id="saveStatus" class="save-status"></p>
       </section>
-
-
-
-
 
 <section class="section section-wide hole-modeling-panel">
         <h2>メジャーシート詳細</h2>
@@ -6287,37 +6773,6 @@ aside > .measure-section .measure-diagram {
 
       </section>
 
-<section class="section section-wide dual-layout-panel personal-axis-panel">
-        <h2>個人PAP・回転軸情報</h2>
-        <div class="dual-layout-grid pap-grid">
-          <label class="dual-layout-field wide">
-            <span>PAP左右</span>
-            <input id="layoutPapRight" type="range" min="-7" max="7" step="0.03125" value="5" />
-            <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapRight" aria-label="PAP左右">
-              <span class="span-gauge-min"></span>
-              <span class="span-gauge-track"></span>
-              <span class="span-gauge-current"></span>
-              <span class="span-gauge-value"></span>
-              <span class="span-gauge-max"></span>
-            </button>
-          </label>
-          <label class="dual-layout-field wide">
-            <span>PAP上下</span>
-            <input id="layoutPapUp" type="range" min="-3" max="3" step="0.03125" value="0" />
-            <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapUp" aria-label="PAP上下">
-              <span class="span-gauge-min"></span>
-              <span class="span-gauge-track"></span>
-              <span class="span-gauge-current"></span>
-              <span class="span-gauge-value"></span>
-              <span class="span-gauge-max"></span>
-            </button>
-          </label>
-        </div>
-      </section>
-
-
-
-
     </aside>
 
     <section class="right-workspace" aria-label="ボールモデリングと3Dプレビュー">
@@ -6350,16 +6805,11 @@ aside > .measure-section .measure-diagram {
       <section class="section sheet-section measure-section personal-measure-panel">
       <h2>メジャーシート情報</h2>
       <div id="measureDiagram" class="measure-diagram" data-hand="right">
-          <svg viewBox="0 0 1100 760" preserveAspectRatio="none" aria-hidden="true">
-            <defs>
-              <marker id="measureArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-                <path d="M0 0 L8 4 L0 8 Z" fill="#bfe7eb"></path>
-              </marker>
-            </defs>
-            <g fill="none" stroke="#0b0d0f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="520" y1="304" x2="580" y2="304" marker-start="url(#measureArrow)" marker-end="url(#measureArrow)"></line>
-              <line class="thumb-dependent" x1="433" y1="285" x2="520" y2="498" marker-end="url(#measureArrow)"></line>
-              <line class="thumb-dependent" x1="667" y1="285" x2="580" y2="498" marker-end="url(#measureArrow)"></line>
+          <svg id="measureHoleConnectors" class="measure-hole-connectors" aria-hidden="true">
+            <g fill="none">
+              <line data-connector-from="middle" data-connector-to="ring"></line>
+              <line class="thumb-dependent" data-connector-from="middle" data-connector-to="thumb"></line>
+              <line class="thumb-dependent" data-connector-from="ring" data-connector-to="thumb"></line>
             </g>
           </svg>
           <span class="pitch-token left left-cross-left" data-cross="left" data-axis="lateral" data-side="left"><strong></strong><span>L</span></span>
@@ -6382,10 +6832,45 @@ aside > .measure-section .measure-diagram {
           <div id="middleSpanValue" class="sheet-input wide field-main-span thumb-dependent" contenteditable="true" role="textbox" aria-label="メインスパン">4</div>
           <div id="ringSpanOffsetValue" class="sheet-input wide field-offset-span thumb-dependent" contenteditable="true" role="textbox" aria-label="スパン差分">0</div>
           <div id="thumbDiameterValue" class="sheet-input small hole-size field-thumb-hole thumb-dependent" contenteditable="true" role="textbox" aria-label="サム内径">1</div>
+          <label class="measure-thumb-solid-mode thumb-dependent" for="thumbSolidModeSheet">
+            <span>サムソリッド</span>
+            <select id="thumbSolidModeSheet" aria-label="サムソリッドの使用有無">
+              <option value="yes" selected>使用する</option>
+              <option value="no">使用しない</option>
+            </select>
+          </label>
           <div id="thumbSolidValue" class="sheet-input grip field-thumb-solid thumb-dependent" contenteditable="true" role="textbox" aria-label="サムソリッド外径">1 1/4</div>
       </div>
     </section>
       <div class="right-modeling-controls">
+        <section class="section section-wide dual-layout-panel personal-axis-panel">
+          <h2>個人PAP・回転軸情報</h2>
+          <div class="dual-layout-grid pap-grid">
+            <label class="dual-layout-field wide">
+              <span>PAP左右</span>
+              <input id="layoutPapRight" type="range" min="-7" max="7" step="0.03125" value="5" />
+              <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapRight" aria-label="PAP左右">
+                <span class="span-gauge-min"></span>
+                <span class="span-gauge-track"></span>
+                <span class="span-gauge-current"></span>
+                <span class="span-gauge-value"></span>
+                <span class="span-gauge-max"></span>
+              </button>
+            </label>
+            <label class="dual-layout-field wide">
+              <span>PAP上下</span>
+              <input id="layoutPapUp" type="range" min="-3" max="3" step="0.03125" value="0" />
+              <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapUp" aria-label="PAP上下">
+                <span class="span-gauge-min"></span>
+                <span class="span-gauge-track"></span>
+                <span class="span-gauge-current"></span>
+                <span class="span-gauge-value"></span>
+                <span class="span-gauge-max"></span>
+              </button>
+            </label>
+          </div>
+        </section>
+
         <section class="section section-wide dual-layout-panel drill-layout-panel">
         <h2>ドリルレイアウト</h2>
         <div class="dual-layout-grid drill-layout-grid">
@@ -6531,6 +7016,7 @@ aside > .measure-section .measure-diagram {
     const ctx = canvas.getContext("2d");
     const inputs = new Map();
     const STORAGE_KEY = "bowling-drill-layout-profiles-v1";
+    let activeProfileKey = "";
     const BALL_DIAMETER = 8.595;
     const THUMB_SOLID_LENGTH = 2 + 5 / 8;
     const FINGER_GRIP_LENGTH = 1 + 5 / 8;
@@ -6659,6 +7145,12 @@ aside > .measure-section .measure-diagram {
     updateAllGripShapePreviews();
 
     document.querySelector("#thumbSolidMode").addEventListener("change", updateThumbSolidMode);
+    document.querySelector("#thumbSolidModeSheet")?.addEventListener("change", (event) => {
+      const source = document.querySelector("#thumbSolidMode");
+      if (!source) return;
+      source.value = event.target.value;
+      source.dispatchEvent(new Event("change", { bubbles: true }));
+    });
     document.querySelectorAll("select").forEach((select) => {
       if (!["handedness", "thumbSolidMode", "profileList", "bowlingStyle", "twoHandThumbUse"].includes(select.id)) {
         select.addEventListener("change", () => {
@@ -6674,9 +7166,25 @@ aside > .measure-section .measure-diagram {
 
     function setupProfileStorage() {
       renderProfileList();
-      setProfileEditorVisible(false);
+      setProfileView("lookup");
+      const profileBoundaryObserver = new MutationObserver(enforceProfileViewBoundary);
+      const profileAside = document.querySelector(".app > aside");
+      if (profileAside) profileBoundaryObserver.observe(profileAside, { childList: true });
+      if ("ResizeObserver" in window) {
+        const modelViewportObserver = new ResizeObserver((entries) => {
+          const visibleEntry = entries.some((entry) => entry.contentRect.width > 1 && entry.contentRect.height > 1);
+          if (visibleEntry && document.body.dataset.profileView === "measure") requestAnimationFrame(draw);
+        });
+        const modelViewport = document.querySelector(".viewer");
+        if (modelViewport) modelViewportObserver.observe(modelViewport);
+      }
       document.querySelector("#newProfile")?.addEventListener("click", startNewProfile);
       document.querySelector("#saveProfile")?.addEventListener("click", saveCurrentProfile);
+      document.querySelector("#quickSaveProfile")?.addEventListener("click", saveCurrentProfile);
+      document.querySelector("#registerProfile")?.addEventListener("click", registerCurrentProfile);
+      document.querySelector("#cancelProfileRegistration")?.addEventListener("click", cancelProfileRegistration);
+      document.querySelector("#backToProfileLookup")?.addEventListener("click", showProfileLookup);
+      document.querySelector("#editActiveProfile")?.addEventListener("click", editActiveProfile);
       document.querySelector("#profileList")?.addEventListener("change", loadSelectedProfile);
       setupProfileSearch();
       document.querySelector("#deleteProfile")?.addEventListener("click", deleteSelectedProfile);
@@ -6713,6 +7221,74 @@ aside > .measure-section .measure-diagram {
       document.querySelector(".data-section")?.classList.toggle("is-editing", visible);
     }
 
+    function setProfileView(view) {
+      document.body.dataset.profileView = view;
+      enforceProfileViewBoundary();
+      const measuring = view === "measure";
+      const title = document.querySelector("#profileScreenTitle");
+      if (title) title.textContent = view === "lookup"
+        ? "登録者を選択"
+        : view === "register" ? (activeProfileKey ? "個人情報を編集" : "新規個人情報登録") : "対象者";
+      document.querySelector("#profileSaveArea")?.classList.toggle("is-hidden", !measuring);
+      document.querySelector(".data-section")?.classList.toggle("is-editing", view !== "lookup");
+      if (view === "lookup") renderProfileList(activeProfileKey);
+      if (measuring) updateActiveProfileContext();
+      if (measuring) refreshMeasureWorkspace();
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
+
+    function refreshMeasureWorkspace() {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (document.body.dataset.profileView !== "measure") return;
+          updateStickySectionOffsets();
+          resizeCanvas();
+          draw();
+          window.updateMeasureHoleConnectors?.();
+        });
+      });
+    }
+
+    function enforceProfileViewBoundary() {
+      const entryView = document.body.dataset.profileView !== "measure";
+      document.querySelectorAll(".app > aside > :not(.data-section), .right-workspace").forEach((element) => {
+        element.hidden = entryView;
+        element.setAttribute("aria-hidden", entryView ? "true" : "false");
+      });
+    }
+
+    function updateActiveProfileContext() {
+      const profile = readProfiles()[activeProfileKey];
+      const row = profileRosterData(activeProfileKey, profile);
+      const name = document.querySelector("#activeProfileName");
+      const meta = document.querySelector("#activeProfileMeta");
+      if (name) name.textContent = row.displayName || "未選択";
+      if (meta) meta.textContent = `${row.handed} / ${row.style} / 更新 ${row.savedAt}`;
+    }
+
+    function showProfileLookup() {
+      const search = document.querySelector("#profileSearch");
+      if (search) search.value = "";
+      setProfileView("lookup");
+      showSaveStatus("登録者を選択してください。");
+    }
+
+    function cancelProfileRegistration() {
+      if (activeProfileKey && readProfiles()[activeProfileKey]) {
+        setProfileView("measure");
+        showSaveStatus("個人情報の編集を中止しました。");
+      } else {
+        showProfileLookup();
+      }
+    }
+
+    function editActiveProfile() {
+      if (!activeProfileKey || !readProfiles()[activeProfileKey]) return showProfileLookup();
+      document.querySelector("#registerProfile").textContent = "更新";
+      setProfileView("register");
+      showSaveStatus("個人情報を編集中です。");
+    }
+
     function readProfiles() {
       try {
         return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
@@ -6732,7 +7308,7 @@ aside > .measure-section .measure-diagram {
       });
       const selects = {};
       document.querySelectorAll("select").forEach((select) => {
-        if (select.id === "profileList") return;
+        if (["profileList", "handedness", "bowlingStyle", "twoHandThumbUse"].includes(select.id)) return;
         selects[select.id] = select.value;
       });
       const checks = {};
@@ -6744,41 +7320,75 @@ aside > .measure-section .measure-diagram {
         catalogs[input.id] = input.value;
       });
       const person = currentProfilePerson();
-      const existingProfile = readProfiles()[person.displayName || ""];
-      const changeEntry = buildChangeEntry(existingProfile, { person, ranges, selects, checks, catalogs });
-      return {
-        version: 2,
+      const storedProfiles = readProfiles();
+      const existingProfile = storedProfiles[activeProfileKey] || storedProfiles[person.displayName || ""];
+      const nextProfile = {
+        version: 3,
         savedAt: new Date().toISOString(),
         person,
-        changeLog: existingProfile?.changeLog ? [...existingProfile.changeLog, changeEntry] : [changeEntry],
-        ranges,
-        selects,
-        checks,
-        catalogs
+        measure: { ranges, selects, checks, catalogs }
       };
+      const changeEntry = buildChangeEntry(existingProfile, nextProfile);
+      nextProfile.changeLog = existingProfile?.changeLog ? [...existingProfile.changeLog, changeEntry] : [changeEntry];
+      return nextProfile;
     }
 
     function saveCurrentProfile() {
+      persistCurrentProfile(false);
+    }
+
+    function registerCurrentProfile() {
+      persistCurrentProfile(true);
+    }
+
+    function persistCurrentProfile(isRegistration) {
       const person = currentProfilePerson();
-      const name = person.displayName || `layout-${new Date().toLocaleString("ja-JP")}`;
+      const name = person.displayName;
+      if (!name) {
+        document.querySelector("#familyName")?.focus();
+        return showSaveStatus("苗字または名前を入力してください。");
+      }
       const profiles = readProfiles();
-      profiles[name] = collectCurrentProfileValues();
+      if (!activeProfileKey && profiles[name]) {
+        return showSaveStatus("同じ氏名の登録があります。名簿から選択してください。");
+      }
+      const previousKey = activeProfileKey;
+      const existingProfile = profiles[previousKey] || profiles[name];
+      if (isRegistration) {
+        const nextProfile = {
+          version: 3,
+          savedAt: new Date().toISOString(),
+          person,
+          measure: existingProfile ? profileMeasure(existingProfile) : null
+        };
+        const changeEntry = buildChangeEntry(existingProfile, nextProfile);
+        nextProfile.changeLog = existingProfile?.changeLog ? [...existingProfile.changeLog, changeEntry] : [changeEntry];
+        profiles[name] = nextProfile;
+      } else {
+        profiles[name] = collectCurrentProfileValues();
+      }
+      if (previousKey && previousKey !== name) delete profiles[previousKey];
       writeProfiles(profiles);
+      activeProfileKey = name;
       renderProfileList(name);
       clearChangeFields();
-      showSaveStatus(`保存しました: ${name}`);
+      updateActiveProfileContext();
+      setProfileView("measure");
+      showSaveStatus(`${isRegistration ? "登録" : "保存"}しました: ${name}`);
     }
 
     function startNewProfile() {
+      activeProfileKey = "";
       document.querySelector("#profileList").value = "";
       const search = document.querySelector("#profileSearch");
       if (search) search.value = "";
       clearProfileNameFields();
       clearChangeFields();
       resetLayoutInputsToDefaults();
-      setProfileEditorVisible(true);
+      document.querySelector("#registerProfile").textContent = "登録";
+      setProfileView("register");
       renderProfileList();
-      showSaveStatus("新規データを作成中です。入力後に保存してください。");
+      showSaveStatus("新規個人情報を登録してください。");
     }
 
     function loadSelectedProfile() {
@@ -6792,23 +7402,30 @@ aside > .measure-section .measure-diagram {
       if (!profile) return showSaveStatus("保存データが見つかりません");
       const list = document.querySelector("#profileList");
       if (list) list.value = name;
+      activeProfileKey = name;
       applyProfileValues(profile);
       setProfileNameFields(profile, name);
       clearChangeFields();
-      setProfileEditorVisible(true);
+      setProfileView("measure");
       renderProfileList(name);
-      showSaveStatus(`読み込みました: ${name}`);
+      showSaveStatus(`メジャーシートを開きました: ${name}`);
     }
 
     function deleteSelectedProfile() {
       const list = document.querySelector("#profileList");
       const name = list?.value;
       if (!name) return showSaveStatus("削除するデータを選択してください");
+      const profile = readProfiles()[name];
+      const label = profileDisplayName(name, profile);
+      if (!window.confirm(`${label} の保存データを削除します。\nこの操作は元に戻せません。`)) {
+        return showSaveStatus("削除を中止しました。");
+      }
       const profiles = readProfiles();
       delete profiles[name];
       writeProfiles(profiles);
+      if (activeProfileKey === name) activeProfileKey = "";
       renderProfileList();
-      setProfileEditorVisible(false);
+      setProfileView("lookup");
       clearProfileNameFields();
       clearChangeFields();
       showSaveStatus(`削除しました: ${name}`);
@@ -6823,7 +7440,7 @@ aside > .measure-section .measure-diagram {
       });
       const query = normalizeSearchText(document.querySelector("#profileSearch")?.value || "");
       const filteredNames = query
-        ? names.filter((name) => normalizeSearchText(`${name} ${profileOptionLabel(name, profiles[name])}`).includes(query))
+        ? names.filter((name) => normalizeSearchText(profileSearchText(name, profiles[name])).includes(query))
         : names;
       list.innerHTML = [
         `<option value="">選択してください</option>`,
@@ -6834,33 +7451,79 @@ aside > .measure-section .measure-diagram {
       const selectedStillExists = Boolean(list.value && names.includes(list.value));
       document.querySelector("#deleteProfile").disabled = !selectedStillExists;
       renderProfileResults(filteredNames, profiles, query, selectedName);
+      const rosterCount = document.querySelector("#profileRosterCount");
+      if (rosterCount) rosterCount.textContent = query
+        ? `${filteredNames.length} / ${names.length}名`
+        : `${names.length}名`;
       const note = document.querySelector("#profileEmptyNote");
       if (note) {
-        if (!hasProfiles) note.textContent = "保存済みデータはありません。検索結果がなければ新規作成できます。";
+        if (!hasProfiles) note.textContent = "登録者はいません。「新規作成」から最初のデータを登録してください。";
         else if (query) note.textContent = `${names.length} 件中 ${filteredNames.length} 件を表示しています。`;
-        else note.textContent = `${names.length} 件の保存データがあります。`;
+        else note.textContent = "名簿から登録者を選択すると、保存済みのメジャー情報を読み込みます。";
       }
     }
 
     function renderProfileResults(names, profiles, query, selectedName = "") {
       const results = document.querySelector("#profileResults");
       if (!results) return;
-      if (!query) {
-        results.innerHTML = "";
-        return;
-      }
       if (!names.length) {
-        results.innerHTML = `<button type="button" class="profile-result-item is-create" data-action="create">該当なし - 新規作成へ進む</button>`;
+        results.innerHTML = query
+          ? `<button type="button" class="profile-result-item is-create" data-action="create">該当する登録者はいません - 新規作成へ進む</button>`
+          : `<button type="button" class="profile-result-item is-create" data-action="create">登録者はいません - 新規作成へ進む</button>`;
         return;
       }
       results.innerHTML = names.map((name) => {
+        const profile = profiles[name];
+        const row = profileRosterData(name, profile);
         const selected = name === selectedName || name === document.querySelector("#profileList")?.value;
-        return `<button type="button" class="profile-result-item${selected ? " is-selected" : ""}" data-profile-name="${escapeHtml(name)}">${escapeHtml(profileOptionLabel(name, profiles[name]))}</button>`;
+        return `<button type="button" role="option" aria-selected="${selected}" class="profile-result-item${selected ? " is-selected" : ""}" data-profile-name="${escapeHtml(name)}">
+          <span class="profile-result-name">${escapeHtml(row.displayName)}</span>
+          <span class="profile-result-meta">${escapeHtml(row.handed)}</span>
+          <span class="profile-result-meta">${escapeHtml(row.style)}</span>
+          <span class="profile-result-date">${escapeHtml(row.savedAt)}</span>
+        </button>`;
       }).join("");
+    }
+
+    function profileDisplayName(name, profile) {
+      const person = profile?.person || {};
+      return [person.familyName, person.givenName].filter(Boolean).join(" ").trim() || name;
+    }
+
+    function profileRosterData(name, profile) {
+      const saved = profile?.savedAt ? new Date(profile.savedAt) : null;
+      const validDate = saved && !Number.isNaN(saved.getTime());
+      const selects = profileMeasure(profile)?.selects || {};
+      const person = profile?.person || {};
+      const handedness = person.handedness || selects.handedness;
+      const bowlingStyle = person.bowlingStyle || selects.bowlingStyle;
+      return {
+        displayName: profileDisplayName(name, profile),
+        handed: handedness === "left" ? "左投げ" : handedness === "right" ? "右投げ" : "未設定",
+        style: bowlingStyle === "thumbless"
+          ? "サムレス"
+          : bowlingStyle === "twoHand" ? "両手" : bowlingStyle === "oneHand" ? "片手" : "未設定",
+        savedAt: validDate
+          ? new Intl.DateTimeFormat("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" }).format(saved)
+          : "--"
+      };
     }
 
     function normalizeSearchText(value) {
       return String(value).toLocaleLowerCase("ja-JP").replace(/\s+/g, " ").trim();
+    }
+
+    function profileSearchText(name, profile) {
+      const person = profile?.person || {};
+      return [
+        name,
+        profileOptionLabel(name, profile),
+        person.nameKana,
+        person.profileCode,
+        person.phone,
+        person.email,
+        person.notes
+      ].filter(Boolean).join(" ");
     }
 
     function currentProfilePerson() {
@@ -6869,6 +7532,14 @@ aside > .measure-section .measure-diagram {
       return {
         familyName,
         givenName,
+        nameKana: (document.querySelector("#nameKana")?.value || "").trim(),
+        profileCode: (document.querySelector("#profileCode")?.value || "").trim(),
+        phone: (document.querySelector("#profilePhone")?.value || "").trim(),
+        email: (document.querySelector("#profileEmail")?.value || "").trim(),
+        notes: (document.querySelector("#profileNotes")?.value || "").trim(),
+        handedness: selectValue("handedness") || "right",
+        bowlingStyle: selectValue("bowlingStyle") || "oneHand",
+        twoHandThumbUse: selectValue("twoHandThumbUse") || "yes",
         displayName: [familyName, givenName].filter(Boolean).join(" ").trim()
       };
     }
@@ -6877,6 +7548,21 @@ aside > .measure-section .measure-diagram {
       const person = profile.person || {};
       const familyName = document.querySelector("#familyName");
       const givenName = document.querySelector("#givenName");
+      const extraFields = {
+        nameKana: "#nameKana",
+        profileCode: "#profileCode",
+        phone: "#profilePhone",
+        email: "#profileEmail",
+        notes: "#profileNotes"
+      };
+      Object.entries(extraFields).forEach(([key, selector]) => {
+        const field = document.querySelector(selector);
+        if (field) field.value = person[key] || "";
+      });
+      setSelectValue("handedness", person.handedness || profile.selects?.handedness || "right");
+      setSelectValue("bowlingStyle", person.bowlingStyle || profile.selects?.bowlingStyle || "oneHand");
+      setSelectValue("twoHandThumbUse", person.twoHandThumbUse || profile.selects?.twoHandThumbUse || "yes");
+      updateBowlingStyleMode();
       if (person.familyName || person.givenName) {
         if (familyName) familyName.value = person.familyName || "";
         if (givenName) givenName.value = person.givenName || "";
@@ -6892,6 +7578,10 @@ aside > .measure-section .measure-diagram {
       const givenName = document.querySelector("#givenName");
       if (familyName) familyName.value = "";
       if (givenName) givenName.value = "";
+      ["#nameKana", "#profileCode", "#profilePhone", "#profileEmail", "#profileNotes"].forEach((selector) => {
+        const field = document.querySelector(selector);
+        if (field) field.value = "";
+      });
     }
 
     function clearChangeFields() {
@@ -6915,16 +7605,32 @@ aside > .measure-section .measure-diagram {
       const changes = [];
       collectDiff(changes, "苗字", previousProfile.person?.familyName, nextProfile.person?.familyName);
       collectDiff(changes, "氏名", previousProfile.person?.givenName, nextProfile.person?.givenName);
-      Object.keys(nextProfile.selects || {}).forEach((id) => {
-        collectDiff(changes, id, previousProfile.selects?.[id], nextProfile.selects?.[id]);
+      const previousMeasure = profileMeasure(previousProfile) || {};
+      const nextMeasure = profileMeasure(nextProfile) || {};
+      Object.keys(nextMeasure.selects || {}).forEach((id) => {
+        collectDiff(changes, id, previousMeasure.selects?.[id], nextMeasure.selects?.[id]);
       });
-      Object.keys(nextProfile.ranges || {}).forEach((id) => {
-        collectDiff(changes, id, previousProfile.ranges?.[id], nextProfile.ranges?.[id]);
+      Object.keys(nextMeasure.ranges || {}).forEach((id) => {
+        collectDiff(changes, id, previousMeasure.ranges?.[id], nextMeasure.ranges?.[id]);
       });
-      Object.keys(nextProfile.catalogs || {}).forEach((id) => {
-        collectDiff(changes, id, previousProfile.catalogs?.[id], nextProfile.catalogs?.[id]);
+      Object.keys(nextMeasure.catalogs || {}).forEach((id) => {
+        collectDiff(changes, id, previousMeasure.catalogs?.[id], nextMeasure.catalogs?.[id]);
       });
       return changes;
+    }
+
+    function profileMeasure(profile) {
+      if (!profile) return null;
+      if (Object.prototype.hasOwnProperty.call(profile, "measure")) return profile.measure;
+      if (profile.ranges || profile.selects || profile.checks || profile.catalogs) {
+        return {
+          ranges: profile.ranges || {},
+          selects: profile.selects || {},
+          checks: profile.checks || {},
+          catalogs: profile.catalogs || {}
+        };
+      }
+      return null;
     }
 
     function collectDiff(changes, field, before, after) {
@@ -6960,26 +7666,20 @@ aside > .measure-section .measure-diagram {
     }
 
     function profileOptionLabel(name, profile) {
-      const person = profile?.person || {};
-      const displayName = [person.familyName, person.givenName].filter(Boolean).join(" ").trim() || name;
-      const handed = profile?.selects?.handedness === "left" ? "左投げ" : "右投げ";
-      const styleLabel = profile?.selects?.bowlingStyle === "thumbless"
-        ? "サムレス"
-        : profile?.selects?.bowlingStyle === "twoHand"
-          ? "両手"
-          : "片手";
-      return `${displayName} / ${handed} / ${styleLabel}`;
+      const row = profileRosterData(name, profile);
+      return `${row.displayName} / ${row.handed} / ${row.style}`;
     }
 
     function applyProfileValues(profile) {
-      const selects = profile.selects || {};
+      const measure = profileMeasure(profile) || {};
+      const selects = measure.selects || {};
       document.querySelectorAll("select").forEach((select) => {
         if (select.id && select.id !== "profileList") setSelectValue(select.id, selects[select.id]);
       });
       ["handedness", "bowlingStyle", "twoHandThumbUse", "thumbSolidMode", "thumbSolid", "middleGripType", "ringGripType", "middleGripOuter", "ringGripOuter", "layoutCoreType"].forEach((id) => {
         setSelectValue(id, selects[id]);
       });
-      const checks = profile.checks || {};
+      const checks = measure.checks || {};
       Object.entries(checks).forEach(([id, checked]) => {
         const checkbox = document.querySelector(`#${id}`);
         if (checkbox?.type === "checkbox") checkbox.checked = Boolean(checked);
@@ -6989,14 +7689,14 @@ aside > .measure-section .measure-diagram {
         setSelectValue(id, selects[id]);
       });
       document.querySelector("#measureDiagram").dataset.hand = selectValue("handedness");
-      const ranges = profile.ranges || {};
+      const ranges = measure.ranges || {};
       Object.entries(ranges).forEach(([id, raw]) => {
         const range = inputs.get(id);
         if (!range) return;
         range.value = clamp(snapToStep(raw, range.step), Number(range.min), Number(range.max));
         setValueOutput(range, document.querySelector(`#${id}Value`));
       });
-      Object.entries(profile.catalogs || {}).forEach(([id, raw]) => {
+      Object.entries(measure.catalogs || {}).forEach(([id, raw]) => {
         const input = document.querySelector(`#${id}`);
         if (!input) return;
         input.value = raw;
@@ -8016,6 +8716,8 @@ aside > .measure-section .measure-diagram {
 
     function updateThumbSolidMode() {
       const useSolid = document.querySelector("#thumbSolidMode").value !== "no";
+      const sheetMode = document.querySelector("#thumbSolidModeSheet");
+      if (sheetMode) sheetMode.value = useSolid ? "yes" : "no";
       const solidSelect = document.querySelector("#thumbSolid");
       const field = document.querySelector("#thumbSolidValue");
       if (solidSelect) solidSelect.disabled = !useSolid;
@@ -8192,12 +8894,13 @@ aside > .measure-section .measure-diagram {
           insertLength: thumbSize.length,
           spanReference: thumbSize.spanReference,
           usesBare: false,
+          pitchRole: "thumb",
           drillDepth: thumbDrillDepth,
           color: "#f1c75f",
-          // Pitch axis contract: see outputs/PROJECT_NOTES.md and outputs/HANDOFF.md.
-          // Do not remap these from the UI labels alone; the model basis is intentionally rotated.
-          lateral: pitchAxisValue("thumbVerticalAxis"),
-          vertical: -pitchAxisValue("thumbLateralAxis"),
+          // UI values map directly to the transported local grip basis.
+          // lateral: side pitch; vertical: Forward/Reverse pitch.
+          lateral: pitchAxisValue("thumbLateralAxis"),
+          vertical: pitchAxisValue("thumbVerticalAxis"),
           lateralDisplay: pitchAxisValue("thumbLateralAxis"),
           verticalDisplay: pitchAxisValue("thumbVerticalAxis")
         } : null,
@@ -8214,11 +8917,11 @@ aside > .measure-section .measure-diagram {
           gripType: middleSize.type,
           spanReference: middleSize.spanReference,
           usesBare: middleSize.usesBare,
+          pitchRole: "finger",
           drillDepth: middleDrillDepth,
           color: "#69b8ff",
-          // Finger Forward bites inward; Reverse opens outward in the saved geometry convention.
-          lateral: -pitchAxisValue("middleVerticalAxis"),
-          vertical: -pitchAxisValue("middleLateralAxis"),
+          lateral: pitchAxisValue("middleLateralAxis"),
+          vertical: pitchAxisValue("middleVerticalAxis"),
           lateralDisplay: pitchAxisValue("middleLateralAxis"),
           verticalDisplay: pitchAxisValue("middleVerticalAxis")
         },
@@ -8235,10 +8938,11 @@ aside > .measure-section .measure-diagram {
           gripType: ringSize.type,
           spanReference: ringSize.spanReference,
           usesBare: ringSize.usesBare,
+          pitchRole: "finger",
           drillDepth: ringDrillDepth,
           color: "#f179a5",
-          lateral: -pitchAxisValue("ringVerticalAxis"),
-          vertical: -pitchAxisValue("ringLateralAxis"),
+          lateral: pitchAxisValue("ringLateralAxis"),
+          vertical: pitchAxisValue("ringVerticalAxis"),
           lateralDisplay: pitchAxisValue("ringLateralAxis"),
           verticalDisplay: pitchAxisValue("ringVerticalAxis")
         },
@@ -9967,24 +10671,48 @@ aside > .measure-section .measure-diagram {
       ctx.closePath();
     }
 
+    function transportedPitchBasis(start, data, hole) {
+      const outward = normalize(start);
+      const source = data.usesDualAngleLayout
+        ? data.dualLayout.layoutBasis
+        : { right: { x: 1, y: 0, z: 0 }, up: { x: 0, y: 1, z: 0 } };
+      // Permanent F/R convention:
+      // thumb Forward: thumb -> finger pair (+grip up)
+      // finger Forward: finger pair -> grip center (-grip up)
+      // UI Forward remains positive; the anatomical basis changes by role.
+      const forwardSign = hole?.pitchRole === "finger" ? -1 : 1;
+      const right = tangentAtSurface(start, source.right);
+      let forward = tangentAtSurface(start, scalePoint(source.up, forwardSign));
+      // Gram-Schmidt orthogonalization preserves the anatomical F/R sign.
+      forward = normalize(sub(forward, scalePoint(right, dot(forward, right))));
+      return { outward, inward: scalePoint(outward, -1), right, forward };
+    }
+
+    function pitchAimPoint(start, hole, data) {
+      const basis = transportedPitchBasis(start, data, hole);
+      const ballCenter = { x: 0, y: 0, z: 0 };
+      return add(
+        ballCenter,
+        add(
+          scalePoint(basis.right, Number(hole.lateral) || 0),
+          scalePoint(basis.forward, Number(hole.vertical) || 0)
+        )
+      );
+    }
+
     function drillSegment(hole, data, radiusOverride = null) {
       const start = toSphere(hole.x, hole.y, data.ballRadius);
-      const inward = normalize({ x: -start.x, y: -start.y, z: -start.z });
-      const right = normalize(cross(inward, { x: 0, y: 1, z: 0 }));
-      const forward = normalize(cross(right, inward));
       const drillDepth = hole.drillDepth ?? data.drillDepth;
-      const pitchEnd = {
-        x: start.x + inward.x * drillDepth + right.x * hole.lateral + forward.x * hole.vertical,
-        y: start.y + inward.y * drillDepth + right.y * hole.lateral + forward.y * hole.vertical,
-        z: start.z + inward.z * drillDepth + right.z * hole.lateral + forward.z * hole.vertical
-      };
-      const axis = normalize(sub(pitchEnd, start));
+      // Pitch fixes the axis through an aim point in the center-depth plane.
+      // Depth only chooses the endpoint along that already-fixed unit axis.
+      const aim = pitchAimPoint(start, hole, data);
+      const axis = normalize(sub(aim, start));
       const radius = radiusOverride ?? hole.radius;
       const pointLength = Math.min(Math.max(radius * 0.72, 0.22), drillDepth * 0.35);
       const cylinderLength = Math.max(0, drillDepth - pointLength);
       const cylinderEnd = addScaled(start, axis, cylinderLength);
       const tip = addScaled(start, axis, drillDepth);
-      return { start, cylinderEnd, tip, axis, radius, pointLength, cylinderLength, ballRadius: data.ballRadius, hole };
+      return { start, aim, cylinderEnd, tip, axis, radius, pointLength, cylinderLength, ballRadius: data.ballRadius, hole };
     }
 
     function drawTrajectory(hole, data, cx, cy, scale) {
@@ -11812,6 +12540,87 @@ aside > .measure-section .measure-diagram {
   };
 
   setupVisibleDepthControls();
+})();
+
+(() => {
+  const diagram = document.getElementById("measureDiagram");
+  const mode = diagram?.querySelector(".measure-thumb-solid-mode");
+  const solidControl = diagram?.querySelector(".measure-sheet-control.field-thumb-solid");
+  const solidCaption = diagram?.querySelector(".measure-sheet-caption.field-thumb-solid");
+  const depth = diagram?.querySelector(".measure-depth-thumb");
+  if (!diagram || !mode || !solidControl || !solidCaption || !depth) return;
+  const group = document.createElement("div");
+  group.className = "thumb-accessory-group thumb-dependent";
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", "サムソリッドとサム深さ");
+  group.append(mode, solidCaption, solidControl, depth);
+  diagram.appendChild(group);
+})();
+
+(() => {
+  const diagram = document.getElementById("measureDiagram");
+  const svg = document.getElementById("measureHoleConnectors");
+  if (!diagram || !svg) return;
+
+  const selectorByHole = {
+    middle: ".measure-sheet-control.field-middle-hole",
+    ring: ".measure-sheet-control.field-ring-hole",
+    thumb: ".measure-sheet-control.field-thumb-hole"
+  };
+
+  const circleGeometry = (hole, diagramRect) => {
+    const element = diagram.querySelector(selectorByHole[hole]);
+    if (!element || element.getClientRects().length === 0) return null;
+    const rect = element.getBoundingClientRect();
+    return {
+      x: rect.left - diagramRect.left + rect.width / 2,
+      y: rect.top - diagramRect.top + rect.height / 2,
+      radius: Math.max(0, Math.min(rect.width, rect.height) / 2)
+    };
+  };
+
+  const circleEdgeSegment = (from, to) => {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const length = Math.hypot(dx, dy) || 1;
+    const ux = dx / length;
+    const uy = dy / length;
+    return {
+      x1: from.x + ux * from.radius,
+      y1: from.y + uy * from.radius,
+      x2: to.x - ux * to.radius,
+      y2: to.y - uy * to.radius
+    };
+  };
+
+  const updateMeasureHoleConnectors = () => {
+    const diagramRect = diagram.getBoundingClientRect();
+    if (diagramRect.width <= 1 || diagramRect.height <= 1) return;
+    svg.setAttribute("viewBox", `0 0 ${diagramRect.width} ${diagramRect.height}`);
+    document.querySelectorAll("#measureHoleConnectors line").forEach((line) => {
+      const from = circleGeometry(line.dataset.connectorFrom, diagramRect);
+      const to = circleGeometry(line.dataset.connectorTo, diagramRect);
+      if (!from || !to) {
+        line.style.visibility = "hidden";
+        return;
+      }
+      line.style.visibility = "visible";
+      const segment = circleEdgeSegment(from, to);
+      Object.entries(segment).forEach(([name, value]) => line.setAttribute(name, value.toFixed(2)));
+    });
+  };
+
+  window.updateMeasureHoleConnectors = updateMeasureHoleConnectors;
+  if ("ResizeObserver" in window) {
+    const connectorObserver = new ResizeObserver(() => requestAnimationFrame(updateMeasureHoleConnectors));
+    connectorObserver.observe(diagram);
+    Object.values(selectorByHole).forEach((selector) => {
+      const circle = diagram.querySelector(selector);
+      if (circle) connectorObserver.observe(circle);
+    });
+  }
+  window.addEventListener("resize", updateMeasureHoleConnectors);
+  requestAnimationFrame(updateMeasureHoleConnectors);
 })();
 </script>
 </body>
