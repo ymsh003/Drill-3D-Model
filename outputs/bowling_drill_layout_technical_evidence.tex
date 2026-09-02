@@ -1,0 +1,526 @@
+% !TeX program = tectonic
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{fontspec}
+\usepackage{xeCJK}
+% Load an OFL-licensed Japanese font from the repository so that Tectonic does
+% not depend on the host's Fontconfig database or proprietary system fonts.
+\setCJKmainfont[
+  Path=./fonts/noto-serif-jp/,
+  BoldFont=NotoSerifJP-wght.ttf
+]{NotoSerifJP-wght.ttf}
+\usepackage[margin=22mm]{geometry}
+\usepackage{amsmath,amssymb,bm,mathtools}
+\usepackage{booktabs,longtable,array,tabularx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{microtype}
+
+\definecolor{navy}{HTML}{17365D}
+\definecolor{blue}{HTML}{2F75B5}
+\definecolor{pale}{HTML}{EAF2F8}
+\definecolor{warn}{HTML}{9C5700}
+\hypersetup{colorlinks=true,linkcolor=navy,urlcolor=blue,citecolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlist{nosep,leftmargin=2em}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{ボウリングボール・ドリルレイアウト技術資料}
+\rhead{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\mat}[1]{\bm{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\unit}[1]{\,\mathrm{#1}}
+
+\title{\textbf{PAPを基準とするドリルレイアウトの物理評価}\\
+\large 重心・慣性テンソル・軸移動・レーン摩擦を結ぶ計算仕様}
+\author{技術検討版（Tectonic / LaTeX）}
+\date{2026年9月}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+本資料は、穴あけ前に測定したボウラーの PAP（Positive Axis Point）を出発点として、候補レイアウトが穴あけ後の質量特性と投球中の運動へどう作用するかを、計算可能な形に整理する。
+中心となる評価量は、穴で除去される質量、穴あけ後の重心、慣性テンソル、主慣性半径、PAP 軸まわりの慣性、接触点の滑り速度、および軸移動である。
+Dual Angle Layout はコアの向きを指定する\emph{幾何学的入力}であり、それ自体がボールモーションを一意に決める物理法則ではない。表面、カバーストック、投球条件、オイル分布を含む運動方程式を通して初めて、用途との適合性を比較できる。
+\end{abstract}
+
+\section{結論を先に示す}
+
+実装上の最重要点は、レイアウト名や角度を直接「曲がり量」に変換しないことである。計算は次の順序で行う。
+
+\begin{enumerate}
+  \item PAP、リリース速度、回転数、軸回転角、軸チルトと、ボールの未ドリル質量特性を入力する。
+  \item Dual Angle の三つの値から、Pin、PSA/MB、穴軸を球面上に配置する。
+  \item 各穴が除去する質量と慣性を差し引き、穴あけ後の重心と慣性テンソルを再計算する。
+  \item レーン上の並進・回転運動を時間積分し、滑り、読み始め、軸移動、ブレークポイント、入射角などを求める。
+  \item 複数のオイル条件と PAP 測定誤差に対して感度解析し、最適値ではなく堅牢な候補群を提示する。
+\end{enumerate}
+
+\fcolorbox{navy}{pale}{\parbox{0.94\linewidth}{
+\textbf{重要な区別：}
+質量保存、重心、慣性テンソル、剛体の運動方程式は物理式から直接計算できる。一方、「このレイアウトなら何枚曲がるか」は、摩擦係数やオイル移動を含む境界条件なしには決まらない。Dual Angle の一般的説明は候補探索の事前知識として使い、最終判断は計算結果と実投球で検証する。
+}}
+
+\section{記号、座標系、入力データ}
+
+ボール中心を原点 $O$ とするボール固定座標を用いる。未ドリル状態の主慣性軸を
+$\vect e_1,\vect e_2,\vect e_3$、その慣性モーメントを
+$I_1\le I_2\le I_3$ とする。レーン固定座標は、前方を $x$、横方向を $y$、鉛直上向きを $z$ とする。
+
+球面上の点は単位ベクトル $\vect p\in\R^3$ で表す。緯度に相当する角 $\phi$ と経度に相当する角 $\lambda$ を用いれば、
+\begin{equation}
+ \vect p(\phi,\lambda)=
+ \begin{bmatrix}
+ \cos\phi\cos\lambda & \cos\phi\sin\lambda & \sin\phi
+ \end{bmatrix}^{\mathsf T}.
+\end{equation}
+半径 $R$ の球面上の位置は $\vect r=R\vect p$ である。二点 $\vect p,\vect q$ 間の大円距離は
+\begin{equation}
+ d_{\mathrm{geo}}(\vect p,\vect q)
+ =R\cos^{-1}\!\left(\operatorname{clip}(\vect p^{\mathsf T}\vect q,-1,1)\right).
+ \label{eq:geodesic}
+\end{equation}
+したがって Pin--PAP 距離は平面距離ではなく、式\eqref{eq:geodesic}で評価する。
+
+最低限必要な入力を表\ref{tab:inputs}に示す。
+
+\begin{longtable}{p{0.24\linewidth}p{0.31\linewidth}p{0.36\linewidth}}
+\caption{必要入力と用途}\label{tab:inputs}\\
+\toprule
+分類 & 入力 & 用途・注意点\\
+\midrule
+\endfirsthead
+\toprule
+分類 & 入力 & 用途・注意点\\
+\midrule
+\endhead
+ボウラー & PAP、球速、回転数、軸回転角、軸チルト & PAP は初期回転軸を球面へ結び付ける。測定誤差も保存する。\\
+未ドリルボール & 質量、直径、$RG_{\rm low},RG_{\rm int},RG_{\rm high}$、Pin と PSA の方向 & カタログ値だけでなく、個体差を扱える入力欄が望ましい。\\
+内部構造 & カバー、フィラー、コアの形状と密度 & 穴がどの材料を通るかで除去質量が変わる。平均密度だけの計算は一次近似。\\
+穴 & 入口、方向、直径、深さ、先端形状 & フィンガー、サム、バランスホール等を別々の除去体として扱う。\\
+レーン & 長さ方向・横方向・時間に依存するオイル量、基材、温湿度 & 単一の摩擦係数で全レーンを表すことはできない。\\
+表面 & カバーストック、表面粗さ、ポリッシュ、使用履歴 & レイアウト効果と分離して比較する。\\
+\bottomrule
+\end{longtable}
+
+\section{穴あけによる質量と重心の変化}
+
+\subsection{除去質量}
+
+穴 $i$ が占める体積を $V_i$、位置依存密度を $\rho(\vect r)$ とすると、除去質量とその重心は
+\begin{align}
+ m_i &= \int_{V_i}\rho(\vect r)\dd V,\\
+ \vect c_i &= \frac{1}{m_i}\int_{V_i}\vect r\,\rho(\vect r)\dd V.
+ \label{eq:holemass}
+\end{align}
+密度一定、半径 $a_i$、円筒長 $L_i$ の単純な穴なら
+\begin{equation}
+ m_i=\rho\pi a_i^2L_i,
+ \qquad
+ \vect c_i=\vect s_i+\frac{L_i}{2}\vect u_i,
+\end{equation}
+ここで $\vect s_i$ は円筒開始点、$\vect u_i$ は穴の奥へ向かう単位ベクトルである。ドリル先端を高さ $h_i$ の円錐で近似する場合は
+\begin{equation}
+ V_{\rm tip}=\frac{1}{3}\pi a_i^2h_i,
+ \qquad
+ \vect c_{\rm tip}=\vect s_{\rm base}+\frac{h_i}{4}\vect u_i.
+\end{equation}
+
+実球では穴がカバー、フィラー、コアを横切るため、式\eqref{eq:holemass}を材料ごとの区間に分割するか、CAD メッシュの各要素を積分する必要がある。平均密度モデルは、レイアウト比較の初期スクリーニングには使えるが、個別ボールの精密値とはみなさない。
+
+\subsection{穴あけ後の重心}
+
+未ドリル質量を $M_0$、重心を $\vect c_0$ とすれば、穴あけ後は
+\begin{align}
+ M &= M_0-\sum_i m_i,\\
+ \vect c &=
+ \frac{M_0\vect c_0-\sum_i m_i\vect c_i}{M}.
+ \label{eq:newcom}
+\end{align}
+式\eqref{eq:newcom}が示すのは、重心が穴の反対側へ移るということである。ただし、ボールモーションを決めるのは重心位置だけではない。除去位置によって慣性テンソルの非対角成分も変わり、主軸そのものが回転する。
+
+\section{慣性テンソルと主慣性半径}
+
+\subsection{穴の慣性を差し引く}
+
+任意の体積の、原点 $O$ まわりの慣性テンソルは
+\begin{equation}
+ \mat I_O=\int_V\rho(\vect r)
+ \left[(\vect r^{\mathsf T}\vect r)\mat 1_3-\vect r\vect r^{\mathsf T}\right]\dd V.
+ \label{eq:inertiatensor}
+\end{equation}
+円筒軸を局所 $z$ 軸とした、重心まわりの中実円筒のテンソルは
+\begin{equation}
+ \mat I_{C,\rm cyl}=
+ \operatorname{diag}\!\left(
+ \frac{m(3a^2+L^2)}{12},
+ \frac{m(3a^2+L^2)}{12},
+ \frac{ma^2}{2}
+ \right).
+\end{equation}
+局所座標からボール座標への回転行列を $\mat Q_i$、原点から穴重心までを $\vect d_i$ とすると、平行軸の定理より
+\begin{equation}
+ \mat I_{O,i}=\mat Q_i\mat I_{C,i}\mat Q_i^{\mathsf T}
+ +m_i\left[(\vect d_i^{\mathsf T}\vect d_i)\mat 1_3-\vect d_i\vect d_i^{\mathsf T}\right].
+ \label{eq:parallel}
+\end{equation}
+穴は「追加物」ではなく「除去物」なので、未ドリルテンソルから差し引く。
+\begin{equation}
+ \mat I_{O,\rm drilled}=\mat I_{O,0}-\sum_i\mat I_{O,i}.
+\end{equation}
+さらに式\eqref{eq:newcom}の新重心へ原点を移す。
+\begin{equation}
+ \mat I_C=\mat I_{O,\rm drilled}
+ -M\left[(\vect c^{\mathsf T}\vect c)\mat 1_3-\vect c\vect c^{\mathsf T}\right].
+ \label{eq:shiftcom}
+\end{equation}
+
+\subsection{主軸、RG、Differential}
+
+対称行列 $\mat I_C$ の固有値問題
+\begin{equation}
+ \mat I_C\vect q_k=\lambda_k\vect q_k,
+ \qquad \lambda_1\le\lambda_2\le\lambda_3
+ \label{eq:eigen}
+\end{equation}
+を解くと、$\vect q_k$ が穴あけ後の主慣性軸、$\lambda_k$ が主慣性モーメントとなる。対応する主慣性半径は
+\begin{equation}
+ RG_k=\sqrt{\frac{\lambda_k}{M}}.
+ \label{eq:rg}
+\end{equation}
+通常の表記に合わせると
+\begin{align}
+ \Delta RG_{\rm total}&=RG_{\rm high}-RG_{\rm low},\\
+ \Delta RG_{\rm int}&=RG_{\rm int}-RG_{\rm low}.
+\end{align}
+USBC の測定手順でも、ねじり振り子の周期から慣性モーメントを求め、$RG^2=I/M$ の関係を用いる\cite{usbc_sop13}。したがって式\eqref{eq:rg}はカタログ用語と剛体力学を直接つなぐ。
+
+USBC の比較試験では、試験範囲内で RG より Differential RG の方がフック量に大きな影響を示した\cite{usbc_rgstudy}。ただし、これは特定のボール構成と投球条件で得られた実験結果であり、表面やレーン条件を無視して全ボールへ同じ枚数差を適用する根拠ではない。
+
+\subsection{PAP 軸まわりの慣性}
+
+PAP から得る初期回転軸の単位ベクトルを $\vect u_0$ とすると、その軸まわりの慣性モーメントと慣性半径は
+\begin{equation}
+ I_{\rm PAP}=\vect u_0^{\mathsf T}\mat I_C\vect u_0,
+ \qquad
+ RG_{\rm PAP}=\sqrt{\frac{I_{\rm PAP}}{M}}.
+ \label{eq:paprg}
+\end{equation}
+式\eqref{eq:paprg}は、同じボールでも PAP とコアの相対方向が変われば、初期回転軸から見た慣性が変わることを示す。Pin--PAP 距離は、この相対方向を大きく支配する幾何学入力である。
+
+\section{回転運動と軸移動}
+
+\subsection{Euler 方程式}
+
+ボール固定の主軸座標における角速度を
+$\vect\omega=(\omega_1,\omega_2,\omega_3)^{\mathsf T}$、外力トルクを $\vect\tau$ とすると、剛体の回転運動は
+\begin{align}
+ I_1\dot\omega_1+(I_3-I_2)\omega_2\omega_3&=\tau_1,\\
+ I_2\dot\omega_2+(I_1-I_3)\omega_3\omega_1&=\tau_2,\\
+ I_3\dot\omega_3+(I_2-I_1)\omega_1\omega_2&=\tau_3.
+ \label{eq:euler}
+\end{align}
+非球対称、すなわち $I_1,I_2,I_3$ が異なる場合、$\vect\omega$ は一般に一つの主軸へ固定されない。これがコアの向きと Differential が軸移動へ関係する力学的な入口である。
+
+角運動量と回転エネルギーは
+\begin{equation}
+ \vect H=\mat I_C\vect\omega,
+ \qquad
+ E_{\rm rot}=\frac12\vect\omega^{\mathsf T}\mat I_C\vect\omega.
+\end{equation}
+外力トルクがなければ慣性空間の $\vect H$ は保存されるが、レーン上では接触摩擦によるトルクが作用する。USBC の軸移動研究も、軸移動が時間、オイルパターン、コアの質量分布、Intermediate Differential と Total Differential の比などに依存すると報告している\cite{usbc_axis}。
+
+\subsection{接触点の滑りと摩擦トルク}
+
+ボール重心速度を $\vect v$、重心から接触点へのベクトルを $\vect r_c$ とすると、接触点の対レーン速度は
+\begin{equation}
+ \vect v_c=\vect v+\vect\omega\times\vect r_c.
+\end{equation}
+鉛直成分を除いた滑り速度を、レーン面への射影行列
+$\mat P=\mat 1_3-\vect n\vect n^{\mathsf T}$ を用いて
+\begin{equation}
+ \vect v_s=\mat P\vect v_c
+\end{equation}
+とする。単純化した Coulomb 摩擦なら
+\begin{equation}
+ \vect F_t=-\mu_k N\frac{\vect v_s}{\|\vect v_s\|},
+ \qquad
+ \vect\tau_c=\vect r_c\times\vect F_t.
+ \label{eq:friction}
+\end{equation}
+並進と回転を連成して
+\begin{align}
+ M\dot{\vect v}&=\vect F_t+\vect F_{\rm other},\\
+ \mat I_C\dot{\vect\omega}+\vect\omega\times(\mat I_C\vect\omega)&=\vect\tau_c+\vect\tau_{\rm other}
+ \label{eq:coupled}
+\end{align}
+を時間積分する。純粋転がりへの移行条件は $\|\vect v_s\|\to0$ である。
+
+滑っている間の全運動エネルギー変化は、理想化したモデルでは
+\begin{equation}
+ \frac{\dd}{\dd t}
+ \left(
+   \frac{1}{2}M\|\vect v\|^2
+   +\frac{1}{2}\vect\omega^{\mathsf T}\mat I_C\vect\omega
+ \right)
+ =\vect F_t^{\mathsf T}\vect v_s\le0.
+ \label{eq:energy}
+\end{equation}
+したがって「早く摩擦を使う」ことは、単純に強いという意味ではない。手前でエネルギーを消費し過ぎれば、奥での方向変化やピン到達時の速度が不足し得る。逆に摩擦を使わなさ過ぎれば、ポケットへ十分な入射角を作れない。
+
+実際の $\mu$ は定数ではなく、少なくとも
+\begin{equation}
+ \mu=\mu(x,y,t;\,\text{oil},\text{surface},\text{cover},\|\vect v_s\|,T)
+\end{equation}
+と考えるべきである。キャリーダウンやブレークダウンを扱わない単投モデルは、ゲーム進行後の適合性を保証しない。
+
+\section{Dual Angle Layout の三要素をどう解釈するか}
+
+Dual Angle の表記を
+\begin{equation}
+ \boxed{\alpha\ \times\ d\ \times\ \beta}
+ =\boxed{\text{Drilling Angle}\ \times\ \text{Pin--PAP}\ \times\ \text{VAL Angle}}
+\end{equation}
+とする。これは球面上にコアを配置する三つの幾何学的拘束である\cite{morrich}。
+
+\subsection{Pin--PAP 距離 $d$}
+
+Pin 方向を $\vect p$、PAP 軸を $\vect u_0$ とすれば
+\begin{equation}
+ \vect p^{\mathsf T}\vect u_0=\cos(d/R).
+ \label{eq:pinpap}
+\end{equation}
+つまり $d$ は、初期回転軸とコア主軸の相対傾きを直接指定する。対称コアを単純化して Pin 軸を低 RG 軸とみなし、初期軸が低 RG 軸となす角を $\theta=d/R$ とすると
+\begin{equation}
+ I_{\rm PAP}(\theta)
+ =I_{\rm low}\cos^2\theta+I_{\perp}\sin^2\theta.
+ \label{eq:axisinertia}
+\end{equation}
+この式から、$d=0$ 付近では初期軸と低 RG 軸が近く、$d$ が増えるにつれて高い側の慣性成分が混ざることが分かる。ただし、実球は非対称性と穴あけの影響を持つため、最終値は式\eqref{eq:paprg}でテンソルから求める。
+
+業界でよく使われる「Pin--PAP 約 $3\frac{3}{8}$ inch でフレア能力が大きく、0 inch と約 $6\frac{3}{4}$ inch で小さい」という説明は、球半径を約 $4.3$ inch としたとき、主軸との角度がそれぞれ約 $45^\circ$、$0^\circ$、$90^\circ$ になることと対応する。探索用の無次元指標なら
+\begin{equation}
+ S_{\rm orient}=|\sin(2\theta)|,
+ \qquad \theta=d/R
+ \label{eq:orientationfactor}
+\end{equation}
+と置け、$45^\circ$ で最大となる。しかし式\eqref{eq:orientationfactor}は\emph{フレア量そのものではない}。Differential、Intermediate Differential、穴配置、摩擦、回転数を含まないため、候補を並べる補助指標に限定する。
+
+\subsection{Drilling Angle $\alpha$}
+
+$\alpha$ は、PAP から見た Pin と PSA/MB の方位関係を主に定める。特に非対称コアでは、中間軸と高 RG 軸が初期回転軸に対してどう置かれるかが変わるため、式\eqref{eq:euler}の結合項と $\Delta RG_{\rm int}$ の現れ方が変わる。
+
+一般的なレイアウト資料では、小さい $\alpha$ は PSA をより強い位置へ置き、軸移動の立ち上がりを早める方向、大きい $\alpha$ は遅らせる方向と説明される\cite{morrich,radical_layouts}。これは候補選択には有用だが、対称コアでは物理的意味が弱く、穴あけで生じる非対称性を含めて再評価すべきである。また、同じ $\alpha$ でも $d$ と $\beta$ が違えば同じ運動にはならない。
+
+\subsection{VAL Angle $\beta$}
+
+VAL（Vertical Axis Line）は PAP を通り、初期回転軸を基準にした球面上の基準線である。$\beta$ は Pin--PAP 線と VAL の交角を規定し、Pin の上下方向配置、したがって穴あけ後の低 RG 軸の向きと PAP 軸 RG に影響する。
+
+一般的な経験則では、小さい $\beta$ は回転応答を速くして方向変化をはっきりさせる側、大きい $\beta$ は応答を遅くして滑らかにする側とされる\cite{morrich,radical_layouts}。物理的には、$\beta$ が単独で「鋭さ」を発生させるのではなく、式\eqref{eq:paprg}の初期慣性、式\eqref{eq:eigen}の主軸方向、式\eqref{eq:euler}の軸間結合を変え、その結果が摩擦トルクを通して軌道へ現れる。
+
+\subsection{三値を独立ノブとして扱わない}
+
+三値は相互作用する。局所感度を確認するには、評価出力 $\vect y=f(\alpha,d,\beta)$ に対し
+\begin{equation}
+ \frac{\partial\vect y}{\partial x_j}
+ \approx
+ \frac{f(\vect x+h_j\vect e_j)-f(\vect x-h_j\vect e_j)}{2h_j}
+ \label{eq:finite}
+\end{equation}
+を用いる。一度に一要素だけ変えた比較を三要素すべてに対して行い、さらに交互作用
+\begin{equation}
+ \frac{\partial^2 y}{\partial x_i\partial x_j}
+\end{equation}
+も確認する。これにより「VAL 角の効果」と呼んでいたものが、実は Pin--PAP との組合せ効果である可能性を識別できる。
+
+\section{レーンコンディションと使用目的への結び付け}
+
+評価出力は「総フック量」一つにしない。少なくとも表\ref{tab:metrics}を保存する。
+
+\begin{table}[htbp]
+\centering
+\caption{用途適合性を判断する出力指標}\label{tab:metrics}
+\begin{tabularx}{\linewidth}{p{0.25\linewidth}X}
+\toprule
+指標 & 定義または意味\\
+\midrule
+スキッド長 & $\|\vect v_s\|$ が所定割合以下になるまでの前方距離。読み始めの比較に用いる。\\
+ブレークポイント & 横方向速度または曲率が明確に変化する位置。定義を実装内で固定する。\\
+軸移動量 & 初期回転軸と時刻 $t$ の回転軸の球面角 $\cos^{-1}(\vect u_0^{\mathsf T}\vect u(t))$。\\
+フレア指標 & 接触軌跡の隣接リング間隔または累積軸移動。単なる Pin--PAP 換算値にしない。\\
+ポケット入射角 & ピンデッキ到達時の速度方向とレーン方向の角度。左右投げを区別する。\\
+残存速度・回転 & ピン到達時の並進速度、角速度、回転エネルギー。\\
+ロバスト性 & PAP、球速、回転数、オイル量の誤差に対する出力分散。\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+適合性の基本的な考え方は次のとおりである。
+
+\begin{itemize}
+  \item \textbf{多い・長いオイル：} 手前で滑り過ぎないことが必要だが、表面とカバーの寄与が大きい。レイアウトだけで補おうとしない。軸移動が十分始まり、かつ奥まで速度を残す候補を探す。
+  \item \textbf{少ない・短いオイル：} 早過ぎるエネルギー消費を避ける。大きめの応答時間、滑らかな方向変化、PAP 誤差に対する低感度を優先する。
+  \item \textbf{新鮮なコンディション：} オイル上の直進性とドライ部での再現可能な応答を両立させる。
+  \item \textbf{変化後・キャリーダウン：} 単一の初期パターンではなく複数時点をシナリオとして計算する。ゲーム進行で最適解が入れ替わる可能性を示す。
+  \item \textbf{コントロール用途：} 最大フックではなく、入力変動に対するブレークポイント分散と入射角分散を小さくする。
+  \item \textbf{角度を作る用途：} 入射角だけでなく、ピン到達時の速度と回転を同時に制約し、過大な手前の消費を排除する。
+\end{itemize}
+
+\section{不確かさと最適化}
+
+\subsection{PAP 測定誤差を無視しない}
+
+入力ベクトルを
+\begin{equation}
+ \vect x=(\alpha,d,\beta,\phi_{\rm PAP},\lambda_{\rm PAP},v_0,\omega_0,\ldots)^{\mathsf T}
+\end{equation}
+とし、その共分散を $\mat\Sigma_x$、出力を $\vect y=f(\vect x)$ とする。局所線形近似では
+\begin{equation}
+ \mat\Sigma_y\approx\mat J\mat\Sigma_x\mat J^{\mathsf T},
+ \qquad
+ \mat J=\frac{\partial f}{\partial\vect x}.
+ \label{eq:covariance}
+\end{equation}
+非線形性が強い場合は、測定誤差分布から Monte Carlo サンプルを生成して式\eqref{eq:coupled}を反復計算する。平均が良くても分散が大きいレイアウトは、実戦では再現性が低い。
+
+\subsection{単一得点ではなく Pareto 候補を出す}
+
+設計変数を $\vect z=(\alpha,d,\beta)$、レーンシナリオを $s$ とし、例えば
+\begin{equation}
+ \min_{\vect z}\;
+ \left[
+ -\overline{\theta_{\rm entry}},\;
+ \operatorname{Var}(x_{\rm break}),\;
+ -\overline{v_{\rm pin}},\;
+ \operatorname{Var}(\theta_{\rm entry})
+ \right]
+ \label{eq:pareto}
+\end{equation}
+を多目的最適化する。上線と分散は、複数の $s$ と入力誤差にわたって計算する。制約には
+\begin{equation}
+ g_k(\vect z)\le0
+\end{equation}
+として、穴同士の最小肉厚、コア境界、トラックと穴の離隔、メーカー保証条件、競技規則、ドリラーの施工可能範囲を含める。重みを隠した単一の「最適スコア」より、用途別の Pareto 候補を提示する方が意思決定の根拠を説明しやすい。
+
+\section{計算例：除去質量の桁を確認する}
+
+これは特定製品の予測ではなく、平均密度近似の桁確認である。半径
+$R=4.2975\unit{in}$、質量 $M_0=15\unit{lbm}$ の一様球を仮定すると、平均密度は
+\begin{equation}
+ \bar\rho=\frac{M_0}{\frac43\pi R^3}
+ \approx0.0450\unit{lbm/in^3}.
+\end{equation}
+直径 $1.00\unit{in}$、円筒長 $2.50\unit{in}$ のサム穴一つでは
+\begin{align}
+ V_{\rm thumb}&=\pi(0.50)^2(2.50)\approx1.963\unit{in^3},\\
+ m_{\rm thumb}&\approx0.0884\unit{lbm}\approx1.41\unit{oz}.
+\end{align}
+直径 $0.8125\unit{in}$、長さ $1.50\unit{in}$ のフィンガー穴二つでは
+\begin{align}
+ V_{\rm finger,each}&=\pi(0.40625)^2(1.50)\approx0.778\unit{in^3},\\
+ m_{\rm finger,total}&\approx2(0.0350)\unit{lbm}\approx1.12\unit{oz}.
+\end{align}
+単純合計は約 $2.53\unit{oz}$ である。実際には先端形状、グリップ、材料密度差、穴深さにより変わる。この計算の目的は、除去質量がゼロ近似できないこと、かつ重心移動を求めるには各穴の\emph{位置ベクトル}が必要であることを示す点にある。
+
+例えば未ドリル重心を原点とし、除去質量の合成重心が $\vect c_h$ にあるなら、式\eqref{eq:newcom}は
+\begin{equation}
+ \vect c=-\frac{m_h}{M_0-m_h}\vect c_h
+\end{equation}
+となる。位置方向を無視して「合計何オンス削ったか」だけを入力しても、重心移動は計算できない。
+
+\section{ソフトウェアへ実装する際の検証基準}
+
+\begin{enumerate}
+  \item \textbf{単位を統一する。} 幾何計算が inch、力学計算が SI なら境界で明示変換する。lbm をそのまま力の式へ入れない。
+  \item \textbf{テンソルを一次情報にする。} RG 三値だけを更新するのではなく、$3\times3$ 慣性テンソルを更新してから固有分解する。
+  \item \textbf{穴軸をベクトルで保存する。} 表面入口と深さだけでは、斜め穴の重心と慣性を再現できない。
+  \item \textbf{解析解で単体試験する。} 一様球、中心を通る円筒、一軸対称配置など、対称性から答えが分かるケースを作る。
+  \item \textbf{回転行列を検証する。} $\mat Q^{\mathsf T}\mat Q=\mat 1$、$\det\mat Q=1$、固有ベクトルの右手系を確認する。
+  \item \textbf{保存則を監視する。} 摩擦なし試験では角運動量と全エネルギー、摩擦あり試験では式\eqref{eq:energy}の符号を確認する。
+  \item \textbf{時間刻み収束を確認する。} 刻み幅を半分にして、ブレークポイントや入射角が許容差内で一致することを確認する。
+  \item \textbf{実測値で校正と検証を分離する。} 同じ投球データを摩擦係数の調整と精度評価の両方に使わない。
+  \item \textbf{説明可能な出力にする。} 推奨レイアウトごとに、穴あけ前後の $RG$、Differential、主軸方向、$RG_{\rm PAP}$、軸移動、各レーン条件の指標を併記する。
+\end{enumerate}
+
+\section{エビデンスの強さと適用限界}
+
+\begin{longtable}{p{0.25\linewidth}p{0.24\linewidth}p{0.42\linewidth}}
+\caption{主張の根拠分類}\label{tab:evidence}\\
+\toprule
+主張 & 根拠の種類 & 適用限界\\
+\midrule
+\endfirsthead
+\toprule
+主張 & 根拠の種類 & 適用限界\\
+\midrule
+\endhead
+穴あけ後の重心と慣性 & 質量保存、体積積分、平行軸の定理 & 密度分布と穴形状の精度に依存する。\\
+$RG=\sqrt{I/M}$ & 剛体力学および USBC 測定手順 & 測定軸と計算軸を一致させる必要がある。\\
+Differential がフックへ影響 & USBC の対照試験 & 試験条件依存。個別レーンの枚数へ直接換算できない。\\
+軸移動は質量分布とレーン条件に依存 & Euler 方程式、USBC 軸移動試験 & 実際の摩擦則とオイル変化の同定が必要。\\
+Pin--PAP 約 $3\frac{3}{8}$ inch の指標最大 & 球面幾何と業界レイアウト法 & 式\eqref{eq:orientationfactor}はフレアの代理指標であり、予測値ではない。\\
+小さい Drilling/VAL Angle の一般傾向 & メーカー・レイアウト資料と経験則 & コア形状、他の二値、表面、投球条件との相互作用が大きい。\\
+特定レイアウトの軌道 & 連成運動方程式の数値積分と実測校正 & 摩擦モデル未校正なら定性的比較に限定する。\\
+\bottomrule
+\end{longtable}
+
+\section{実務上の推奨出力フォーマット}
+
+候補ごとに、次の順で理由を提示する。
+
+\begin{enumerate}
+  \item \textbf{対象用途：} レーン条件、想定ライン、優先するボールモーション。
+  \item \textbf{幾何：} $\alpha\times d\times\beta$、PAP、Pin、PSA、穴位置。
+  \item \textbf{静的変化：} 除去質量、重心移動ベクトル、穴あけ前後の慣性テンソルと RG 三値。
+  \item \textbf{初期回転との関係：} $RG_{\rm PAP}$、主軸との角度、予想される軸移動の方向。
+  \item \textbf{動的結果：} 各レーンシナリオのスキッド長、軸移動、ブレークポイント、入射角、残存速度。
+  \item \textbf{不確かさ：} PAP と投球条件の誤差範囲に対する中央値、5--95 percentile、失敗条件。
+  \item \textbf{採用理由：} 他候補より優れる指標と、犠牲になる特性を一文ずつ示す。
+\end{enumerate}
+
+この形式なら「60×4×30だから強い」という説明ではなく、「この PAP と質量特性では、穴あけ後の主軸が何度動き、どのレーン条件で滑り速度がどの位置から減り、入力誤差に対して結果がどれだけ安定するため採用する」という検証可能な説明になる。
+
+\section*{参考資料}
+\begin{thebibliography}{9}
+
+\bibitem{usbc_sop13}
+United States Bowling Congress,
+\textit{SOP-BALL-13: RG Swing Calibration},
+\url{https://images.bowl.com/bowl/media/assets/usbc/equipment%20specs/sop-ball-13-rg_swing_calibration.pdf}.
+
+\bibitem{usbc_rgstudy}
+United States Bowling Congress,
+\textit{RG and Differential RG Study -- Re-Test},
+\url{https://images.bowl.com/bowl/media/legacy/internap/bowl/equipandspecs/pdfs/TechnologyStudy/Core/5.pdf}.
+
+\bibitem{usbc_axis}
+United States Bowling Congress,
+\textit{The Truth About Axis Migration and Core Dynamics},
+\url{https://images.bowl.com/bowl/media/legacy/internap/bowl/equipandspecs/pdfs/articles/Thetruthaboutaxismigrationandcoredynamics.pdf}.
+
+\bibitem{morrich}
+Mo Pinel / MoRich,
+\textit{Dual Angle Layout Technique},
+\url{https://www.buddiesproshop.com/content/DualAngle.pdf}.
+
+\bibitem{radical_layouts}
+Radical Bowling Technologies,
+\textit{Suggested Layouts},
+\url{https://radicalbowling.com/uploads/downloads/Layouts/radical-layouts.pdf}.
+
+\bibitem{usbc_sops}
+United States Bowling Congress,
+\textit{Standard Operating Procedures},
+\url{https://bowl.com/equipment-specifications2024/standard-operating-procedures}.
+
+\end{thebibliography}
+
+\end{document}
