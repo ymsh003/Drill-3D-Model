@@ -6295,6 +6295,30 @@ aside > .measure-section .measure-diagram {
   .measure-diagram .measure-sheet-caption.field-thumb-solid { top: 87%; }
   .measure-thumb-solid-mode { left: 20%; top: 91%; }
 }
+
+.motion-simulation-panel {
+  position: relative;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(103, 232, 249, .34);
+  border-radius: 12px;
+  background: rgba(5, 23, 25, .86);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .26);
+  backdrop-filter: blur(8px);
+}
+.motion-simulation-panel h3 { margin: 0 0 8px; font-size: 14px; color: #bff7ee; }
+.motion-simulation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.motion-simulation-grid label { display: grid; gap: 3px; color: var(--muted); font-size: 12px; }
+.motion-simulation-grid select,
+.motion-simulation-grid input { min-width: 0; width: 100%; height: 34px; }
+.motion-simulation-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
+.motion-simulation-actions button { min-height: 36px; }
+.motion-simulation-readout { margin-top: 7px; color: #dffcf7; font-size: 12px; line-height: 1.45; }
+.motion-simulation-progress { display: block; width: 100%; height: 8px; margin-top: 7px; accent-color: #67e8f9; }
+.motion-simulation-note { margin: 6px 0 0; color: #9fc4c0; font-size: 11px; line-height: 1.35; }
+@media (max-width: 700px) {
+  .motion-simulation-panel { width: 100%; }
+}
 </style>
 </head>
 <body data-profile-view="lookup">
@@ -6802,6 +6826,36 @@ aside > .measure-section .measure-diagram {
       </div>
       <div class="zoom-hud">ズーム <output id="zoomValue">100%</output></div>
     </section>
+      <section class="motion-simulation-panel" aria-label="回転と軸移動シミュレーション">
+        <h3>回転・軸移動・オイルフレア</h3>
+        <div class="motion-simulation-grid">
+          <label>表示モード
+            <select id="motionSimulationMode">
+              <option value="initial">初期軸まわりの回転</option>
+              <option value="migration">慣性主軸への軸移動（概念）</option>
+            </select>
+          </label>
+          <label>回転数 rpm
+            <input id="motionSimulationRpm" type="number" min="50" max="700" step="10" value="350" />
+          </label>
+          <label>ボール速度 km/h
+            <input id="motionSimulationSpeed" type="number" min="8" max="48" step="0.1" value="27.4" data-transient="true" />
+          </label>
+          <label>フレア表示
+            <select id="motionFlareVisible">
+              <option value="yes" selected>表示する</option>
+              <option value="no">表示しない</option>
+            </select>
+          </label>
+        </div>
+        <div class="motion-simulation-actions">
+          <button id="motionSimulationToggle" type="button">再生</button>
+          <button id="motionSimulationReset" type="button">リセット</button>
+        </div>
+        <div id="motionSimulationReadout" class="motion-simulation-readout">距離 0.0 / 60.0 ft・回転 0.0 / 軸移動 0.00° / リング 1</div>
+        <progress id="motionSimulationProgress" class="motion-simulation-progress" min="0" max="60" value="0" aria-label="レーン上の移動距離"></progress>
+        <p class="motion-simulation-note">初期PAP–NAP軸を初期角速度とし、完成球の三主慣性モーメントにEulerの剛体回転方程式を適用します。Bowtieはサムありではサム下方の着床側、サムレスではPAP–PIN側のレイアウト基準から設定します。油リングは1回転ごとに生成します。</p>
+      </section>
       <section class="section sheet-section measure-section personal-measure-panel">
       <h2>メジャーシート情報</h2>
       <div id="measureDiagram" class="measure-diagram" data-hand="right">
@@ -6848,7 +6902,7 @@ aside > .measure-section .measure-diagram {
           <div class="dual-layout-grid pap-grid">
             <label class="dual-layout-field wide">
               <span>PAP左右</span>
-              <input id="layoutPapRight" type="range" min="-7" max="7" step="0.03125" value="5" />
+              <input id="layoutPapRight" type="range" min="-7" max="7" step="0.0625" value="5" />
               <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapRight" aria-label="PAP左右">
                 <span class="span-gauge-min"></span>
                 <span class="span-gauge-track"></span>
@@ -6859,7 +6913,7 @@ aside > .measure-section .measure-diagram {
             </label>
             <label class="dual-layout-field wide">
               <span>PAP上下</span>
-              <input id="layoutPapUp" type="range" min="-3" max="3" step="0.03125" value="0" />
+              <input id="layoutPapUp" type="range" min="-3" max="3" step="0.0625" value="0" />
               <button class="span-horizontal-gauge dual-length-gauge signed-axis-gauge" type="button" data-span-range="layoutPapUp" aria-label="PAP上下">
                 <span class="span-gauge-min"></span>
                 <span class="span-gauge-track"></span>
@@ -7001,7 +7055,8 @@ aside > .measure-section .measure-diagram {
                 <div id="inertiaAfterSlot"></div>
               </div>
             </div>
-            <p class="physical-model-note">PAP-NAP軸 I は、カタログ重量とRG低/Differential/Intermediate Differentialから主慣性を作り、現在のPAP-NAP回転軸へ投影した計算値です。ドリル後は各穴の削除質量を差し引いた推定値として表示しています。</p>
+            <div id="staticTensorOutput" class="physical-model-output" aria-label="完成球の静的質量特性"></div>
+            <p class="physical-model-note">完成球の値は、各穴の質量・一次モーメント・3×3慣性テンソルを未ドリル球から差し引き、新重心へ平行移動してから固有分解した一様密度近似です。PAP-NAP軸 I / RG は同じ完成球テンソルを初期回転軸へ投影しています。グリップ、スラグ、接着剤と穴同士の交差体積は、材料密度またはCAD和集合が未入力のため含みません。</p>
           </div>
         </div>
       </section>
@@ -7071,8 +7126,27 @@ aside > .measure-section .measure-diagram {
       layoutOrigin: null,
       layoutBasis: null
     };
+    const motionSim = {
+      running: false,
+      angle: 0,
+      revolutions: 0,
+      distanceFeet: 0,
+      axis: null,
+      initialAxis: null,
+      omegaPrincipal: null,
+      initialAxisRg: 0,
+      currentAxisRg: 0,
+      maxFlareRadians: 0,
+      ballRadius: 4.2975,
+      bowtieAxis: null,
+      migrationDirectionSign: 1,
+      flareTracks: [],
+      lastFlareRevolution: 0,
+      lastTimestamp: 0,
+      frameId: 0
+    };
 
-    document.querySelectorAll("input[type='range']").forEach((range) => {
+    document.querySelectorAll("input[type='range']:not([data-transient='true'])").forEach((range) => {
       const valueOutput = document.querySelector(`#${range.id}Value`);
       inputs.set(range.id, range);
       const sync = (fromRange) => {
@@ -7970,6 +8044,7 @@ aside > .measure-section .measure-diagram {
 
     function rangeListStep(range) {
       if (range.id === "layoutDrillAngle" || range.id === "layoutValAngle") return 1;
+      if (range.id === "layoutPapRight" || range.id === "layoutPapUp") return 1 / 16;
       if (range.id.endsWith("Axis")) return 1 / 16;
       if (["middleSpan", "ringSpanOffset", "middleDrillDepth", "ringDrillDepth", "thumbDrillDepth"].includes(range.id)) return 1 / 32;
       return 1 / 64;
@@ -9130,16 +9205,19 @@ aside > .measure-section .measure-diagram {
     }
 
     function rotate(p) {
+      const animated = motionSim.axis && Math.abs(motionSim.angle) > 1e-12
+        ? rotateAroundAxis(p, motionSim.axis, motionSim.angle)
+        : p;
       const cy = Math.cos(state.yaw);
       const sy = Math.sin(state.yaw);
       const cp = Math.cos(state.pitch);
       const sp = Math.sin(state.pitch);
       const cr = Math.cos(state.roll || 0);
       const sr = Math.sin(state.roll || 0);
-      const x1 = p.x * cy + p.z * sy;
-      const z1 = -p.x * sy + p.z * cy;
-      const y1 = p.y * cp - z1 * sp;
-      const z2 = p.y * sp + z1 * cp;
+      const x1 = animated.x * cy + animated.z * sy;
+      const z1 = -animated.x * sy + animated.z * cy;
+      const y1 = animated.y * cp - z1 * sp;
+      const z2 = animated.y * sp + z1 * cp;
       return {
         x: x1 * cr - y1 * sr,
         y: x1 * sr + y1 * cr,
@@ -9379,6 +9457,8 @@ aside > .measure-section .measure-diagram {
       renderZoom();
 
       drawBall(cx, cy, radius, scale);
+      drawOilFlareRings(data, cx, cy, scale);
+      drawInitialRotationAxis(data, cx, cy, scale);
       drawDualAngleLayout(data, cx, cy, scale);
       drawSpanAngles(data, cx, cy, scale);
       data.holes.forEach((hole) => drawTrajectory(hole, data, cx, cy, scale));
@@ -9539,6 +9619,127 @@ aside > .measure-section .measure-diagram {
       for (let i = -60; i <= 60; i += 20) drawLatitude(i, radius, cx, cy, scale);
       for (let i = -80; i <= 80; i += 20) drawLongitude(i, radius, cx, cy, scale);
       ctx.restore();
+    }
+
+    function drawInitialRotationAxis(data, cx, cy, scale) {
+      const pap = currentMotionAxis(data);
+      const papPoint = scalePoint(pap, data.ballRadius);
+      const napPoint = scalePoint(pap, -data.ballRadius);
+      const axisPositive = scalePoint(pap, data.ballRadius * 1.22);
+      const axisNegative = scalePoint(pap, -data.ballRadius * 1.22);
+      const pPap = project(papPoint, scale, cx, cy);
+      const pNap = project(napPoint, scale, cx, cy);
+      const pPositive = project(axisPositive, scale, cx, cy);
+      const pNegative = project(axisNegative, scale, cx, cy);
+      const pCenter = project({ x: 0, y: 0, z: 0 }, scale, cx, cy);
+      ctx.save();
+      ctx.strokeStyle = "rgba(103,232,249,.96)";
+      ctx.lineWidth = 2.4;
+      ctx.setLineDash([8, 5]);
+      ctx.beginPath();
+      ctx.moveTo(pNegative.x, pNegative.y);
+      ctx.lineTo(pPositive.x, pPositive.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(103,232,249,.98)";
+      for (const point of [pPap, pNap]) {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = "rgba(255,255,255,.92)";
+      ctx.beginPath();
+      ctx.arc(pCenter.x, pCenter.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+      const label = (text, point, offset) => {
+        ctx.font = "700 12px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const width = ctx.measureText(text).width + 12;
+        ctx.fillStyle = "rgba(7,25,26,.84)";
+        roundRect(point.x - width / 2, point.y + offset - 9, width, 18, 5);
+        ctx.fill();
+        ctx.fillStyle = "#67e8f9";
+        ctx.fillText(text, point.x, point.y + offset);
+      };
+      label("PAP", pPap, pPap.y < cy ? -15 : 15);
+      label("NAP", pNap, pNap.y < cy ? -15 : 15);
+      ctx.restore();
+    }
+
+    function currentMotionAxis(data) {
+      const initial = normalize(data.dualLayout?.pap || { x: 0, y: 0, z: data.ballRadius });
+      return normalize(motionSim.axis || initial);
+    }
+
+    function createFlareTrack(axis, data, revolution = 0, first = false) {
+      const n = normalize(axis);
+      const laneDown = { x: 0, y: 1, z: 0 };
+      let tangent = sub(laneDown, scalePoint(n, dot(laneDown, n)));
+      if (Math.hypot(tangent.x, tangent.y, tangent.z) < 1e-8) tangent = cross(n, { x: 1, y: 0, z: 0 });
+      tangent = normalize(tangent);
+      return {
+        axis: n,
+        planeOffset: 0,
+        contactPoint: scalePoint(tangent, data.ballRadius),
+        revolution,
+        first
+      };
+    }
+
+    function drawOilFlareRings(data, cx, cy, scale) {
+      if (document.querySelector("#motionFlareVisible")?.value === "no") return;
+      const tracks = motionSim.flareTracks.length
+        ? motionSim.flareTracks
+        : [createFlareTrack(currentMotionAxis(data), data, 0, true)];
+      tracks.forEach((track, index) => {
+        const n = normalize(track.axis);
+        const helper = Math.abs(n.y) < 0.88 ? { x: 0, y: 1, z: 0 } : { x: 1, y: 0, z: 0 };
+        const u = normalize(cross(n, helper));
+        const v = normalize(cross(n, u));
+        const center = { x: 0, y: 0, z: 0 };
+        const circleRadius = data.ballRadius;
+        const points = [];
+        for (let i = 0; i <= 180; i++) {
+          const angle = i / 180 * Math.PI * 2;
+          points.push(add(center, add(
+            scalePoint(u, circleRadius * Math.cos(angle)),
+            scalePoint(v, circleRadius * Math.sin(angle))
+          )));
+        }
+        const alpha = track.first ? 0.90 : 0.25 + 0.42 * ((index + 1) / tracks.length);
+        const color = track.first ? `rgba(236,255,250,${alpha})` : `rgba(174,220,229,${alpha.toFixed(3)})`;
+        strokeProjected(points, cx, cy, scale, track.first ? "rgba(220,255,247,.20)" : "rgba(160,210,220,.13)", track.first ? 5.5 : 4.0);
+        strokeProjected(points, cx, cy, scale, color, track.first ? 2.3 : (index === tracks.length - 1 ? 1.8 : 1.15));
+        if (track.first) {
+          const marker = project(track.contactPoint, scale, cx, cy);
+          ctx.save();
+          ctx.fillStyle = "#e0fff9";
+          ctx.beginPath();
+          ctx.arc(marker.x, marker.y, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.font = "600 11px system-ui, sans-serif";
+          ctx.fillText("1st track", marker.x + 7, marker.y - 7);
+          ctx.restore();
+        }
+      });
+      if (tracks.length > 1 && motionSim.bowtieAxis) {
+        [motionSim.bowtieAxis, scalePoint(motionSim.bowtieAxis, -1)].forEach((axis, index) => {
+          const point = scalePoint(axis, data.ballRadius);
+          const marker = project(point, scale, cx, cy);
+          if (marker.z <= 0) return;
+          ctx.save();
+          ctx.fillStyle = "rgba(255,209,102,.92)";
+          ctx.beginPath();
+          ctx.arc(marker.x, marker.y, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+          if (index === 0) {
+            ctx.font = "600 10px system-ui, sans-serif";
+            ctx.fillText("Bowtie", marker.x + 6, marker.y - 6);
+          }
+          ctx.restore();
+        });
+      }
     }
 
     function drawLatitude(deg, radius, cx, cy, scale) {
@@ -9831,12 +10032,19 @@ aside > .measure-section .measure-diagram {
       const iLow = mass * rgLow * rgLow;
       const iMid = mass * rgMid * rgMid;
       const iHigh = mass * rgHigh * rgHigh;
-      const iBefore = axisInertiaFromPrincipal(papAxis, basis, iLow, iMid, iHigh);
-      const removed = drilledRemovalInertia(data, papAxis, mass);
+      const tensorBefore = tensorFromPrincipal(basis, iLow, iMid, iHigh);
+      const iBefore = axisInertia(papAxis, tensorBefore);
+      const removed = drilledRemovalProperties(data, mass);
       const massAfter = Math.max(0.001, mass - removed.mass);
-      const iAfter = Math.max(0, iBefore - removed.inertia);
+      const firstMomentAfter = scalePoint(removed.firstMoment, -1);
+      const centerOfMass = scalePoint(firstMomentAfter, 1 / massAfter);
+      const tensorAboutOrigin = matrixSubtract(tensorBefore, removed.tensor);
+      const tensorAfter = matrixSubtract(tensorAboutOrigin, parallelAxisTensor(massAfter, centerOfMass));
+      const iAfter = Math.max(0, axisInertia(papAxis, tensorAfter));
       const rgBefore = Math.sqrt(iBefore / mass);
       const rgAfter = Math.sqrt(iAfter / massAfter);
+      const eigen = symmetricEigen3(tensorAfter);
+      const rgPrincipal = eigen.values.map((moment) => Math.sqrt(Math.max(0, moment) / massAfter));
       return {
         mass,
         massAfter,
@@ -9851,11 +10059,30 @@ aside > .measure-section .measure-diagram {
         iAfter,
         rgBefore,
         rgAfter,
+        tensorBefore,
+        tensorAfter,
+        tensorAboutOrigin,
+        centerOfMass,
+        principalMoments: eigen.values,
+        principalAxes: eigen.vectors,
+        rgPrincipal,
+        totalDiffAfter: rgPrincipal[2] - rgPrincipal[0],
+        intDiffAfter: rgPrincipal[1] - rgPrincipal[0],
         removedMass: removed.mass,
         removedOz: removed.mass * 16,
-        removedInertia: removed.inertia,
+        removedInertia: iBefore - axisInertia(papAxis, tensorAboutOrigin),
         axisDifferential: rgAfter - rgBefore
       };
+    }
+
+    function rotateAroundAxis(point, axis, angle) {
+      const u = normalize(axis);
+      const c = Math.cos(angle);
+      const s = Math.sin(angle);
+      return add(
+        add(scalePoint(point, c), scalePoint(cross(u, point), s)),
+        scalePoint(u, dot(u, point) * (1 - c))
+      );
     }
 
     function catalogWeightPounds() {
@@ -9879,50 +10106,140 @@ aside > .measure-section .measure-diagram {
       return { lowAxis, midAxis: mbAxis, highAxis };
     }
 
-    function axisInertiaFromPrincipal(axis, basis, iLow, iMid, iHigh) {
-      const u = normalize(axis);
-      return iLow * dot(u, basis.lowAxis) ** 2
-        + iMid * dot(u, basis.midAxis) ** 2
-        + iHigh * dot(u, basis.highAxis) ** 2;
+    function zeroMatrix() {
+      return [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
     }
 
-    function drilledRemovalInertia(data, axis, ballMass) {
+    function matrixAdd(a, b) {
+      return a.map((row, i) => row.map((value, j) => value + b[i][j]));
+    }
+
+    function matrixSubtract(a, b) {
+      return a.map((row, i) => row.map((value, j) => value - b[i][j]));
+    }
+
+    function matrixScale(a, scalar) {
+      return a.map((row) => row.map((value) => value * scalar));
+    }
+
+    function outerProduct(a, b = a) {
+      const av = [a.x, a.y, a.z];
+      const bv = [b.x, b.y, b.z];
+      return av.map((x) => bv.map((y) => x * y));
+    }
+
+    function identityMatrix() {
+      return [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+    }
+
+    function tensorFromPrincipal(basis, iLow, iMid, iHigh) {
+      return [
+        [basis.lowAxis, iLow],
+        [basis.midAxis, iMid],
+        [basis.highAxis, iHigh]
+      ].reduce((tensor, [axis, moment]) => matrixAdd(tensor, matrixScale(outerProduct(axis), moment)), zeroMatrix());
+    }
+
+    function parallelAxisTensor(mass, center) {
+      return matrixScale(
+        matrixSubtract(matrixScale(identityMatrix(), dot(center, center)), outerProduct(center)),
+        mass
+      );
+    }
+
+    function bodyTensor(axis, axial, perpendicular) {
+      const a = normalize(axis);
+      return matrixAdd(
+        matrixScale(identityMatrix(), perpendicular),
+        matrixScale(outerProduct(a), axial - perpendicular)
+      );
+    }
+
+    function axisInertia(axis, tensor) {
+      const u = normalize(axis);
+      const values = [u.x, u.y, u.z];
+      return values.reduce((sum, x, i) => sum + x * values.reduce((row, y, j) => row + tensor[i][j] * y, 0), 0);
+    }
+
+    function drilledRemovalProperties(data, ballMass) {
       const density = ballMass / (4 / 3 * Math.PI * data.ballRadius ** 3);
       return data.holes.reduce((total, hole) => {
         const segment = drillSegment(hole, data, drilledOpeningRadius(hole));
-        const cylinder = cylinderRemovalContribution(segment.start, segment.axis, segment.radius, segment.cylinderLength, density, axis);
-        const cone = coneRemovalContribution(segment.cylinderEnd, segment.axis, segment.radius, segment.pointLength, density, axis);
+        const cylinder = cylinderRemovalContribution(segment.start, segment.axis, segment.radius, segment.cylinderLength, density);
+        const cone = coneRemovalContribution(segment.cylinderEnd, segment.axis, segment.radius, segment.pointLength, density);
         total.mass += cylinder.mass + cone.mass;
-        total.inertia += cylinder.inertia + cone.inertia;
+        total.firstMoment = add(total.firstMoment, add(cylinder.firstMoment, cone.firstMoment));
+        total.tensor = matrixAdd(total.tensor, matrixAdd(cylinder.tensor, cone.tensor));
         return total;
-      }, { mass: 0, inertia: 0 });
+      }, { mass: 0, firstMoment: { x: 0, y: 0, z: 0 }, tensor: zeroMatrix() });
     }
 
-    function cylinderRemovalContribution(start, drillAxis, radius, length, density, evalAxis) {
-      if (length <= 0 || radius <= 0) return { mass: 0, inertia: 0 };
+    function cylinderRemovalContribution(start, drillAxis, radius, length, density) {
+      if (length <= 0 || radius <= 0) return { mass: 0, firstMoment: { x: 0, y: 0, z: 0 }, tensor: zeroMatrix() };
       const mass = density * Math.PI * radius ** 2 * length;
       const center = addScaled(start, drillAxis, length / 2);
       const axial = 0.5 * mass * radius ** 2;
       const perpendicular = mass * (3 * radius ** 2 + length ** 2) / 12;
-      return { mass, inertia: bodyAxisInertia(evalAxis, drillAxis, center, mass, axial, perpendicular) };
+      return {
+        mass,
+        firstMoment: scalePoint(center, mass),
+        tensor: matrixAdd(bodyTensor(drillAxis, axial, perpendicular), parallelAxisTensor(mass, center))
+      };
     }
 
-    function coneRemovalContribution(base, drillAxis, radius, length, density, evalAxis) {
-      if (length <= 0 || radius <= 0) return { mass: 0, inertia: 0 };
+    function coneRemovalContribution(base, drillAxis, radius, length, density) {
+      if (length <= 0 || radius <= 0) return { mass: 0, firstMoment: { x: 0, y: 0, z: 0 }, tensor: zeroMatrix() };
       const mass = density * Math.PI * radius ** 2 * length / 3;
       const center = addScaled(base, drillAxis, length / 4);
       const axial = 0.3 * mass * radius ** 2;
       const perpendicular = 3 * mass * (4 * radius ** 2 + length ** 2) / 80;
-      return { mass, inertia: bodyAxisInertia(evalAxis, drillAxis, center, mass, axial, perpendicular) };
+      return {
+        mass,
+        firstMoment: scalePoint(center, mass),
+        tensor: matrixAdd(bodyTensor(drillAxis, axial, perpendicular), parallelAxisTensor(mass, center))
+      };
     }
 
-    function bodyAxisInertia(evalAxis, bodyAxis, center, mass, axial, perpendicular) {
-      const u = normalize(evalAxis);
-      const a = normalize(bodyAxis);
-      const alignment = dot(u, a);
-      const centroidInertia = perpendicular * (1 - alignment ** 2) + axial * alignment ** 2;
-      const parallel = mass * Math.max(0, dot(center, center) - dot(u, center) ** 2);
-      return centroidInertia + parallel;
+    function symmetricEigen3(input) {
+      const a = input.map((row) => row.slice());
+      const v = identityMatrix();
+      for (let sweep = 0; sweep < 32; sweep++) {
+        let p = 0;
+        let q = 1;
+        let largest = Math.abs(a[0][1]);
+        for (const [i, j] of [[0, 2], [1, 2]]) {
+          if (Math.abs(a[i][j]) > largest) {
+            largest = Math.abs(a[i][j]);
+            p = i;
+            q = j;
+          }
+        }
+        if (largest < 1e-12) break;
+        const phi = 0.5 * Math.atan2(2 * a[p][q], a[q][q] - a[p][p]);
+        const c = Math.cos(phi);
+        const s = Math.sin(phi);
+        for (let k = 0; k < 3; k++) {
+          const apk = a[p][k];
+          const aqk = a[q][k];
+          a[p][k] = c * apk - s * aqk;
+          a[q][k] = s * apk + c * aqk;
+        }
+        for (let k = 0; k < 3; k++) {
+          const akp = a[k][p];
+          const akq = a[k][q];
+          a[k][p] = c * akp - s * akq;
+          a[k][q] = s * akp + c * akq;
+          const vkp = v[k][p];
+          const vkq = v[k][q];
+          v[k][p] = c * vkp - s * vkq;
+          v[k][q] = s * vkp + c * vkq;
+        }
+      }
+      const pairs = [0, 1, 2].map((i) => ({
+        value: a[i][i],
+        vector: normalize({ x: v[0][i], y: v[1][i], z: v[2][i] })
+      })).sort((left, right) => left.value - right.value);
+      return { values: pairs.map((pair) => pair.value), vectors: pairs.map((pair) => pair.vector) };
     }
 
     function renderPhysicalModelOutput(model) {
@@ -9941,6 +10258,19 @@ aside > .measure-section .measure-diagram {
       renderSlot("inertiaBeforeSlot", physicalMetric("PAP-NAP軸 I", `${model.iBefore.toFixed(3)} lb in^2`));
       renderSlot("inertiaDeltaSlot", physicalDeltaPill(`${signedFixed(inertiaDelta, 3)} lb in^2`));
       renderSlot("inertiaAfterSlot", physicalMetric("PAP-NAP軸 I", `${model.iAfter.toFixed(3)} lb in^2`));
+      const output = document.querySelector("#staticTensorOutput");
+      if (output) {
+        const c = model.centerOfMass;
+        const shift = Math.hypot(c.x, c.y, c.z);
+        const [rgLow, rgMid, rgHigh] = model.rgPrincipal;
+        const tensorRows = model.tensorAfter.map((row) => row.map((value) => value.toFixed(3)).join("  ")).join(" / ");
+        output.innerHTML = [
+          physicalMetric("重心移動", `${shift.toFixed(4)} in  (${c.x.toFixed(4)}, ${c.y.toFixed(4)}, ${c.z.toFixed(4)})`),
+          physicalMetric("完成球 RG", `${rgLow.toFixed(4)} / ${rgMid.toFixed(4)} / ${rgHigh.toFixed(4)}`),
+          physicalMetric("完成球 Diff", `Total ${model.totalDiffAfter.toFixed(4)} / Int ${model.intDiffAfter.toFixed(4)}`),
+          physicalMetric("新重心まわり I", tensorRows)
+        ].join("");
+      }
     }
 
     function renderLayoutImpactOutput(data) {
@@ -9953,21 +10283,21 @@ aside > .measure-section .measure-diagram {
           label: "ドリル角",
           step: 5,
           unit: "5°",
-          note: "読み出し位置と角度和。小さいほど早く、大きいほど奥へ寄る。"
+          note: "コア基準線の幾何配置を変更する。早さや軌道への変換にはレーン動力学が必要。"
         },
         {
           id: "layoutPinPap",
           label: "PIN-PAP",
           step: 0.25,
           unit: "1/4\"",
-          note: "PAP-NAP軸に対するコア姿勢。フレアと軸慣性への寄与が最も直接的。"
+          note: "PAP-NAP初期回転軸に対するコア姿勢と静的軸慣性を変更する。フレア量そのものではない。"
         },
         {
           id: "layoutValAngle",
           label: "VAL角",
           step: 5,
           unit: "5°",
-          note: "角度和とブレイク形状。小さいほど移行が速く、大きいほど緩やか。"
+          note: "PinとVALの幾何関係を変更する。ブレイク形状への換算は静的モデルの対象外。"
         }
       ];
       output.innerHTML = cases.map((item) => layoutImpactCard(item, base)).join("");
@@ -11551,7 +11881,272 @@ aside > .measure-section .measure-diagram {
       setZoom(1);
     });
 
+    function setupMotionSimulation() {
+      document.querySelector("#motionSimulationToggle")?.addEventListener("click", () => {
+        motionSim.running = !motionSim.running;
+        document.querySelector("#motionSimulationToggle").textContent = motionSim.running ? "一時停止" : "再生";
+        if (motionSim.running) {
+          motionSim.lastTimestamp = 0;
+          motionSim.frameId = requestAnimationFrame(motionSimulationFrame);
+        } else if (motionSim.frameId) {
+          cancelAnimationFrame(motionSim.frameId);
+          motionSim.frameId = 0;
+        }
+      });
+      document.querySelector("#motionSimulationReset")?.addEventListener("click", resetMotionSimulation);
+      document.querySelector("#motionSimulationMode")?.addEventListener("change", resetMotionSimulation);
+      document.querySelector("#motionFlareVisible")?.addEventListener("change", draw);
+      document.querySelector("#motionSimulationRpm")?.addEventListener("change", resetMotionSimulation);
+      document.querySelector("#motionSimulationSpeed")?.addEventListener("change", draw);
+      resetMotionSimulation();
+    }
+
+    function resetMotionSimulation() {
+      if (motionSim.frameId) cancelAnimationFrame(motionSim.frameId);
+      const data = layout();
+      data.physicalModel = calculatePhysicalModel(data);
+      const initial = normalize(data.dualLayout?.pap || { x: 0, y: 0, z: data.ballRadius });
+      const rpm = clamp(Number(document.querySelector("#motionSimulationRpm")?.value || 350), 50, 700);
+      const omegaMagnitude = rpm * Math.PI * 2 / 60;
+      const axes = data.physicalModel.principalAxes;
+      motionSim.running = false;
+      motionSim.angle = 0;
+      motionSim.revolutions = 0;
+      motionSim.distanceFeet = 0;
+      motionSim.axis = initial;
+      motionSim.initialAxis = initial;
+      motionSim.initialAxisRg = Math.sqrt(axisInertia(initial, data.physicalModel.tensorAfter) / data.physicalModel.massAfter);
+      motionSim.currentAxisRg = motionSim.initialAxisRg;
+      const empiricalFlareInches = usbcDifferentialFlareEstimate(data.physicalModel.totalDiffAfter);
+      motionSim.maxFlareRadians = empiricalFlareInches / data.ballRadius;
+      motionSim.ballRadius = data.ballRadius;
+      motionSim.omegaPrincipal = {
+        x: dot(initial, axes[0]) * omegaMagnitude,
+        y: dot(initial, axes[1]) * omegaMagnitude,
+        z: dot(initial, axes[2]) * omegaMagnitude
+      };
+      const gripBasis = data.dualLayout?.layoutBasis;
+      const gripNormal = normalize(data.dualLayout?.gripCenter || { x: 0, y: 0, z: data.ballRadius });
+      let landingReference;
+      if (data.hasThumb && gripBasis) {
+        landingReference = normalize(add(
+          add(scalePoint(gripNormal, data.ballRadius), scalePoint(gripBasis.right, data.thumb.x)),
+          scalePoint(gripBasis.up, data.thumb.y - data.thumb.radius)
+        ));
+      } else if (!data.hasThumb && data.dualLayout?.pin) {
+        landingReference = normalize(data.dualLayout.pin);
+      } else if (gripBasis) {
+        landingReference = normalize(add(scalePoint(gripNormal, data.ballRadius), scalePoint(gripBasis.up, -data.ballRadius)));
+      } else {
+        landingReference = normalize({ x: 0, y: -1, z: 0 });
+      }
+      let bowtieTowardLanding = sub(landingReference, scalePoint(initial, dot(landingReference, initial)));
+      if (Math.hypot(bowtieTowardLanding.x, bowtieTowardLanding.y, bowtieTowardLanding.z) < 1e-9) {
+        bowtieTowardLanding = sub(axes[0], scalePoint(initial, dot(axes[0], initial)));
+      }
+      motionSim.bowtieAxis = normalize(bowtieTowardLanding);
+      motionSim.migrationDirectionSign = data.hasThumb
+        ? flareDirectionAwayFromGrip(initial, motionSim.bowtieAxis, data)
+        : 0;
+      motionSim.flareTracks = [createFlareTrack(initial, data, 0, true)];
+      motionSim.lastFlareRevolution = 0;
+      motionSim.lastTimestamp = 0;
+      motionSim.frameId = 0;
+      const toggle = document.querySelector("#motionSimulationToggle");
+      if (toggle) toggle.textContent = "再生";
+      updateMotionSimulationReadout();
+      draw();
+    }
+
+    function usbcDifferentialFlareEstimate(totalDiff) {
+      const measurements = [
+        [0.000, 0.1875], [0.010, 0.625], [0.020, 1.125], [0.030, 1.500],
+        [0.040, 2.250], [0.050, 2.875], [0.060, 3.4375], [0.070, 3.875]
+      ];
+      const value = clamp(totalDiff, measurements[0][0], measurements[measurements.length - 1][0]);
+      for (let index = 1; index < measurements.length; index++) {
+        const [rightDiff, rightFlare] = measurements[index];
+        const [leftDiff, leftFlare] = measurements[index - 1];
+        if (value <= rightDiff) {
+          const ratio = (value - leftDiff) / (rightDiff - leftDiff);
+          return leftFlare + (rightFlare - leftFlare) * ratio;
+        }
+      }
+      return measurements[measurements.length - 1][1];
+    }
+
+    function layoutHoleSurfaceDirection(hole, data) {
+      const basis = data.dualLayout?.layoutBasis;
+      const origin = normalize(data.dualLayout?.gripCenter || { x: 0, y: 0, z: data.ballRadius });
+      if (!basis) return normalize({ x: hole.x, y: hole.y, z: data.ballRadius });
+      return normalize(add(
+        add(scalePoint(origin, data.ballRadius), scalePoint(basis.right, hole.x)),
+        scalePoint(basis.up, hole.y)
+      ));
+    }
+
+    function flareDirectionAwayFromGrip(initialAxis, bowtieAxis, data) {
+      const holes = data.holes.map((hole) => layoutHoleSurfaceDirection(hole, data));
+      const probeAngle = 2 * Math.PI / 180;
+      const clearance = (sign) => {
+        const axis = normalize(rotateAroundAxis(initialAxis, bowtieAxis, sign * probeAngle));
+        return Math.min(...holes.map((hole) => Math.asin(clamp(Math.abs(dot(axis, hole)), 0, 1))));
+      };
+      return clearance(1) >= clearance(-1) ? 1 : -1;
+    }
+
+    function eulerAngularAcceleration(omega, moments) {
+      const [i1, i2, i3] = moments;
+      return {
+        x: (i2 - i3) / i1 * omega.y * omega.z,
+        y: (i3 - i1) / i2 * omega.z * omega.x,
+        z: (i1 - i2) / i3 * omega.x * omega.y
+      };
+    }
+
+    function integrateEulerAngularVelocity(omega, moments, dt) {
+      let result = { ...omega };
+      const steps = Math.max(1, Math.ceil(dt / 0.002));
+      const h = dt / steps;
+      for (let step = 0; step < steps; step++) {
+        const k1 = eulerAngularAcceleration(result, moments);
+        const k2 = eulerAngularAcceleration(add(result, scalePoint(k1, h / 2)), moments);
+        const k3 = eulerAngularAcceleration(add(result, scalePoint(k2, h / 2)), moments);
+        const k4 = eulerAngularAcceleration(add(result, scalePoint(k3, h)), moments);
+        result = add(result, scalePoint(add(add(k1, scalePoint(k2, 2)), add(scalePoint(k3, 2), k4)), h / 6));
+      }
+      return result;
+    }
+
+    function principalToBallVector(components, axes) {
+      return add(
+        add(scalePoint(axes[0], components.x), scalePoint(axes[1], components.y)),
+        scalePoint(axes[2], components.z)
+      );
+    }
+
+    function projectAxisToInitialRg(candidateAxis, initialAxis, model) {
+      const moments = model.principalMoments;
+      const axes = model.principalAxes;
+      const initialMoment = axisInertia(initialAxis, model.tensorAfter);
+      const candidate = {
+        x: dot(candidateAxis, axes[0]),
+        y: dot(candidateAxis, axes[1]),
+        z: dot(candidateAxis, axes[2])
+      };
+      const initial = {
+        x: dot(initialAxis, axes[0]),
+        y: dot(initialAxis, axes[1]),
+        z: dot(initialAxis, axes[2])
+      };
+      let projected;
+      if (initialMoment <= moments[1]) {
+        const yRadius = Math.sqrt(clamp((initialMoment - moments[0]) / Math.max(1e-12, moments[1] - moments[0]), 0, 1));
+        const zRadius = Math.sqrt(clamp((initialMoment - moments[0]) / Math.max(1e-12, moments[2] - moments[0]), 0, 1));
+        const phase = Math.atan2(candidate.z / Math.max(zRadius, 1e-9), candidate.y / Math.max(yRadius, 1e-9));
+        const y = yRadius * Math.cos(phase);
+        const z = zRadius * Math.sin(phase);
+        const x = Math.sign(initial.x || 1) * Math.sqrt(Math.max(0, 1 - y * y - z * z));
+        projected = { x, y, z };
+      } else {
+        const xRadius = Math.sqrt(clamp((moments[2] - initialMoment) / Math.max(1e-12, moments[2] - moments[0]), 0, 1));
+        const yRadius = Math.sqrt(clamp((moments[2] - initialMoment) / Math.max(1e-12, moments[2] - moments[1]), 0, 1));
+        const phase = Math.atan2(candidate.y / Math.max(yRadius, 1e-9), candidate.x / Math.max(xRadius, 1e-9));
+        const x = xRadius * Math.cos(phase);
+        const y = yRadius * Math.sin(phase);
+        const z = Math.sign(initial.z || 1) * Math.sqrt(Math.max(0, 1 - x * x - y * y));
+        projected = { x, y, z };
+      }
+      return normalize(principalToBallVector(projected, axes));
+    }
+
+    function limitAxisMigration(initialAxis, candidateAxis, maxAngle) {
+      const from = normalize(initialAxis);
+      const to = normalize(candidateAxis);
+      const angle = Math.acos(clamp(dot(from, to), -1, 1));
+      if (angle <= maxAngle || angle < 1e-10) return to;
+      const tangent = normalize(sub(to, scalePoint(from, Math.cos(angle))));
+      return normalize(add(scalePoint(from, Math.cos(maxAngle)), scalePoint(tangent, Math.sin(maxAngle))));
+    }
+
+    function motionSimulationFrame(timestamp) {
+      if (!motionSim.running) return;
+      const dt = motionSim.lastTimestamp ? Math.min(0.05, Math.max(0, (timestamp - motionSim.lastTimestamp) / 1000)) : 0;
+      motionSim.lastTimestamp = timestamp;
+      const rpm = clamp(Number(document.querySelector("#motionSimulationRpm")?.value || 350), 50, 700);
+      const speedKmh = clamp(Number(document.querySelector("#motionSimulationSpeed")?.value || 27.4), 8, 48);
+      const speedFeetPerSecond = speedKmh * 1000 / 3600 * 3.280839895;
+      const remainingFeet = Math.max(0, 60 - motionSim.distanceFeet);
+      const simulationDt = speedFeetPerSecond > 0 ? Math.min(dt, remainingFeet / speedFeetPerSecond) : 0;
+      const revolutionsStep = rpm / 60 * simulationDt;
+      motionSim.revolutions += revolutionsStep;
+      motionSim.angle = (motionSim.angle + revolutionsStep * Math.PI * 2) % (Math.PI * 2);
+      motionSim.distanceFeet = Math.min(60, motionSim.distanceFeet + speedFeetPerSecond * simulationDt);
+
+      if (document.querySelector("#motionSimulationMode")?.value === "migration" && simulationDt > 0) {
+        const data = layout();
+        data.physicalModel = calculatePhysicalModel(data);
+        motionSim.omegaPrincipal = integrateEulerAngularVelocity(
+          motionSim.omegaPrincipal,
+          data.physicalModel.principalMoments,
+          simulationDt
+        );
+        const constantRgAxis = projectAxisToInitialRg(
+          principalToBallVector(motionSim.omegaPrincipal, data.physicalModel.principalAxes),
+          motionSim.initialAxis,
+          data.physicalModel
+        );
+        const migrationAngle = Math.min(
+          Math.acos(clamp(dot(normalize(motionSim.initialAxis), constantRgAxis), -1, 1)),
+          motionSim.maxFlareRadians
+        );
+        const migrationTangent = normalize(cross(motionSim.bowtieAxis, motionSim.initialAxis));
+        const dynamicsDirection = dot(constantRgAxis, migrationTangent) >= 0 ? 1 : -1;
+        const direction = motionSim.migrationDirectionSign || dynamicsDirection;
+        motionSim.axis = normalize(rotateAroundAxis(
+          motionSim.initialAxis,
+          motionSim.bowtieAxis,
+          direction * migrationAngle
+        ));
+        motionSim.currentAxisRg = Math.sqrt(axisInertia(motionSim.axis, data.physicalModel.tensorAfter) / data.physicalModel.massAfter);
+        if (motionSim.revolutions - motionSim.lastFlareRevolution >= 0.9) {
+          const previous = motionSim.flareTracks[motionSim.flareTracks.length - 1];
+          if (axisAngleDegrees(previous?.axis, motionSim.axis) >= 0.12) {
+            motionSim.flareTracks.push(createFlareTrack(motionSim.axis, data, motionSim.revolutions, false));
+            if (motionSim.flareTracks.length > 14) motionSim.flareTracks.splice(1, 1);
+          }
+          motionSim.lastFlareRevolution = motionSim.revolutions;
+        }
+      }
+      updateMotionSimulationReadout();
+      draw();
+      if (motionSim.distanceFeet >= 60 - 1e-9) {
+        motionSim.running = false;
+        motionSim.frameId = 0;
+        const toggle = document.querySelector("#motionSimulationToggle");
+        if (toggle) toggle.textContent = "再生完了";
+        return;
+      }
+      motionSim.frameId = requestAnimationFrame(motionSimulationFrame);
+    }
+
+    function axisAngleDegrees(a, b) {
+      if (!a || !b) return 0;
+      return Math.acos(clamp(dot(normalize(a), normalize(b)), -1, 1)) * 180 / Math.PI;
+    }
+
+    function updateMotionSimulationReadout() {
+      const readout = document.querySelector("#motionSimulationReadout");
+      if (!readout) return;
+      const migration = axisAngleDegrees(motionSim.initialAxis, motionSim.axis);
+      const flareWidth = motionSim.ballRadius * migration * Math.PI / 180;
+      readout.textContent = `距離 ${motionSim.distanceFeet.toFixed(1)} / 60.0 ft・回転 ${motionSim.revolutions.toFixed(1)} / 軸移動 ${migration.toFixed(2)}° / フレア幅 ${flareWidth.toFixed(2)} in / 軸RG ${motionSim.initialAxisRg.toFixed(3)}→${motionSim.currentAxisRg.toFixed(3)} / リング ${motionSim.flareTracks.length || 1}`;
+      const progress = document.querySelector("#motionSimulationProgress");
+      if (progress) progress.value = motionSim.distanceFeet;
+    }
+
     window.addEventListener("resize", draw);
+    setupMotionSimulation();
     draw();
 (() => {
   const parseSheetInch = (raw) => {

@@ -15,8 +15,21 @@ The user wants this to eventually reproduce real drill press work on a PC, inclu
 ## Main Deliverable
 
 - `outputs/bowling-drill-3d-prototype.html`
+- `outputs/FLARE_PHYSICS_TECHNICAL_NOTE.md`
+- `output/pdf/bowling_flare_physics_technical_note.pdf`
 
 This is a standalone HTML prototype with no external library dependency.
+
+## 2026-09-02 PAP / Axis Migration / Flare Model
+
+- PAP and NAP define the initial through-ball rotation axis; PAP inputs use `1/16"` increments.
+- The first track is the great circle perpendicular to the initial PAP axis.
+- Axis migration is integrated from the completed-ball inertia tensor with torque-free Euler rigid-body equations. It is a geometric tendency model, not a lane-time predictor.
+- Oil flare rings are successive contact-track histories. Oil records the track; it does not itself cause flare.
+- The simulated travel interval ends at 60 ft and speed is shown in km/h.
+- Thumb-present and thumbless layouts use separate Bowtie-side heuristics. The thumb-present branch chooses the direction that increases clearance from the grip holes; the thumbless branch uses PAP-PIN as a layout reference because PAP alone cannot determine the actual landing point.
+- Maximum displayed flare is capped by interpolation of the USBC Differential RG Study measurements.
+- Full equations, evidence, assumptions, and non-identifiable inputs are documented in `outputs/FLARE_PHYSICS_TECHNICAL_NOTE.md` and its generated PDF.
 
 ## Current Modeling Rules
 
