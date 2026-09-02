@@ -9,7 +9,7 @@ from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle, KeepTogether
+    SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,6 +40,11 @@ code = ParagraphStyle("CodeJP", parent=body, fontName="NotoJP", fontSize=8.2, le
                       leftIndent=8, rightIndent=8, backColor=colors.HexColor("#F2F6F6"),
                       borderColor=colors.HexColor("#B9D4D0"), borderWidth=.5, borderPadding=6)
 bullet = ParagraphStyle("BulletJP", parent=body, leftIndent=12, firstLineIndent=-7, bulletIndent=3)
+formula = ParagraphStyle("FormulaJP", parent=body, fontName="NotoJP", fontSize=12,
+                         leading=19, alignment=TA_CENTER, textColor=INK,
+                         backColor=colors.HexColor("#F2F6F6"),
+                         borderColor=colors.HexColor("#B9D4D0"), borderWidth=.5,
+                         borderPadding=7, spaceBefore=3, spaceAfter=3)
 
 
 def esc(text):
@@ -57,11 +62,64 @@ def footer(canvas, doc):
     canvas.restoreState()
 
 
+FORMULA_DISPLAY = {
+    r"M' = M - \sum_h m_h": "M′ = M − Σ<sub>h</sub> m<sub>h</sub>",
+    r"\boldsymbol{c} = -\frac{\sum_h m_h\boldsymbol{r}_h}{M'}":
+        "<b>c</b> = −(Σ<sub>h</sub> m<sub>h</sub><b>r</b><sub>h</sub>) / M′",
+    r"\mathbf{I}' = \mathbf{I}_{\mathrm{blank}}-\sum_h\mathbf{I}_h-M'\left(\lVert\boldsymbol{c}\rVert^2\mathbf{E}-\boldsymbol{c}\boldsymbol{c}^{\mathsf T}\right)":
+        "<b>I</b>′ = <b>I</b><sub>blank</sub> − Σ<sub>h</sub><b>I</b><sub>h</sub> − M′(‖<b>c</b>‖<super>2</super><b>E</b> − <b>c c</b><super>T</super>)",
+    r"RG_i=\sqrt{\frac{I_i}{M'}}": "RG<sub>i</sub> = √(I<sub>i</sub> / M′)",
+    r"\lVert\boldsymbol{r}\rVert=R,\qquad \boldsymbol{u}_0\cdot\boldsymbol{r}=0":
+        "‖<b>r</b>‖ = R,　<b>u</b><sub>0</sub> · <b>r</b> = 0",
+    r"\boldsymbol{\omega}(0)=\frac{2\pi\,\mathrm{rpm}}{60}\boldsymbol{u}_0":
+        "<b>ω</b>(0) = (2π rpm / 60)<b>u</b><sub>0</sub>",
+    r"\frac{d\omega_1}{dt}=\frac{(I_2-I_3)\omega_2\omega_3}{I_1}":
+        "dω<sub>1</sub>/dt = (I<sub>2</sub> − I<sub>3</sub>)ω<sub>2</sub>ω<sub>3</sub> / I<sub>1</sub>",
+    r"\frac{d\omega_2}{dt}=\frac{(I_3-I_1)\omega_3\omega_1}{I_2}":
+        "dω<sub>2</sub>/dt = (I<sub>3</sub> − I<sub>1</sub>)ω<sub>3</sub>ω<sub>1</sub> / I<sub>2</sub>",
+    r"\frac{d\omega_3}{dt}=\frac{(I_1-I_2)\omega_1\omega_2}{I_3}":
+        "dω<sub>3</sub>/dt = (I<sub>1</sub> − I<sub>2</sub>)ω<sub>1</sub>ω<sub>2</sub> / I<sub>3</sub>",
+    r"s=R\Delta\theta": "s = RΔθ",
+    r"v_{\mathrm{ft/s}}=v\frac{1000}{3600}\times 3.280839895":
+        "v<sub>ft/s</sub> = v(1000 / 3600) × 3.280839895",
+    r"t_{60}=\frac{60}{v_{\mathrm{ft/s}}}": "t<sub>60</sub> = 60 / v<sub>ft/s</sub>",
+    r"N=\frac{\mathrm{rpm}}{60}t_{60}": "N = (rpm / 60)t<sub>60</sub>",
+}
+
+
+def formula_flowable(latex):
+    display = FORMULA_DISPLAY.get(latex, esc(latex))
+    return Paragraph(display, formula)
+
+
+INLINE_DISPLAY = {
+    r"\boldsymbol{u}_0": "<b>u</b><sub>0</sub>",
+    r"\boldsymbol{c}": "<b>c</b>",
+    r"\mathbf{I}'": "<b>I</b>′",
+    r"I_1\le I_2\le I_3": "I<sub>1</sub> ≤ I<sub>2</sub> ≤ I<sub>3</sub>",
+    r"R": "<i>R</i>",
+    r"\Delta\theta": "Δθ",
+    r"v": "<i>v</i>",
+    r"v=R\omega": "<i>v</i> = <i>Rω</i>",
+}
+
+
+def inline_formula(match):
+    latex = match.group(1)
+    return INLINE_DISPLAY.get(latex, f"<i>{esc(latex)}</i>")
+
+
+def rich_inline(text):
+    cleaned = re.sub(r"`([^`]+)`", r"<b>\1</b>", esc(text))
+    return re.sub(r"\$([^$]+)\$", inline_formula, cleaned)
+
+
 def parse_markdown(text):
     lines = text.splitlines()
     story = []
     i = 0
     first_title = True
+    formula_index = 0
     while i < len(lines):
         line = lines[i].rstrip()
         if not line:
@@ -75,6 +133,16 @@ def parse_markdown(text):
                 block.append(lines[i])
                 i += 1
             story.append(Paragraph("<br/>".join(esc(x).replace(" ", "&nbsp;") for x in block), code))
+            i += 1
+            continue
+        if line == "$$":
+            formula = []
+            i += 1
+            while i < len(lines) and lines[i].strip() != "$$":
+                formula.append(lines[i].strip())
+                i += 1
+            formula_index += 1
+            story.append(formula_flowable(" ".join(formula)))
             i += 1
             continue
         if line.startswith("| "):
@@ -106,15 +174,14 @@ def parse_markdown(text):
         elif line.startswith("### "):
             story.append(Paragraph(esc(line[4:]), h3))
         elif re.match(r"^\d+\. ", line):
-            story.append(Paragraph(esc(line), bullet))
+            story.append(Paragraph(rich_inline(line), bullet))
         elif line.startswith("- "):
-            story.append(Paragraph("• " + esc(line[2:]), bullet))
+            story.append(Paragraph("• " + rich_inline(line[2:]), bullet))
         elif re.match(r"^https?://", line.strip()):
             url = line.strip()
             story.append(Paragraph(f'<link href="{esc(url)}" color="#168C8C">{esc(url)}</link>', small))
         else:
-            cleaned = re.sub(r"`([^`]+)`", r"<b>\1</b>", esc(line))
-            story.append(Paragraph(cleaned, body))
+            story.append(Paragraph(rich_inline(line), body))
         i += 1
     return story
 
