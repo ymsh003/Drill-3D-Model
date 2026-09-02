@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bowling Drill Grip Center Prototype</title>
+  <title>ボウリング ドリル設計 | Drill Studio</title>
+  <meta name="description" content="メジャーシート、ドリルレイアウト、3Dプレビューを一つの作業画面で管理するボウリングボール設計ツール。" />
   <style>
     :root {
       color-scheme: dark;
@@ -6319,11 +6320,1705 @@ aside > .measure-section .measure-diagram {
 @media (max-width: 700px) {
   .motion-simulation-panel { width: 100%; }
 }
+
+/* 2026-09 information architecture and interface refinement */
+:root {
+  --bg: #071014;
+  --panel: #0d171c;
+  --panel-2: #132027;
+  --line: #29404a;
+  --line-strong: #3d5c67;
+  --text: #f4f8f8;
+  --muted: #9fb0b7;
+  --accent: #62d6b2;
+  --accent-strong: #8ce8cc;
+  --surface-raised: #17262d;
+  --surface-soft: #0b151a;
+  --focus: #91f2d5;
+  --shadow: 0 18px 48px rgba(0, 0, 0, .28);
+}
+
+body {
+  background:
+    radial-gradient(circle at 80% 0%, rgba(52, 154, 139, .13), transparent 35rem),
+    linear-gradient(180deg, #071014 0%, #0a1217 100%);
+}
+
+.app {
+  grid-template-columns: minmax(430px, 38%) minmax(620px, 62%);
+  grid-template-rows: 72px minmax(0, 1fr);
+  grid-template-areas:
+    "shell-header shell-header"
+    "controls viewer";
+  gap: 14px;
+  width: min(1600px, 100vw);
+  height: 100vh;
+  min-height: 760px;
+  padding: 14px;
+}
+
+.shell-header {
+  grid-area: shell-header;
+  display: grid;
+  grid-template-columns: minmax(250px, .8fr) minmax(520px, 1.45fr) auto;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+  padding: 10px 14px 10px 18px;
+  border: 1px solid rgba(98, 214, 178, .22);
+  border-radius: 14px;
+  background: rgba(13, 23, 28, .92);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .2);
+  backdrop-filter: blur(14px);
+}
+
+.brand-block { min-width: 0; }
+.brand-eyebrow {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--accent-strong);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.brand-title {
+  display: block;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.workflow-nav li {
+  position: relative;
+  min-width: 0;
+  padding: 8px 9px 8px 32px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #7f929a;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.workflow-nav li::before {
+  content: attr(data-step);
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  translate: 0 -50%;
+  border: 1px solid #45606a;
+  border-radius: 50%;
+  color: #aab8bd;
+  font-size: 10px;
+}
+body[data-profile-view="lookup"] .workflow-nav li:first-child,
+body[data-profile-view="register"] .workflow-nav li:first-child,
+body[data-profile-view="measure"] .workflow-nav li {
+  color: #dbf8ef;
+}
+body[data-profile-view="lookup"] .workflow-nav li:first-child,
+body[data-profile-view="register"] .workflow-nav li:first-child,
+body[data-profile-view="measure"] .workflow-nav li:first-child,
+body[data-profile-view="measure"] .workflow-nav li:nth-child(2) {
+  border-color: rgba(98, 214, 178, .28);
+  background: rgba(98, 214, 178, .09);
+}
+body[data-profile-view="lookup"] .workflow-nav li:first-child::before,
+body[data-profile-view="register"] .workflow-nav li:first-child::before,
+body[data-profile-view="measure"] .workflow-nav li::before {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #062018;
+}
+
+.shell-mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.shell-mode::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(98, 214, 178, .12);
+}
+.mode-measure { display: none; }
+body[data-profile-view="measure"] .mode-entry { display: none; }
+body[data-profile-view="measure"] .mode-measure { display: inline; }
+
+aside,
+.right-workspace {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(13, 23, 28, .94);
+  box-shadow: var(--shadow);
+}
+aside { padding: 10px; }
+aside > * + * { margin-top: 12px; }
+
+.section,
+.sheet-card,
+.motion-simulation-panel {
+  border-color: var(--line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(23, 38, 45, .98), rgba(17, 30, 36, .98));
+}
+.section::before,
+.sheet-card::before {
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  background: var(--section-accent, var(--accent));
+  opacity: .82;
+}
+.section > h2,
+.sheet-card > h2,
+.sheet-card > h3 {
+  margin-bottom: 12px;
+  font-size: 16px;
+  letter-spacing: .02em;
+}
+
+input,
+select,
+textarea,
+button {
+  border-radius: 8px;
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+[contenteditable="true"]:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+button { transition: border-color .16s ease, background-color .16s ease, transform .16s ease; }
+button:hover { border-color: rgba(140, 232, 204, .72); }
+button:active { transform: translateY(1px); }
+
+.profile-roster-toolbar {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.profile-roster-title { font-size: 15px; }
+.profile-results { gap: 7px; }
+.profile-result-row {
+  border-radius: 10px;
+  background: rgba(7, 16, 20, .6);
+}
+.profile-start-actions { margin-top: 12px; }
+#newProfile,
+#registerProfile,
+#quickSaveProfile,
+#motionSimulationToggle {
+  border-color: rgba(98, 214, 178, .48);
+  background: linear-gradient(180deg, #287a65, #1e5f50);
+  color: #f3fffb;
+}
+
+.right-workspace {
+  padding: 10px;
+  gap: 12px;
+}
+.viewer {
+  border-color: #31505a;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(62, 104, 112, .18), transparent 42%),
+    linear-gradient(90deg, rgba(136, 202, 210, .035) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(136, 202, 210, .035) 1px, transparent 1px),
+    #081115;
+  background-size: auto, 48px 48px, 48px 48px, auto;
+}
+.viewer .title {
+  left: 22px;
+  top: 20px;
+  max-width: 480px;
+  padding: 11px 13px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  background: linear-gradient(90deg, rgba(5, 13, 16, .82), rgba(5, 13, 16, 0));
+}
+.viewer h1 { font-size: 20px; }
+.viewer .title p { font-size: 12px; }
+.legend,
+.zoom-hud {
+  border-color: rgba(140, 232, 204, .2);
+  border-radius: 9px;
+  background: rgba(5, 13, 16, .8);
+}
+.motion-simulation-panel { box-shadow: none; }
+
+body[data-profile-view="lookup"] .app,
+body[data-profile-view="register"] .app {
+  display: grid;
+  grid-template-columns: minmax(0, 820px);
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "shell-header"
+    "controls";
+  justify-content: center;
+  align-content: start;
+  width: min(1120px, 100%);
+  padding-top: 22px;
+}
+body[data-profile-view="lookup"] .shell-header,
+body[data-profile-view="register"] .shell-header {
+  grid-template-columns: minmax(220px, .85fr) minmax(430px, 1.4fr);
+}
+body[data-profile-view="lookup"] .shell-mode,
+body[data-profile-view="register"] .shell-mode { display: none; }
+body[data-profile-view="lookup"] aside,
+body[data-profile-view="register"] aside {
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(13, 23, 28, .94);
+  box-shadow: var(--shadow);
+}
+body[data-profile-view="lookup"] .data-section,
+body[data-profile-view="register"] .data-section { padding: 20px; }
+
+@media (max-width: 1200px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(640px, 74vh) auto;
+    grid-template-areas:
+      "shell-header"
+      "controls"
+      "viewer";
+    height: auto;
+  }
+  .shell-header { grid-template-columns: minmax(220px, .7fr) minmax(500px, 1.3fr); }
+  .shell-mode { display: none; }
+  aside { height: 100%; }
+  .right-workspace { min-height: 760px; }
+}
+
+@media (max-width: 760px) {
+  .app,
+  body[data-profile-view="lookup"] .app,
+  body[data-profile-view="register"] .app {
+    grid-template-rows: auto auto auto;
+    width: 100%;
+    padding: 8px;
+    gap: 8px;
+  }
+  .shell-header,
+  body[data-profile-view="lookup"] .shell-header,
+  body[data-profile-view="register"] .shell-header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+  .brand-title { font-size: 17px; }
+  .workflow-nav { gap: 4px; }
+  .workflow-nav li {
+    padding: 27px 3px 4px;
+    text-align: center;
+    font-size: 10px;
+    white-space: normal;
+  }
+  .workflow-nav li::before {
+    left: 50%;
+    top: 3px;
+    translate: -50% 0;
+  }
+  aside,
+  .right-workspace { border-radius: 11px; }
+  body[data-profile-view="lookup"] .data-section,
+  body[data-profile-view="register"] .data-section { padding: 14px; }
+  .viewer .title { right: 14px; left: 14px; top: 14px; }
+  .viewer .title p { display: none; }
+  .legend { right: 14px; left: 14px; bottom: 14px; gap: 8px; }
+}
+
+/* Three-screen workflow: profile -> measure/PAP -> layout/3D */
+.workflow-nav button {
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  white-space: inherit;
+}
+.workflow-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.workflow-nav li[aria-current="step"] {
+  border-color: rgba(98, 214, 178, .42);
+  background: rgba(98, 214, 178, .13);
+  color: #effff9;
+}
+.workflow-nav li[aria-current="step"]::before {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #062018;
+}
+.workflow-nav button:disabled { cursor: not-allowed; opacity: .42; }
+.workflow-nav button:not(:disabled) { cursor: pointer; }
+
+body[data-profile-view="measure"][data-workspace-stage="measure"] .workflow-nav li:nth-child(2),
+body[data-profile-view="measure"][data-workspace-stage="layout"] .workflow-nav li:nth-child(3) {
+  border-color: rgba(98, 214, 178, .42);
+  background: rgba(98, 214, 178, .13);
+  color: #effff9;
+}
+
+.stage-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 0 2px;
+}
+.stage-actions button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(98, 214, 178, .44);
+  background: #1e6554;
+  color: #f3fffb;
+  font-weight: 800;
+}
+.stage-actions .secondary-action {
+  border-color: var(--line-strong);
+  background: #15242b;
+  color: var(--text);
+}
+
+/* Modeling inputs are intentionally deferred from the current workflow. */
+.ball-model-panel { display: none !important; }
+
+body[data-profile-view="measure"][data-workspace-stage="measure"] .viewer,
+body[data-profile-view="measure"][data-workspace-stage="measure"] .motion-simulation-panel,
+body[data-profile-view="measure"][data-workspace-stage="measure"] .drill-layout-panel,
+body[data-profile-view="measure"][data-workspace-stage="measure"] .layout-stage-actions,
+body[data-profile-view="measure"][data-workspace-stage="layout"] aside,
+body[data-profile-view="measure"][data-workspace-stage="layout"] .measure-section,
+body[data-profile-view="measure"][data-workspace-stage="layout"] .personal-axis-panel,
+body[data-profile-view="measure"][data-workspace-stage="layout"] .measure-stage-actions {
+  display: none !important;
+}
+
+body[data-profile-view="measure"][data-workspace-stage="measure"] .app {
+  grid-template-columns: minmax(450px, .95fr) minmax(560px, 1.05fr);
+}
+body[data-profile-view="measure"][data-workspace-stage="measure"] .right-workspace {
+  display: block;
+  overflow: auto;
+}
+body[data-profile-view="measure"][data-workspace-stage="measure"] .measure-section,
+body[data-profile-view="measure"][data-workspace-stage="measure"] .right-modeling-controls {
+  display: block;
+}
+body[data-profile-view="measure"][data-workspace-stage="measure"] .personal-axis-panel {
+  margin-top: 12px;
+}
+
+body[data-profile-view="measure"][data-workspace-stage="layout"] .app {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "shell-header"
+    "viewer";
+  max-width: 1320px;
+}
+body[data-profile-view="measure"][data-workspace-stage="layout"] .right-workspace {
+  grid-template-columns: minmax(0, 1.55fr) minmax(340px, .65fr);
+  grid-template-rows: minmax(520px, 1fr) auto;
+  grid-template-areas:
+    "viewer layout"
+    "motion layout";
+  overflow: hidden;
+}
+body[data-profile-view="measure"][data-workspace-stage="layout"] .viewer { grid-area: viewer; }
+body[data-profile-view="measure"][data-workspace-stage="layout"] .motion-simulation-panel { grid-area: motion; }
+body[data-profile-view="measure"][data-workspace-stage="layout"] .right-modeling-controls {
+  grid-area: layout;
+  display: block;
+  overflow: auto;
+}
+body[data-profile-view="measure"][data-workspace-stage="layout"] .drill-layout-panel { margin: 0; }
+
+/* Pitch controls live in their own row below the finger-hole circles. */
+.measure-pitch-control.measure-pitch-middle,
+.measure-pitch-control.measure-pitch-ring {
+  top: 51% !important;
+  width: 150px;
+  height: 118px;
+  padding-top: 18px;
+  border: 1px solid rgba(89, 201, 167, .22);
+  border-radius: 10px;
+  background: rgba(3, 20, 24, .88);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 32% !important;
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 68% !important;
+}
+.measure-pitch-control.measure-pitch-middle .measure-pitch-label,
+.measure-pitch-control.measure-pitch-ring .measure-pitch-label {
+  top: 7px;
+  background: transparent;
+}
+.measure-pitch-control.measure-pitch-middle::before,
+.measure-pitch-control.measure-pitch-middle::after,
+.measure-pitch-control.measure-pitch-ring::before,
+.measure-pitch-control.measure-pitch-ring::after {
+  top: 61%;
+}
+.measure-pitch-control.measure-pitch-middle .measure-pitch-button.right,
+.measure-pitch-control.measure-pitch-middle .measure-pitch-button.left,
+.measure-pitch-control.measure-pitch-ring .measure-pitch-button.right,
+.measure-pitch-control.measure-pitch-ring .measure-pitch-button.left {
+  top: 61%;
+}
+.measure-diagram .measure-sheet-caption.field-middle-hole,
+.measure-diagram .measure-sheet-caption.field-ring-hole {
+  top: 46% !important;
+}
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span { top: 66% !important; }
+.measure-diagram .measure-sheet-caption.field-main-span,
+.measure-diagram .measure-sheet-caption.field-offset-span { top: 62% !important; }
+
+@media (max-width: 1200px) {
+  body[data-profile-view="measure"][data-workspace-stage="measure"] .app,
+  body[data-profile-view="measure"][data-workspace-stage="layout"] .app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "shell-header"
+      "controls"
+      "viewer";
+  }
+  body[data-profile-view="measure"][data-workspace-stage="layout"] .app {
+    grid-template-areas:
+      "shell-header"
+      "viewer";
+  }
+  body[data-profile-view="measure"][data-workspace-stage="layout"] .right-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(480px, 62vh) auto auto;
+    grid-template-areas:
+      "viewer"
+      "layout"
+      "motion";
+    overflow: visible;
+  }
+}
+
+@media (max-width: 700px) {
+  .measure-pitch-control.measure-pitch-middle,
+  .measure-pitch-control.measure-pitch-ring {
+    top: 49% !important;
+    width: 132px;
+    height: 112px;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring { left: 24% !important; }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle { left: 76% !important; }
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span { top: 62% !important; }
+  .measure-diagram .measure-sheet-caption.field-main-span,
+  .measure-diagram .measure-sheet-caption.field-offset-span { top: 58.5% !important; }
+  .stage-actions { justify-content: stretch; }
+  .stage-actions button { width: 100%; }
+}
+
+/* Conventional measure-sheet placement refinement */
+#quickSaveProfile { display: none !important; }
+
+.measure-pitch-control,
+.measure-pitch-control.measure-pitch-middle,
+.measure-pitch-control.measure-pitch-ring,
+.measure-pitch-control.measure-pitch-thumb {
+  width: 150px !important;
+  height: 118px !important;
+  padding-top: 18px;
+  border: 1px solid rgba(89, 201, 167, .22);
+  border-radius: 10px;
+  background: rgba(3, 20, 24, .88);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+}
+
+/* Finger pitch is aligned beside its hole, never over the circular size control. */
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 18% !important;
+  top: 40% !important;
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 82% !important;
+  top: 40% !important;
+}
+.measure-pitch-control.measure-pitch-thumb {
+  left: 78% !important;
+  top: 78% !important;
+}
+.measure-pitch-control.measure-pitch-thumb .measure-pitch-button,
+.measure-pitch-control.measure-pitch-thumb .measure-pitch-button.top,
+.measure-pitch-control.measure-pitch-thumb .measure-pitch-button.bottom {
+  width: 60px !important;
+  height: 28px !important;
+  font-size: 12px !important;
+}
+
+/* Depth follows a single vertical rule: finger below, thumb above. */
+.measure-depth-middle,
+.measure-depth-ring { top: 49% !important; }
+.measure-diagram[data-hand="right"] .measure-depth-middle,
+.measure-diagram[data-hand="left"] .measure-depth-ring { left: 39.091% !important; }
+.measure-diagram[data-hand="right"] .measure-depth-ring,
+.measure-diagram[data-hand="left"] .measure-depth-middle { left: 60.909% !important; }
+.measure-depth-thumb {
+  left: 50% !important;
+  top: 70% !important;
+}
+
+/* Bridge and hole captions stay attached to the geometry they describe. */
+.measure-diagram .measure-sheet-control.field-bridge { top: 32.5% !important; }
+.measure-diagram .measure-sheet-caption.field-bridge { top: 28.5% !important; }
+.measure-diagram .measure-sheet-caption.field-middle-hole,
+.measure-diagram .measure-sheet-caption.field-ring-hole { top: 44.5% !important; }
+.measure-diagram .measure-sheet-caption.field-thumb-hole { top: 83.2% !important; }
+
+.motion-simulation-panel h3 {
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+.motion-internal-setting { display: none !important; }
+.motion-primary-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: rgba(5, 17, 21, .72);
+}
+.motion-input-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 11px 12px;
+}
+.motion-input-field + .motion-input-field { border-left: 1px solid var(--line-strong); }
+.motion-input-label {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+}
+.motion-input-range {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.motion-value-entry {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+.motion-value-entry input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid rgba(103, 232, 249, .34);
+  background: #081419;
+  color: var(--text);
+  padding: 0 10px;
+  font-size: 16px;
+  font-weight: 800;
+}
+.motion-value-entry span {
+  min-width: 42px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 700px) {
+  .measure-pitch-control,
+  .measure-pitch-control.measure-pitch-middle,
+  .measure-pitch-control.measure-pitch-ring,
+  .measure-pitch-control.measure-pitch-thumb {
+    width: 126px !important;
+    height: 108px !important;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+    left: 16% !important;
+    top: 37% !important;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+    left: 84% !important;
+    top: 37% !important;
+  }
+  .measure-pitch-control.measure-pitch-thumb {
+    left: 80% !important;
+    top: 76% !important;
+  }
+  .measure-pitch-control.measure-pitch-thumb .measure-pitch-button,
+  .measure-pitch-control.measure-pitch-thumb .measure-pitch-button.top,
+  .measure-pitch-control.measure-pitch-thumb .measure-pitch-button.bottom {
+    width: 52px !important;
+    height: 24px !important;
+    font-size: 11px !important;
+  }
+  .measure-depth-middle,
+  .measure-depth-ring { top: 46% !important; }
+  .measure-depth-thumb { top: 68% !important; }
+  .measure-diagram .measure-sheet-control.field-bridge { top: 29% !important; }
+  .measure-diagram .measure-sheet-caption.field-bridge { top: 25.5% !important; }
+  .measure-diagram .measure-sheet-caption.field-middle-hole,
+  .measure-diagram .measure-sheet-caption.field-ring-hole { top: 41.5% !important; }
+  .measure-diagram .measure-sheet-caption.field-thumb-hole { top: 80.2% !important; }
+  .motion-primary-inputs { grid-template-columns: minmax(0, 1fr); }
+  .motion-input-field + .motion-input-field {
+    border-top: 1px solid var(--line-strong);
+    border-left: 0;
+  }
+}
+
+/* Collision-free final placement: pitch above finger holes, thumb depth in the center lane. */
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 32% !important;
+  top: 24% !important;
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 68% !important;
+  top: 24% !important;
+}
+.measure-diagram .measure-sheet-control.field-bridge {
+  left: 50% !important;
+  top: 34.5% !important;
+}
+.measure-diagram .measure-sheet-caption.field-bridge {
+  left: 50% !important;
+  top: 30.5% !important;
+}
+.measure-depth-thumb {
+  left: 50% !important;
+  top: 68.5% !important;
+}
+.measure-depth-middle,
+.measure-depth-ring { top: 48.5% !important; }
+.measure-diagram[data-hand="right"] .measure-depth-middle,
+.measure-diagram[data-hand="left"] .measure-depth-ring { left: 39.091% !important; }
+.measure-diagram[data-hand="right"] .measure-depth-ring,
+.measure-diagram[data-hand="left"] .measure-depth-middle { left: 60.909% !important; }
+
+@media (max-width: 700px) {
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+    left: 27% !important;
+    top: 21.5% !important;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+    left: 73% !important;
+    top: 21.5% !important;
+  }
+  .measure-diagram .measure-sheet-control.field-bridge { top: 31% !important; }
+  .measure-diagram .measure-sheet-caption.field-bridge { top: 27.5% !important; }
+  .measure-depth-middle,
+  .measure-depth-ring { top: 45.5% !important; }
+  .measure-depth-thumb { top: 67.5% !important; }
+}
+
+/* Deterministic geometry: related labels and depth controls are anchored to each hole. */
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 32% !important;
+  top: 29.5% !important;
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 68% !important;
+  top: 29.5% !important;
+}
+.measure-diagram .measure-sheet-control.field-bridge {
+  left: 50% !important;
+  top: 40% !important;
+}
+.measure-diagram .measure-sheet-caption.field-bridge {
+  left: 50% !important;
+  top: 34.5% !important;
+}
+
+.measure-sheet-control .measure-sheet-caption.is-hole-attached {
+  position: absolute !important;
+  left: 50% !important;
+  top: calc(100% + 7px) !important;
+  width: max-content;
+  max-width: 140px;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  white-space: nowrap;
+}
+.measure-sheet-control .measure-depth-card.is-hole-attached {
+  position: absolute !important;
+  left: 50% !important;
+  top: calc(100% + 38px) !important;
+  width: 132px;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+}
+.measure-sheet-control .measure-depth-card.is-hole-attached span:first-child {
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span { top: 58% !important; }
+.measure-diagram .measure-sheet-caption.field-main-span,
+.measure-diagram .measure-sheet-caption.field-offset-span { top: 54% !important; }
+.measure-depth-thumb {
+  left: 50% !important;
+  top: 55% !important;
+}
+
+@media (max-width: 700px) {
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+    left: 27% !important;
+    top: 28.5% !important;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+    left: 73% !important;
+    top: 28.5% !important;
+  }
+  .measure-diagram .measure-sheet-control.field-bridge { top: 37% !important; }
+  .measure-diagram .measure-sheet-caption.field-bridge { top: 32.5% !important; }
+  .measure-sheet-control .measure-depth-card.is-hole-attached {
+    top: calc(100% + 34px) !important;
+    width: 118px;
+  }
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span { top: 56% !important; }
+  .measure-diagram .measure-sheet-caption.field-main-span,
+  .measure-diagram .measure-sheet-caption.field-offset-span { top: 52.5% !important; }
+  .measure-depth-thumb { top: 53% !important; }
+}
+
+/* Hole clusters: one visual unit per hole, with a shared circle diameter. */
+.hole-control-cluster {
+  position: absolute;
+  z-index: 18;
+  width: 200px;
+  height: 240px;
+  transform: translate(-50%, -56px);
+  overflow: visible;
+  pointer-events: none;
+}
+.hole-control-cluster.hole-middle { left: 39.091%; top: 40%; }
+.hole-control-cluster.hole-ring { left: 60.909%; top: 40%; }
+.hole-control-cluster.hole-thumb { left: 50%; top: 78%; }
+.hole-control-cluster .measure-sheet-control {
+  position: absolute !important;
+  left: 50% !important;
+  top: 0 !important;
+  width: 112px !important;
+  height: 112px !important;
+  min-height: 112px !important;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  pointer-events: auto;
+}
+.hole-control-cluster .measure-sheet-control button {
+  flex-basis: 32px !important;
+  min-height: 32px !important;
+  font-size: 24px !important;
+}
+.hole-control-cluster .measure-sheet-control .measure-sheet-value {
+  min-height: 44px !important;
+  font-size: 21px !important;
+}
+.hole-control-cluster .measure-sheet-caption.is-hole-attached {
+  position: absolute !important;
+  left: 50% !important;
+  top: 118px !important;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  pointer-events: none;
+}
+.hole-control-cluster .measure-depth-card {
+  position: absolute !important;
+  left: 50% !important;
+  top: 150px !important;
+  width: 132px !important;
+  margin: 0 !important;
+  transform: translateX(-50%) !important;
+  pointer-events: auto;
+}
+.hole-control-cluster.hole-thumb .measure-depth-card { top: -92px !important; }
+
+/* Pitch receives a larger operating area; bridge stays above the center line. */
+.measure-pitch-control,
+.measure-pitch-control.measure-pitch-middle,
+.measure-pitch-control.measure-pitch-ring,
+.measure-pitch-control.measure-pitch-thumb {
+  width: 190px !important;
+  height: 132px !important;
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 32% !important;
+  top: 29.8% !important;
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 68% !important;
+  top: 29.8% !important;
+}
+.measure-diagram .measure-sheet-control.field-bridge {
+  left: 50% !important;
+  top: 34.5% !important;
+}
+.measure-diagram .measure-sheet-caption.field-bridge {
+  left: 50% !important;
+  top: 30.8% !important;
+}
+
+@media (max-width: 700px) {
+  .hole-control-cluster {
+    width: 176px;
+    height: 220px;
+    transform: translate(-50%, -50px);
+  }
+  .hole-control-cluster.hole-middle { left: 39.091%; top: 37%; }
+  .hole-control-cluster.hole-ring { left: 60.909%; top: 37%; }
+  .hole-control-cluster.hole-thumb { left: 50%; top: 76%; }
+  .hole-control-cluster .measure-sheet-control {
+    width: 100px !important;
+    height: 100px !important;
+    min-height: 100px !important;
+  }
+  .hole-control-cluster .measure-sheet-caption.is-hole-attached { top: 106px !important; }
+  .hole-control-cluster .measure-depth-card {
+    top: 136px !important;
+    width: 118px !important;
+  }
+  .hole-control-cluster.hole-thumb .measure-depth-card { top: -86px !important; }
+  .measure-pitch-control,
+  .measure-pitch-control.measure-pitch-middle,
+  .measure-pitch-control.measure-pitch-ring,
+  .measure-pitch-control.measure-pitch-thumb {
+    width: 165px !important;
+    height: 120px !important;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+    left: 27% !important;
+    top: 25% !important;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+    left: 73% !important;
+    top: 25% !important;
+  }
+  .measure-diagram .measure-sheet-control.field-bridge {
+    top: 32.2% !important;
+    width: 136px !important;
+  }
+  .measure-diagram .measure-sheet-caption.field-bridge { top: 28.8% !important; }
+}
+
+/* Reserved vertical bands prevent pitch, bridge, and hole controls from sharing space. */
+aside > .measure-section .measure-diagram {
+  height: 1700px !important;
+  min-height: 1700px !important;
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+  left: 30% !important;
+  top: 28.5% !important;
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+  left: 70% !important;
+  top: 28.5% !important;
+}
+.measure-diagram .measure-sheet-control.field-bridge {
+  left: 50% !important;
+  top: 35.5% !important;
+}
+.measure-diagram .measure-sheet-caption.field-bridge {
+  left: 50% !important;
+  top: 32.5% !important;
+}
+.hole-control-cluster.hole-middle,
+.hole-control-cluster.hole-ring { top: 42% !important; }
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span { top: 60% !important; }
+.measure-diagram .measure-sheet-caption.field-main-span,
+.measure-diagram .measure-sheet-caption.field-offset-span { top: 56.5% !important; }
+
+@media (max-width: 700px) {
+  aside > .measure-section .measure-diagram {
+    height: 1800px !important;
+    min-height: 1800px !important;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring {
+    left: 27% !important;
+    top: 25% !important;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle {
+    left: 73% !important;
+    top: 25% !important;
+  }
+  .measure-diagram .measure-sheet-control.field-bridge {
+    left: 50% !important;
+    top: 32.5% !important;
+  }
+  .measure-diagram .measure-sheet-caption.field-bridge {
+    left: 50% !important;
+    top: 29.5% !important;
+  }
+  .hole-control-cluster.hole-middle,
+  .hole-control-cluster.hole-ring { top: 38.5% !important; }
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span { top: 56% !important; }
+  .measure-diagram .measure-sheet-caption.field-main-span,
+  .measure-diagram .measure-sheet-caption.field-offset-span { top: 52.5% !important; }
+}
+
+/* Product-wide interface system */
+:root {
+  --ui-radius-xs: 7px;
+  --ui-radius-sm: 10px;
+  --ui-radius-md: 14px;
+  --ui-space-1: 6px;
+  --ui-space-2: 10px;
+  --ui-space-3: 14px;
+  --ui-space-4: 18px;
+  --ui-space-5: 24px;
+  --ui-control: 44px;
+  --ui-surface-1: #0b161b;
+  --ui-surface-2: #102027;
+  --ui-surface-3: #162a32;
+  --ui-border: rgba(128, 180, 190, .22);
+  --ui-border-strong: rgba(125, 235, 255, .36);
+}
+
+body {
+  font-family: Inter, "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.app { gap: var(--ui-space-3); padding: var(--ui-space-3); }
+.shell-header {
+  min-height: 68px;
+  padding: 10px 16px;
+  border-color: var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: linear-gradient(180deg, rgba(16, 32, 39, .97), rgba(10, 22, 27, .97));
+}
+.brand-eyebrow { color: #74ddbf; font-size: 10px; }
+.brand-title { font-size: 17px; letter-spacing: .01em; }
+.workflow-nav { gap: 8px; }
+.workflow-nav li {
+  min-height: 40px;
+  padding: 7px 10px 7px 36px;
+  border-color: rgba(128, 180, 190, .13);
+  background: rgba(255, 255, 255, .018);
+}
+.workflow-nav li::before { left: 10px; width: 20px; height: 20px; }
+
+aside,
+.right-workspace {
+  border-color: var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-surface-1);
+}
+aside {
+  padding: var(--ui-space-2);
+  scrollbar-color: rgba(98, 214, 178, .35) transparent;
+}
+.right-workspace { padding: var(--ui-space-2); }
+
+.section,
+.sheet-card,
+.motion-simulation-panel {
+  padding: var(--ui-space-4);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: linear-gradient(180deg, rgba(20, 39, 46, .94), rgba(13, 28, 34, .96));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .16);
+}
+.section::before,
+.sheet-card::before { display: none; }
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  margin: 0 0 var(--ui-space-4);
+  padding-bottom: var(--ui-space-3);
+  border-bottom: 1px solid var(--ui-border);
+}
+.section-heading-text { min-width: 0; }
+.section-heading h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1.35;
+}
+.section-heading p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.section-kicker {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border: 1px solid rgba(98, 214, 178, .28);
+  border-radius: 999px;
+  background: rgba(98, 214, 178, .08);
+  color: #9cebd4;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.save-field,
+.material-field,
+.indicator-control,
+.dual-layout-field,
+.catalog-model-field {
+  gap: 7px;
+}
+.save-field > label,
+.material-field > label,
+.indicator-control > label,
+.dual-layout-field > span:first-child,
+.catalog-model-field > span:first-child {
+  color: #c9d7db;
+  font-size: 12px;
+  font-weight: 750;
+}
+.save-field input,
+.save-field select,
+.save-field textarea,
+.material-field input,
+.material-field select,
+.indicator-control select,
+.dual-layout-field select,
+.dual-layout-field input:not([type="range"]),
+.catalog-model-field input,
+.catalog-model-field select {
+  min-height: var(--ui-control);
+  border: 1px solid var(--ui-border-strong);
+  border-radius: var(--ui-radius-xs);
+  background: #071318;
+  color: var(--text);
+  padding: 0 11px;
+}
+textarea { padding-top: 10px !important; padding-bottom: 10px !important; }
+
+button {
+  min-height: 40px;
+  border-color: var(--ui-border-strong);
+  color: #edf8f7;
+  font-weight: 760;
+}
+#newProfile,
+#registerProfile,
+#continueToLayout,
+#motionSimulationToggle {
+  background: linear-gradient(180deg, #2b8069, #1e604f);
+  box-shadow: 0 8px 20px rgba(19, 101, 82, .2);
+}
+.danger-action {
+  border-color: rgba(241, 121, 165, .35) !important;
+  background: rgba(105, 32, 57, .22) !important;
+  color: #ffc4d8 !important;
+}
+
+.personal-measure-data-panel { background: linear-gradient(145deg, rgba(32, 77, 68, .32), rgba(14, 29, 35, .98) 52%); }
+.profile-roster-toolbar { min-height: 38px; }
+.profile-search-row { gap: 8px; }
+.profile-result-row {
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid var(--ui-border);
+}
+.profile-result-row:hover,
+.profile-result-row[aria-selected="true"] {
+  border-color: rgba(98, 214, 178, .5);
+  background: rgba(98, 214, 178, .08);
+}
+.profile-context-bar {
+  padding: 2px;
+  border-radius: var(--ui-radius-sm);
+}
+.profile-context-person {
+  border-color: var(--ui-border);
+  border-radius: var(--ui-radius-xs);
+  background: rgba(98, 214, 178, .06);
+}
+
+.measure-section {
+  overflow: hidden;
+  background: #0b181d;
+}
+.measure-section .measure-diagram {
+  border: 1px solid rgba(125, 235, 255, .2);
+  border-radius: var(--ui-radius-sm);
+  background-color: #07171b;
+}
+.personal-axis-panel,
+.drill-layout-panel { background: linear-gradient(145deg, rgba(37, 75, 83, .3), rgba(14, 29, 35, .98) 56%); }
+.dual-layout-grid { gap: 12px; }
+.dual-layout-field {
+  padding: 11px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-xs);
+  background: rgba(4, 18, 23, .48);
+}
+.dual-layout-readout {
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--ui-radius-xs) var(--ui-radius-xs) 0;
+  background: rgba(98, 214, 178, .06);
+}
+
+.stage-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+  margin-top: var(--ui-space-3);
+  padding: 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  background: rgba(7, 19, 24, .94);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, .28);
+  backdrop-filter: blur(12px);
+}
+.stage-actions button { min-height: 46px; padding-inline: 20px; }
+
+.viewer {
+  border-radius: var(--ui-radius-sm);
+  box-shadow: inset 0 0 0 1px rgba(125, 235, 255, .06);
+}
+.viewer .title { max-width: 430px; }
+.viewer .title h1 { font-size: 19px; }
+.legend { max-width: calc(100% - 40px); }
+.motion-simulation-panel { padding: var(--ui-space-3); }
+.motion-simulation-actions { gap: 10px; }
+.motion-simulation-readout {
+  padding: 8px 10px;
+  border-radius: var(--ui-radius-xs);
+  background: rgba(4, 18, 23, .55);
+}
+
+body[data-profile-view="lookup"] .data-section,
+body[data-profile-view="register"] .data-section {
+  padding: var(--ui-space-5);
+}
+body[data-profile-view="lookup"] #profileScreenTitle,
+body[data-profile-view="register"] #profileScreenTitle {
+  margin: 0 0 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ui-border);
+  font-size: 20px;
+}
+
+@media (max-width: 760px) {
+  .app { padding: 8px; gap: 8px; }
+  .shell-header { border-radius: 10px; }
+  .workflow-nav li { min-height: 50px; padding-top: 27px; }
+  .section,
+  .sheet-card { padding: 13px; }
+  .section-heading { align-items: center; }
+  .section-heading p { display: none; }
+  .section-kicker { font-size: 9px; }
+  .stage-actions { padding: 8px; }
+  .viewer .title h1 { font-size: 16px; }
+}
+
+/* Compact rhythm and deliberate Japanese wrapping */
+.app { gap: 10px; padding: 10px; }
+aside,
+.right-workspace { padding: 8px; }
+.section,
+.sheet-card,
+.motion-simulation-panel { padding: 14px; }
+.section + .section,
+.sheet-card + .sheet-card { margin-top: 10px; }
+.section-heading {
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+}
+.section-heading h2,
+.section-kicker,
+.workflow-nav button,
+.shell-mode,
+.save-field > label,
+.material-field > label,
+.indicator-control > label,
+.dual-layout-field > span:first-child,
+.catalog-model-field > span:first-child,
+.measure-sheet-caption,
+.measure-depth-card > span,
+.measure-pitch-label,
+button,
+output,
+.measure-sheet-value {
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+button,
+output,
+.measure-sheet-value,
+.measure-pitch-button,
+.measure-pitch-value { white-space: nowrap; }
+.section-heading p,
+.control-group-note,
+.motion-simulation-note,
+.dual-layout-readout,
+.physical-model-note,
+.profile-result-meta {
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+.section-heading p { max-width: 64ch; }
+input,
+select,
+textarea,
+.section-heading-text,
+.save-field,
+.material-field,
+.indicator-control,
+.dual-layout-field,
+.catalog-model-field { min-width: 0; }
+.save-field,
+.material-field,
+.indicator-control,
+.dual-layout-field,
+.catalog-model-field { gap: 5px; }
+.dual-layout-grid { gap: 8px; }
+.dual-layout-field { padding: 9px; }
+.dual-layout-readout { padding: 8px 10px; }
+.profile-result-row { min-height: 48px; padding: 8px 10px; }
+.stage-actions { margin-top: 10px; padding: 8px; }
+.stage-actions button { min-height: 44px; padding-inline: 16px; }
+.motion-simulation-panel { gap: 10px; }
+.motion-simulation-actions { gap: 8px; }
+body[data-profile-view="lookup"] .data-section,
+body[data-profile-view="register"] .data-section { padding: 18px; }
+body[data-profile-view="lookup"] #profileScreenTitle,
+body[data-profile-view="register"] #profileScreenTitle {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+}
+
+/* Compress the measure sheet while retaining dedicated collision-free bands. */
+aside > .measure-section .measure-diagram {
+  height: 1500px !important;
+  min-height: 1500px !important;
+}
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle { top: 29% !important; }
+.measure-diagram .measure-sheet-control.field-bridge { top: 37% !important; }
+.measure-diagram .measure-sheet-caption.field-bridge { top: 33.7% !important; }
+.hole-control-cluster.hole-middle,
+.hole-control-cluster.hole-ring { top: 44% !important; }
+.measure-diagram .measure-sheet-control.field-main-span,
+.measure-diagram .measure-sheet-control.field-offset-span { top: 59% !important; }
+.measure-diagram .measure-sheet-caption.field-main-span,
+.measure-diagram .measure-sheet-caption.field-offset-span { top: 55.5% !important; }
+.hole-control-cluster.hole-thumb { top: 74% !important; }
+
+@media (max-width: 760px) {
+  .app { padding: 6px; gap: 6px; }
+  aside,
+  .right-workspace { padding: 6px; }
+  .section,
+  .sheet-card,
+  .motion-simulation-panel { padding: 10px; }
+  .section-heading { gap: 7px; margin-bottom: 10px; padding-bottom: 8px; }
+  .section-heading h2 { font-size: 16px; }
+  .section-kicker { padding: 3px 6px; }
+  .profile-search-row { gap: 6px; }
+  .stage-actions { margin-top: 8px; padding: 6px; }
+}
+
+@media (max-width: 700px) {
+  aside > .measure-section .measure-diagram {
+    height: 1650px !important;
+    min-height: 1650px !important;
+  }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle { top: 25% !important; }
+  .measure-diagram .measure-sheet-control.field-bridge { top: 33% !important; }
+  .measure-diagram .measure-sheet-caption.field-bridge { top: 30% !important; }
+  .hole-control-cluster.hole-middle,
+  .hole-control-cluster.hole-ring { top: 40% !important; }
+  .measure-diagram .measure-sheet-control.field-main-span,
+  .measure-diagram .measure-sheet-control.field-offset-span { top: 54.5% !important; }
+  .measure-diagram .measure-sheet-caption.field-main-span,
+  .measure-diagram .measure-sheet-caption.field-offset-span { top: 51% !important; }
+  .hole-control-cluster.hole-thumb { top: 72% !important; }
+}
+
+/* Final alignment pass: remove unused columns and align related controls. */
+.workflow-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.shell-header {
+  grid-template-columns: minmax(210px, max-content) minmax(0, 1fr) auto;
+  gap: 16px;
+  min-height: 58px;
+  padding: 8px 12px;
+}
+body[data-profile-view="lookup"] .shell-header,
+body[data-profile-view="register"] .shell-header {
+  grid-template-columns: minmax(210px, max-content) minmax(0, 1fr);
+}
+body[data-profile-view="lookup"] .app,
+body[data-profile-view="register"] .app { padding-top: 10px; }
+.profile-search-row { grid-template-columns: minmax(0, 1fr) 56px; }
+#clearProfileSearch { padding-inline: 7px; }
+.profile-context-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#saveStatus:empty { display: none; }
+#saveStatus:not(:empty) {
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 8px;
+}
+
+/* Finger pitch groups share the exact center axes of their finger holes. */
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring { left: 39.091% !important; }
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle { left: 60.909% !important; }
+
+/* Pitch and depth use the same typographic tier as the other measure labels. */
+.measure-pitch-label,
+.measure-depth-card > span {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+.measure-pitch-button { font-size: 13px !important; }
+.measure-depth-stepper output { font-size: 14px !important; }
+.measure-depth-stepper button { font-size: 16px !important; }
+
+/* The thumb depth belongs beside the thumb hole, in the open left-hand bay. */
+.hole-control-cluster.hole-thumb .measure-depth-card {
+  left: -36px !important;
+  top: 20px !important;
+  transform: translateX(-50%) !important;
+}
+
+@media (max-width: 760px) {
+  .shell-header,
+  body[data-profile-view="lookup"] .shell-header,
+  body[data-profile-view="register"] .shell-header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+    min-height: 0;
+    padding: 9px;
+  }
+  body[data-profile-view="lookup"] .app,
+  body[data-profile-view="register"] .app { padding-top: 6px; }
+}
+
+@media (max-width: 700px) {
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring { left: 39.091% !important; }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle { left: 60.909% !important; }
+  .hole-control-cluster.hole-thumb .measure-depth-card {
+    left: -27px !important;
+    top: 18px !important;
+  }
+}
+
+/* Audited layout: centered workflow, intrinsic text widths, and hole-owned controls. */
+.shell-header,
+body[data-profile-view="lookup"] .shell-header,
+body[data-profile-view="register"] .shell-header {
+  grid-template-columns: minmax(210px, 1fr) minmax(540px, 760px) minmax(210px, 1fr);
+}
+.brand-block { justify-self: start; }
+.workflow-nav {
+  grid-column: 2;
+  justify-self: center;
+  width: 100%;
+}
+.workflow-nav li {
+  display: grid;
+  grid-template-columns: 24px max-content;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+  text-align: center;
+}
+.workflow-nav li::before {
+  position: static;
+  width: 24px;
+  height: 24px;
+  translate: none;
+}
+.shell-mode {
+  grid-column: 3;
+  justify-self: end;
+}
+.profile-search-row { grid-template-columns: minmax(0, 1fr) max-content; }
+#clearProfileSearch {
+  width: auto;
+  min-width: 78px;
+  padding-inline: 12px;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* Finger hole labels sit above their circles; depth steppers sit beside them. */
+.hole-control-cluster.hole-middle .measure-sheet-caption.is-hole-attached,
+.hole-control-cluster.hole-ring .measure-sheet-caption.is-hole-attached,
+.hole-control-cluster.hole-thumb .measure-sheet-caption.is-hole-attached {
+  top: -30px !important;
+}
+.hole-control-cluster.hole-middle .measure-depth-card,
+.hole-control-cluster.hole-ring .measure-depth-card,
+.hole-control-cluster.hole-thumb .measure-depth-card {
+  top: 20px !important;
+}
+.hole-control-cluster.hole-middle .measure-depth-card { left: -36px !important; }
+.hole-control-cluster.hole-ring .measure-depth-card { left: 236px !important; }
+.hole-control-cluster.hole-thumb .measure-depth-card { left: -36px !important; }
+
+/* Pitch groups and hole circles use one shared pair of vertical center axes. */
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring,
+.hole-control-cluster.hole-middle { left: 39.091% !important; }
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle,
+.hole-control-cluster.hole-ring { left: 60.909% !important; }
+.measure-pitch-control.measure-pitch-middle,
+.measure-pitch-control.measure-pitch-ring { height: 120px !important; }
+.measure-pitch-control.measure-pitch-middle .measure-pitch-label,
+.measure-pitch-control.measure-pitch-ring .measure-pitch-label { top: 4px !important; }
+.measure-pitch-control.measure-pitch-middle .measure-pitch-button.top,
+.measure-pitch-control.measure-pitch-ring .measure-pitch-button.top { top: 30px !important; }
+
+/* Give bridge and finger-hole labels their own vertical lanes. */
+.measure-diagram .measure-sheet-control.field-bridge { top: 38% !important; }
+.measure-diagram .measure-sheet-caption.field-bridge { top: 34.8% !important; }
+.hole-control-cluster.hole-middle,
+.hole-control-cluster.hole-ring { top: 47% !important; }
+
+/* Thumb-solid selector sizes to its complete Japanese option text. */
+.thumb-accessory-group {
+  grid-template-columns: minmax(240px, max-content) 166px;
+  width: min(430px, 96%);
+}
+.thumb-accessory-group .measure-thumb-solid-mode {
+  width: 240px;
+  grid-template-columns: max-content minmax(128px, 1fr);
+}
+.measure-thumb-solid-mode select {
+  width: 100%;
+  min-width: 128px;
+  padding-inline: 10px 28px;
+  text-overflow: clip;
+}
+
+@media (max-width: 1100px) {
+  .shell-header,
+  body[data-profile-view="lookup"] .shell-header,
+  body[data-profile-view="register"] .shell-header {
+    grid-template-columns: minmax(190px, .65fr) minmax(500px, 1.35fr);
+  }
+  .workflow-nav { grid-column: 2; }
+  .shell-mode { display: none; }
+}
+
+@media (max-width: 760px) {
+  .shell-header,
+  body[data-profile-view="lookup"] .shell-header,
+  body[data-profile-view="register"] .shell-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .brand-block,
+  .workflow-nav { grid-column: 1; }
+  .workflow-nav { width: min(100%, 620px); }
+  .workflow-nav li {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 24px auto;
+    justify-items: center;
+    gap: 3px;
+    padding: 6px 3px;
+    white-space: normal;
+  }
+  .workflow-nav li::before {
+    position: static;
+    translate: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .hole-control-cluster.hole-middle .measure-sheet-caption.is-hole-attached,
+  .hole-control-cluster.hole-ring .measure-sheet-caption.is-hole-attached,
+  .hole-control-cluster.hole-thumb .measure-sheet-caption.is-hole-attached { top: -28px !important; }
+  .hole-control-cluster.hole-middle .measure-depth-card,
+  .hole-control-cluster.hole-ring .measure-depth-card,
+  .hole-control-cluster.hole-thumb .measure-depth-card { top: 18px !important; }
+  .hole-control-cluster.hole-middle .measure-depth-card { left: -27px !important; }
+  .hole-control-cluster.hole-ring .measure-depth-card { left: 203px !important; }
+  .hole-control-cluster.hole-thumb .measure-depth-card { left: -27px !important; }
+  .measure-diagram .measure-sheet-control.field-bridge { top: 33% !important; }
+  .measure-diagram .measure-sheet-caption.field-bridge { top: 30% !important; }
+  .hole-control-cluster.hole-middle,
+  .hole-control-cluster.hole-ring { top: 40% !important; }
+}
+
+@media (max-width: 560px) {
+  .thumb-accessory-group {
+    grid-template-columns: minmax(206px, 1fr) 150px;
+    width: min(374px, 98%);
+  }
+  .thumb-accessory-group .measure-thumb-solid-mode {
+    width: 206px;
+    grid-template-columns: max-content minmax(112px, 1fr);
+  }
+  .measure-thumb-solid-mode select { min-width: 112px; }
+}
+
+/* Column alignment: pitch follows the grip-shape and finger-size columns. */
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring { left: 32% !important; }
+.measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+.measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle { left: 68% !important; }
+
+@media (max-width: 900px) {
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-middle,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-ring { left: 26% !important; }
+  .measure-diagram[data-hand="right"] .measure-pitch-control.measure-pitch-ring,
+  .measure-diagram[data-hand="left"] .measure-pitch-control.measure-pitch-middle { left: 74% !important; }
+}
+
+/* Thumb row: depth, hole and pitch share one horizontal center line. */
+.measure-pitch-control.measure-pitch-thumb { top: 74% !important; }
+.hole-control-cluster.hole-thumb .measure-depth-card { top: 28px !important; }
+
+/* Thumb accessory row: solid outside diameter is centered below the thumb hole. */
+.thumb-accessory-group {
+  left: 0 !important;
+  top: 80% !important;
+  width: 100% !important;
+  height: 126px;
+  transform: none !important;
+  display: block;
+}
+.thumb-accessory-group .measure-thumb-solid-mode {
+  position: absolute !important;
+  left: 25% !important;
+  top: 64px !important;
+  width: 240px;
+  transform: translate(-50%, -50%) !important;
+}
+.thumb-accessory-group .measure-sheet-caption.field-thumb-solid {
+  position: absolute !important;
+  left: 50% !important;
+  top: 0 !important;
+  transform: translateX(-50%) !important;
+}
+.thumb-accessory-group .measure-sheet-control.field-thumb-solid {
+  position: absolute !important;
+  left: 50% !important;
+  top: 64px !important;
+  width: 166px;
+  transform: translate(-50%, -50%) !important;
+}
+
+@media (max-width: 700px) {
+  .measure-pitch-control.measure-pitch-thumb { top: 72% !important; }
+  .hole-control-cluster.hole-thumb .measure-depth-card { top: 22px !important; }
+  .thumb-accessory-group { top: 78% !important; }
+  .thumb-accessory-group .measure-thumb-solid-mode { left: 24% !important; }
+}
+
+@media (max-width: 560px) {
+  .thumb-accessory-group { height: 196px; }
+  .thumb-accessory-group .measure-sheet-caption.field-thumb-solid { top: 0 !important; }
+  .thumb-accessory-group .measure-sheet-control.field-thumb-solid { top: 64px !important; }
+  .thumb-accessory-group .measure-thumb-solid-mode {
+    left: 50% !important;
+    top: 154px !important;
+  }
+}
+
+/* User-facing layout copy only; implementation notes stay out of the product surface. */
+.layout-public-copy { color: var(--muted); }
 </style>
 </head>
 <body data-profile-view="lookup">
   <main class="app">
-    
+    <header class="shell-header" aria-label="アプリケーションヘッダー">
+      <div class="brand-block">
+        <span class="brand-eyebrow">Drill Studio</span>
+        <strong class="brand-title">ボウリング ドリル設計</strong>
+      </div>
+      <ol class="workflow-nav" aria-label="作業の流れ">
+        <li data-step="1"><button id="workflowProfile" type="button">登録者</button></li>
+        <li data-step="2"><button id="workflowMeasure" type="button" disabled>メジャー・PAP</button></li>
+        <li data-step="3"><button id="workflowLayout" type="button" disabled>レイアウト・3D</button></li>
+      </ol>
+      <div class="shell-mode" aria-live="polite">
+        <span class="mode-entry">登録モード</span>
+        <span class="mode-measure">設計モード</span>
+      </div>
+    </header>
+
 
     <aside>
 <section class="section save-panel data-section personal-measure-data-panel">
@@ -6804,7 +8499,7 @@ aside > .measure-section .measure-diagram {
       <canvas id="scene" aria-label="grip center drill layout preview"></canvas>
       <div class="title">
         <h1>グリップセンター ドリルレイアウト</h1>
-        <p>手入力またはDual Angleで算出したグリップセンターを基準に、三穴位置、端点間スパン、ブリッジ、表面レイアウトを描画します。</p>
+        <p class="layout-public-copy">ホール位置、スパン、ブリッジ、PIN・PAP・VALの配置を確認できます。</p>
       </div>
       <div id="gripShapeOverlay" class="grip-shape-overlay" aria-label="フィンガーグリップ形状">
         <div class="grip-shape-item middle">
@@ -6826,26 +8521,34 @@ aside > .measure-section .measure-diagram {
       </div>
       <div class="zoom-hud">ズーム <output id="zoomValue">100%</output></div>
     </section>
-      <section class="motion-simulation-panel" aria-label="回転と軸移動シミュレーション">
-        <h3>回転・軸移動・オイルフレア</h3>
-        <div class="motion-simulation-grid">
-          <label>表示モード
-            <select id="motionSimulationMode">
-              <option value="initial">初期軸まわりの回転</option>
-              <option value="migration">慣性主軸への軸移動（概念）</option>
-            </select>
+      <section class="motion-simulation-panel" aria-label="オイルフレアシミュレーション">
+        <h3>オイルフレアシミュレーション</h3>
+        <label class="motion-internal-setting">表示モード
+          <select id="motionSimulationMode" aria-hidden="true" tabindex="-1">
+            <option value="migration" selected>オイルフレア</option>
+          </select>
+        </label>
+        <label class="motion-internal-setting">フレア表示
+          <select id="motionFlareVisible" aria-hidden="true" tabindex="-1">
+            <option value="yes" selected>表示する</option>
+          </select>
+        </label>
+        <div class="motion-primary-inputs" aria-label="投球条件">
+          <label class="motion-input-field" for="motionSimulationRpm">
+            <span class="motion-input-label">回転数</span>
+            <span class="motion-input-range">50–700 rpm</span>
+            <span class="motion-value-entry">
+              <input id="motionSimulationRpm" type="number" min="50" max="700" step="10" value="350" />
+              <span>rpm</span>
+            </span>
           </label>
-          <label>回転数 rpm
-            <input id="motionSimulationRpm" type="number" min="50" max="700" step="10" value="350" />
-          </label>
-          <label>ボール速度 km/h
-            <input id="motionSimulationSpeed" type="number" min="8" max="48" step="0.1" value="27.4" data-transient="true" />
-          </label>
-          <label>フレア表示
-            <select id="motionFlareVisible">
-              <option value="yes" selected>表示する</option>
-              <option value="no">表示しない</option>
-            </select>
+          <label class="motion-input-field" for="motionSimulationSpeed">
+            <span class="motion-input-label">ボール速度</span>
+            <span class="motion-input-range">8–48 km/h</span>
+            <span class="motion-value-entry">
+              <input id="motionSimulationSpeed" type="number" min="8" max="48" step="0.1" value="27.4" data-transient="true" />
+              <span>km/h</span>
+            </span>
           </label>
         </div>
         <div class="motion-simulation-actions">
@@ -6854,10 +8557,16 @@ aside > .measure-section .measure-diagram {
         </div>
         <div id="motionSimulationReadout" class="motion-simulation-readout">距離 0.0 / 60.0 ft・回転 0.0 / 軸移動 0.00° / リング 1</div>
         <progress id="motionSimulationProgress" class="motion-simulation-progress" min="0" max="60" value="0" aria-label="レーン上の移動距離"></progress>
-        <p class="motion-simulation-note">初期PAP–NAP軸を初期角速度とし、完成球の三主慣性モーメントにEulerの剛体回転方程式を適用します。Bowtieはサムありではサム下方の着床側、サムレスではPAP–PIN側のレイアウト基準から設定します。油リングは1回転ごとに生成します。</p>
+        <p class="motion-simulation-note layout-public-copy">入力した回転数とボール速度で、PAPを基準としたオイルリングの移動を表示します。</p>
       </section>
       <section class="section sheet-section measure-section personal-measure-panel">
-      <h2>メジャーシート情報</h2>
+      <div class="section-heading">
+        <div class="section-heading-text">
+          <h2>メジャーシート</h2>
+          <p>ホールサイズ、深さ、ピッチ、スパンを一つのシート上で設定します。</p>
+        </div>
+        <span class="section-kicker">Measure</span>
+      </div>
       <div id="measureDiagram" class="measure-diagram" data-hand="right">
           <svg id="measureHoleConnectors" class="measure-hole-connectors" aria-hidden="true">
             <g fill="none">
@@ -6898,7 +8607,13 @@ aside > .measure-section .measure-diagram {
     </section>
       <div class="right-modeling-controls">
         <section class="section section-wide dual-layout-panel personal-axis-panel">
-          <h2>個人PAP・回転軸情報</h2>
+          <div class="section-heading">
+            <div class="section-heading-text">
+              <h2>個人PAP・回転軸</h2>
+              <p>レイアウト計算に使用する投球者固有の軸情報です。</p>
+            </div>
+            <span class="section-kicker">PAP</span>
+          </div>
           <div class="dual-layout-grid pap-grid">
             <label class="dual-layout-field wide">
               <span>PAP左右</span>
@@ -6924,9 +8639,18 @@ aside > .measure-section .measure-diagram {
             </label>
           </div>
         </section>
+        <div class="stage-actions measure-stage-actions">
+          <button id="continueToLayout" type="button">保存してレイアウト・3D確認へ進む</button>
+        </div>
 
         <section class="section section-wide dual-layout-panel drill-layout-panel">
-        <h2>ドリルレイアウト</h2>
+        <div class="section-heading">
+          <div class="section-heading-text">
+            <h2>ドリルレイアウト</h2>
+            <p>Dual Angleの主要値を設定し、3Dモデルで結果を確認します。</p>
+          </div>
+          <span class="section-kicker">Layout</span>
+        </div>
         <div class="dual-layout-grid drill-layout-grid">
           <label class="dual-layout-field wide">
             <span>算出GC</span>
@@ -6953,9 +8677,12 @@ aside > .measure-section .measure-diagram {
             <input id="layoutValAngle" type="range" min="-120" max="120" step="1" value="45" />
             <button class="dual-layout-scale" type="button" data-range="layoutValAngle" aria-label="VAL角"></button>
           </label>
-          <p id="dualLayoutReadout" class="dual-layout-readout">Dual Angleガイドは未表示です。</p>
+          <p id="dualLayoutReadout" class="dual-layout-readout">表面レイアウトは非表示です。</p>
         </div>
       </section>
+        <div class="stage-actions layout-stage-actions">
+          <button id="backToMeasureStage" class="secondary-action" type="button">メジャー・PAPへ戻る</button>
+        </div>
 
         <section class="section section-wide dual-layout-panel ball-model-panel hole-model-subpanel">
         <h2>ボールモデリング情報</h2>
@@ -7296,7 +9023,11 @@ aside > .measure-section .measure-diagram {
     }
 
     function setProfileView(view) {
+      const previousView = document.body.dataset.profileView;
       document.body.dataset.profileView = view;
+      if (view === "measure" && previousView !== "measure") {
+        document.body.dataset.workspaceStage = "measure";
+      }
       enforceProfileViewBoundary();
       const measuring = view === "measure";
       const title = document.querySelector("#profileScreenTitle");
@@ -7308,7 +9039,29 @@ aside > .measure-section .measure-diagram {
       if (view === "lookup") renderProfileList(activeProfileKey);
       if (measuring) updateActiveProfileContext();
       if (measuring) refreshMeasureWorkspace();
+      updateWorkflowNavigation();
       window.scrollTo({ top: 0, behavior: "auto" });
+    }
+
+    function setWorkspaceStage(stage) {
+      if (document.body.dataset.profileView !== "measure") return;
+      document.body.dataset.workspaceStage = stage === "layout" ? "layout" : "measure";
+      updateWorkflowNavigation();
+      window.scrollTo({ top: 0, behavior: "auto" });
+      if (document.body.dataset.workspaceStage === "layout") refreshMeasureWorkspace();
+    }
+
+    function updateWorkflowNavigation() {
+      const measuring = document.body.dataset.profileView === "measure";
+      const stage = document.body.dataset.workspaceStage || "measure";
+      const profileItem = document.querySelector("#workflowProfile")?.closest("li");
+      const measureItem = document.querySelector("#workflowMeasure")?.closest("li");
+      const layoutItem = document.querySelector("#workflowLayout")?.closest("li");
+      document.querySelectorAll(".workflow-nav li").forEach((item) => item.removeAttribute("aria-current"));
+      document.querySelector("#workflowMeasure")?.toggleAttribute("disabled", !measuring);
+      document.querySelector("#workflowLayout")?.toggleAttribute("disabled", !measuring);
+      const current = !measuring ? profileItem : stage === "layout" ? layoutItem : measureItem;
+      current?.setAttribute("aria-current", "step");
     }
 
     function refreshMeasureWorkspace() {
@@ -7396,11 +9149,15 @@ aside > .measure-section .measure-diagram {
       const person = currentProfilePerson();
       const storedProfiles = readProfiles();
       const existingProfile = storedProfiles[activeProfileKey] || storedProfiles[person.displayName || ""];
+      const pap = {
+        right: ranges.layoutPapRight ?? document.querySelector("#layoutPapRight")?.value ?? "5",
+        up: ranges.layoutPapUp ?? document.querySelector("#layoutPapUp")?.value ?? "0"
+      };
       const nextProfile = {
-        version: 3,
+        version: 4,
         savedAt: new Date().toISOString(),
         person,
-        measure: { ranges, selects, checks, catalogs }
+        measure: { ranges, selects, checks, catalogs, pap }
       };
       const changeEntry = buildChangeEntry(existingProfile, nextProfile);
       nextProfile.changeLog = existingProfile?.changeLog ? [...existingProfile.changeLog, changeEntry] : [changeEntry];
@@ -7430,7 +9187,7 @@ aside > .measure-section .measure-diagram {
       const existingProfile = profiles[previousKey] || profiles[name];
       if (isRegistration) {
         const nextProfile = {
-          version: 3,
+          version: 4,
           savedAt: new Date().toISOString(),
           person,
           measure: existingProfile ? profileMeasure(existingProfile) : null
@@ -7695,16 +9452,24 @@ aside > .measure-section .measure-diagram {
 
     function profileMeasure(profile) {
       if (!profile) return null;
-      if (Object.prototype.hasOwnProperty.call(profile, "measure")) return profile.measure;
-      if (profile.ranges || profile.selects || profile.checks || profile.catalogs) {
-        return {
-          ranges: profile.ranges || {},
-          selects: profile.selects || {},
-          checks: profile.checks || {},
-          catalogs: profile.catalogs || {}
-        };
-      }
-      return null;
+      const source = Object.prototype.hasOwnProperty.call(profile, "measure")
+        ? (profile.measure || {})
+        : (profile.ranges || profile.selects || profile.checks || profile.catalogs ? profile : null);
+      if (!source) return null;
+      const pap = source.pap || profile.pap || {};
+      const ranges = { ...(source.ranges || {}) };
+      if (pap.right != null && ranges.layoutPapRight == null) ranges.layoutPapRight = String(pap.right);
+      if (pap.up != null && ranges.layoutPapUp == null) ranges.layoutPapUp = String(pap.up);
+      return {
+        ranges,
+        selects: source.selects || {},
+        checks: source.checks || {},
+        catalogs: source.catalogs || {},
+        pap: {
+          right: ranges.layoutPapRight ?? "5",
+          up: ranges.layoutPapUp ?? "0"
+        }
+      };
     }
 
     function collectDiff(changes, field, before, after) {
@@ -10009,14 +11774,18 @@ aside > .measure-section .measure-diagram {
       const readout = document.querySelector("#dualLayoutReadout");
       if (!readout) return;
       if (!data.usesDualAngleLayout || !data.dualLayout) {
-        readout.textContent = "Dual Angleガイドは未表示です。";
+        readout.textContent = "表面レイアウトは非表示です。";
         return;
       }
       const dual = data.dualLayout;
       const mbLabel = dual.mb ? "MB" : "vMB";
       const pinPap = surfaceDistance(dual.pin, dual.pap, data.ballRadius);
       const papGc = surfaceDistance(dual.pap, dual.gripCenter, data.ballRadius);
-      readout.textContent = `基準: PIN-${mbLabel} / PIN-PAP ${formatInch(pinPap)} / PAP-GC ${formatInch(papGc)} / 算出GCを三穴ローカル配置の原点に適用中`;
+      const papRight = value("layoutPapRight");
+      const papUp = value("layoutPapUp");
+      const horizontal = Math.abs(papRight) < 0.0001 ? "左右 0\"" : `${papRight > 0 ? "右" : "左"} ${formatInch(Math.abs(papRight))}`;
+      const vertical = Math.abs(papUp) < 0.0001 ? "上下 0\"" : `${papUp > 0 ? "上" : "下"} ${formatInch(Math.abs(papUp))}`;
+      readout.textContent = `PAP ${horizontal}・${vertical} / PIN-${mbLabel} / PIN-PAP ${formatInch(pinPap)} / PAP-GC ${formatInch(papGc)}`;
     }
 
     function calculatePhysicalModel(data) {
@@ -13148,7 +14917,7 @@ aside > .measure-section .measure-diagram {
   group.className = "thumb-accessory-group thumb-dependent";
   group.setAttribute("role", "group");
   group.setAttribute("aria-label", "サムソリッドとサム深さ");
-  group.append(mode, solidCaption, solidControl, depth);
+  group.append(mode, solidCaption, solidControl);
   diagram.appendChild(group);
 })();
 
@@ -13216,6 +14985,46 @@ aside > .measure-section .measure-diagram {
   }
   window.addEventListener("resize", updateMeasureHoleConnectors);
   requestAnimationFrame(updateMeasureHoleConnectors);
+})();
+
+(() => {
+  const diagram = document.getElementById("measureDiagram");
+  if (!diagram) return;
+  ["middle", "ring", "thumb"].forEach((hole) => {
+    const control = diagram.querySelector(`.measure-sheet-control.field-${hole}-hole`);
+    const caption = diagram.querySelector(`.measure-sheet-caption.field-${hole}-hole`);
+    const depth = diagram.querySelector(`.measure-depth-${hole}`);
+    if (!control) return;
+    const cluster = document.createElement("div");
+    cluster.className = `hole-control-cluster hole-${hole}${hole === "thumb" ? " thumb-dependent" : ""}`;
+    cluster.setAttribute("role", "group");
+    cluster.setAttribute("aria-label", `${hole === "middle" ? "中指" : hole === "ring" ? "薬指" : "サム"}のホールサイズと深さ`);
+    diagram.insertBefore(cluster, control);
+    cluster.appendChild(control);
+    if (caption) {
+      caption.classList.add("is-hole-attached");
+      cluster.appendChild(caption);
+    }
+    if (depth) {
+      depth.classList.remove("is-hole-attached");
+      cluster.appendChild(depth);
+    }
+  });
+  requestAnimationFrame(() => window.updateMeasureHoleConnectors?.());
+})();
+
+(() => {
+  const bind = (selector, handler) => document.querySelector(selector)?.addEventListener("click", handler);
+  const saveAndOpenLayout = () => {
+    saveCurrentProfile();
+    setWorkspaceStage("layout");
+  };
+  bind("#workflowProfile", () => showProfileLookup());
+  bind("#workflowMeasure", () => setWorkspaceStage("measure"));
+  bind("#workflowLayout", saveAndOpenLayout);
+  bind("#continueToLayout", saveAndOpenLayout);
+  bind("#backToMeasureStage", () => setWorkspaceStage("measure"));
+  updateWorkflowNavigation();
 })();
 </script>
 </body>
