@@ -1,0 +1,24 @@
+{
+  "status": "pass",
+  "checks": [
+    "USBC principal RG and PSA definition, without drilling",
+    "Symmetric blank has a degenerate high-RG plane",
+    "Eigen residuals, reconstruction and right-handed sorted basis",
+    "Mass model is independent of ambient draw projection state",
+    "Torque-free RK4 preserves energy and angular-momentum magnitude",
+    "Every exact principal axis is stationary; middle-axis stationarity is not stability",
+    "Misalignment is sin(2 theta) for an axisymmetric tensor, not flare utilization",
+    "Axis-rate diagnostic matches an infinitesimal Euler integration",
+    "Spherical clipping agrees with analytic radial flat-bottom drill volume",
+    "Pitch axis is depth independent using the production geometry",
+    "Dual-angle spherical distance and local angle definitions",
+    "Default completed tensor is positive and satisfies inertia triangle inequality"
+  ],
+  "maxEnergyRelativeError": 8.981704269217516e-14,
+  "maxMomentumRelativeError": 4.518607710224387e-14,
+  "removalConvergence": {
+    "analytic": 1.1666557179186996,
+    "default": 1.1666656836813103,
+    "fine": 1.1666563407809296
+  }
+}

@@ -1,3 +1,4 @@
+import { functionalAnova } from "./experiment_statistics.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,6 +27,8 @@ const metricKeys = [
   "performance_diff_in",
   "effective_flare_diff_in",
   "flare_utilization_pct",
+  "normalized_axis_misalignment",
+  "torque_free_axis_rate_per_spin",
   "removed_mass_oz",
   "com_shift_in"
 ];
@@ -37,84 +40,10 @@ for (const drillAngle of levels.drill_angle_deg) {
       const observation = evaluate(drillAngle, pinPap, valAngle);
       rows.push({
         ...observation,
-        angle_sum_deg: drillAngle + valAngle,
-        source_timing_guide_pct: Math.max(0, Math.min(100, (160 - drillAngle - valAngle) / 130 * 100))
+        angle_sum_deg: drillAngle + valAngle
       });
     }
   }
-}
-
-function keyFor(values) {
-  return values.join("|");
-}
-
-function groupMeans(data, groupKeys, metric) {
-  const groups = new Map();
-  for (const row of data) {
-    const key = keyFor(groupKeys.map((name) => row[name]));
-    const group = groups.get(key) || { sum: 0, count: 0 };
-    group.sum += row[metric];
-    group.count += 1;
-    groups.set(key, group);
-  }
-  return new Map([...groups].map(([key, group]) => [key, group.sum / group.count]));
-}
-
-function functionalAnova(data, metric) {
-  const factors = ["drill_angle_deg", "pin_pap_in", "val_angle_deg"];
-  const grandMean = data.reduce((sum, row) => sum + row[metric], 0) / data.length;
-  const oneWayMeans = Object.fromEntries(factors.map((factor) => [factor, groupMeans(data, [factor], metric)]));
-  const pairs = [
-    ["drill_angle_deg", "pin_pap_in"],
-    ["drill_angle_deg", "val_angle_deg"],
-    ["pin_pap_in", "val_angle_deg"]
-  ];
-  const pairMeans = Object.fromEntries(pairs.map((pair) => [pair.join("*"), groupMeans(data, pair, metric)]));
-  const sums = {
-    drill_angle_deg: 0,
-    pin_pap_in: 0,
-    val_angle_deg: 0,
-    "drill_angle_deg*pin_pap_in": 0,
-    "drill_angle_deg*val_angle_deg": 0,
-    "pin_pap_in*val_angle_deg": 0,
-    three_way: 0
-  };
-  const pairExtremes = Object.fromEntries(pairs.map((pair) => [pair.join("*"), { value: 0, at: null }]));
-  let total = 0;
-  for (const row of data) {
-    const main = Object.fromEntries(factors.map((factor) => [
-      factor,
-      oneWayMeans[factor].get(keyFor([row[factor]])) - grandMean
-    ]));
-    const pairEffects = {};
-    for (const pair of pairs) {
-      const name = pair.join("*");
-      const effect = pairMeans[name].get(keyFor(pair.map((factor) => row[factor])))
-        - grandMean - main[pair[0]] - main[pair[1]];
-      pairEffects[name] = effect;
-      if (Math.abs(effect) > Math.abs(pairExtremes[name].value)) {
-        pairExtremes[name] = {
-          value: effect,
-          at: Object.fromEntries(pair.map((factor) => [factor, row[factor]]))
-        };
-      }
-    }
-    const predictedWithoutThreeWay = grandMean
-      + factors.reduce((sum, factor) => sum + main[factor], 0)
-      + Object.values(pairEffects).reduce((sum, effect) => sum + effect, 0);
-    const threeWay = row[metric] - predictedWithoutThreeWay;
-    factors.forEach((factor) => { sums[factor] += main[factor] ** 2; });
-    Object.entries(pairEffects).forEach(([name, effect]) => { sums[name] += effect ** 2; });
-    sums.three_way += threeWay ** 2;
-    total += (row[metric] - grandMean) ** 2;
-  }
-  const shares = Object.fromEntries(Object.entries(sums).map(([name, sum]) => [name, total > 1e-18 ? sum / total * 100 : 0]));
-  return {
-    grand_mean: grandMean,
-    total_sum_of_squares: total,
-    variance_share_pct: shares,
-    strongest_pair_effect: pairExtremes
-  };
 }
 
 function extrema(metric) {
@@ -131,11 +60,19 @@ const analysis = Object.fromEntries(metricKeys.map((metric) => [metric, {
 }]));
 
 const payload = {
-  schema_version: 2,
+  schema_version: 3,
+  model_revision: "mass-moments-2026-09-25",
+  metric_interpretation: {
+    performance_diff_in: "Legacy hypot(total,int) composite, not an established flare bound or verified Radical formula.",
+    effective_flare_diff_in: "Legacy composite multiplied by normalized axis misalignment; uncalibrated comparison only.",
+    flare_utilization_pct: "Legacy name for 100 times normalized axis misalignment; NOT percentage of actual flare.",
+    normalized_axis_misalignment: "2 norm(u cross Iu)/(Imax-Imin); dimensionless instantaneous diagnostic.",
+    torque_free_axis_rate_per_spin: "norm(du/dt)/norm(omega) under zero external torque; not a lane prediction."
+  },
   generated_at: new Date().toISOString(),
   experiment: "Balanced full-factorial static drilling-layout experiment over the primary-source practical range.",
   interpretation: {
-    physical_outputs: "Post-drilling mass properties from the completed inertia tensor. Effective flare differential combines the completed-ball differential ceiling with PAP-axis misalignment.",
+    physical_outputs: "Approximate mass properties and uncalibrated axis diagnostics. No calculated value is an actual flare width or upper bound.",
     timing_guide: "Source-derived guide only: a smaller drilling-angle plus VAL-angle sum indicates a faster transition; it is not a lane hook or breakpoint prediction.",
     excluded: "Lane oil, cover surface, speed loss, friction and release variability are not simulated."
   },
@@ -161,9 +98,10 @@ function csvCell(value) {
 }
 
 const columns = [
-  "drill_angle_deg", "pin_pap_in", "val_angle_deg", "angle_sum_deg", "source_timing_guide_pct",
+  "drill_angle_deg", "pin_pap_in", "val_angle_deg", "angle_sum_deg",
   "mass_after_lb", "removed_mass_oz", "com_shift_in", "pap_rg_in", "pap_inertia_lb_in2",
   "rg_low_in", "rg_mid_in", "rg_high_in", "total_diff_in", "int_diff_in",
+  "normalized_axis_misalignment", "torque_free_axis_rate_per_spin",
   "performance_diff_in", "effective_flare_diff_in", "flare_utilization_pct",
   "pap_to_pin_deg", "pap_to_psa_deg"
 ];
@@ -174,3 +112,4 @@ const csv = "\uFEFF" + [columns, ...rows.map((row) => columns.map((column) => ro
 fs.writeFileSync(jsonPath, JSON.stringify(payload, null, 2));
 fs.writeFileSync(csvPath, csv);
 console.log(JSON.stringify({ jsonPath, csvPath, rowCount: rows.length }, null, 2));
+

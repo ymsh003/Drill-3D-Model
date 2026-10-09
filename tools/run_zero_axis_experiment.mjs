@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -215,14 +214,9 @@ const context = {
   navigator: {},
   performance: { now: () => 0 }
 };
-vm.createContext(context);
-
-for (const source of extractFunctions(inlineScript)) {
-  const name = source.match(/function\s+([A-Za-z_$][\w$]*)/)?.[1] || "anonymous";
-  vm.runInContext(source, context, { filename: `drill-model-function-${name}.js` });
-}
-
-for (const name of [
+const functionSources = extractFunctions(inlineScript);
+const functionNames = [...new Set(functionSources.map(source => source.match(/function\s+([A-Za-z_$][\w$]*)/)[1]))];
+const constantNames = [
   "BALL_DIAMETER",
   "THUMB_SOLID_LENGTH",
   "FINGER_GRIP_LENGTH",
@@ -236,9 +230,13 @@ for (const name of [
   "DEFAULT_GRIP_INNER",
   "DUAL_LAYOUT_COLORS",
   "FIXED_PIN_DIRECTION"
-]) {
-  vm.runInContext(extractConst(inlineScript, name), context, { filename: `constant-${name}.js` });
-}
+];
+// Compile the same production functions into one lexical scope. This avoids slow
+// per-call VM global proxies during deterministic quadrature; no page startup runs.
+const build = new Function(...Object.keys(context),
+  constantNames.map(name => extractConst(inlineScript, name)).join('\n') + '\n' +
+  functionSources.join('\n') + '\nreturn {' + functionNames.join(',') + '};');
+Object.assign(context, build(...Object.values(context)));
 
 function setValue(id, value) {
   const element = elements.get(id);
@@ -280,8 +278,10 @@ function evaluate(drillAngle, pinPap, valAngle) {
     performance_diff_in: model.performanceDiffAfter,
     effective_flare_diff_in: model.effectiveFlareDiffAfter,
     flare_utilization_pct: model.flareUtilizationAfter * 100,
-    pap_to_pin_deg: context.vectorAngleDegrees(model.papAxis, basis.lowAxis),
-    pap_to_psa_deg: context.vectorAngleDegrees(model.papAxis, basis.highAxis)
+    normalized_axis_misalignment: model.diagnostics.normalizedMisalignment,
+    torque_free_axis_rate_per_spin: model.diagnostics.axisRatePerSpin,
+    pap_to_pin_deg: context.axisAngleDegrees(model.papAxis, basis.lowAxis),
+    pap_to_psa_deg: context.axisAngleDegrees(model.papAxis, basis.highAxis)
   };
 }
 
@@ -397,14 +397,22 @@ for (const row of zeroRows) {
 }
 
 const finiteCheck = rows.flatMap((row) => metricKeys
-  .filter((metric) => row[metric] != null && !Number.isFinite(row[metric]))
+  .filter((metric) => !Number.isFinite(row[metric]))
   .map((metric) => `${row.sweep_key}:${row.factor_value}:${metric}`));
 if (finiteCheck.length) throw new Error(`Non-finite results: ${finiteCheck.slice(0, 10).join(", ")}`);
 
 const payload = {
-  schema_version: 1,
+  schema_version: 3,
+  model_revision: "mass-moments-2026-09-25",
+  metric_interpretation: {
+    performance_diff_in: "Legacy hypot(total,int) composite, not an established flare bound or verified Radical formula.",
+    effective_flare_diff_in: "Legacy composite multiplied by normalized axis misalignment; uncalibrated comparison only.",
+    flare_utilization_pct: "Legacy name for 100 times normalized axis misalignment; NOT percentage of actual flare.",
+    normalized_axis_misalignment: "2 norm(u cross Iu)/(Imax-Imin); dimensionless instantaneous diagnostic.",
+    torque_free_axis_rate_per_spin: "norm(du/dt)/norm(omega) under zero external torque; not a lane prediction."
+  },
   generated_at: new Date().toISOString(),
-  experiment: "Each Dual Angle factor is swept over every UI-supported step while the other two factors are fixed at zero.",
+  experiment: "Degenerate zero-axis coordinate diagnostic only: PIN=PAP makes the angle reference non-unique. Not a practical layout sensitivity experiment.",
   row_count: rows.length,
   unique_condition_count: rows.length - 2,
   baseline,
@@ -433,3 +441,4 @@ console.log(JSON.stringify({ outputPath, rowCount: rows.length, uniqueConditions
 }
 
 export { context, evaluate, numericRange, setValue };
+
