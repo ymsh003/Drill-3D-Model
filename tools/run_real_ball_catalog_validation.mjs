@@ -148,7 +148,15 @@ const summary = balls.map((ball) => {
 });
 
 const payload = {
-  schema_version: 1,
+  schema_version: 3,
+  model_revision: "mass-moments-2026-09-25",
+  metric_interpretation: {
+    performance_diff_in: "Legacy hypot(total,int) composite, not an established flare bound or verified Radical formula.",
+    effective_flare_diff_in: "Legacy composite multiplied by normalized axis misalignment; uncalibrated comparison only.",
+    flare_utilization_pct: "Legacy name for 100 times normalized axis misalignment; NOT percentage of actual flare.",
+    normalized_axis_misalignment: "2 norm(u cross Iu)/(Imax-Imin); dimensionless instantaneous diagnostic.",
+    torque_free_axis_rate_per_spin: "norm(du/dt)/norm(omega) under zero external torque; not a lane prediction."
+  },
   generated_at: new Date().toISOString(),
   method_ja: "メーカー公式カタログの15ポンド値を静的穴あけモデルへ入力し、同じPAP・グリップ・穴径・穴深さで63条件を比較した。レーン上の軌道予測ではない。",
   catalog_updated: catalog.updated,
@@ -175,3 +183,4 @@ const csv = "\uFEFF" + [columns, ...rows.map((row) => columns.map((column) => ro
 fs.writeFileSync(jsonPath, JSON.stringify(payload, null, 2));
 fs.writeFileSync(csvPath, csv);
 console.log(JSON.stringify({ jsonPath, csvPath, ballCount: balls.length, rowCount: rows.length, summary }, null, 2));
+

@@ -1,0 +1,33 @@
+{
+  "layout": "45 x 4.5 x 45",
+  "rows": [
+    {
+      "radialSteps": 24,
+      "angularSteps": 32,
+      "summedRemovalLb": 0.1485895808968528,
+      "unionRemovalLb": 0.14833145000902118,
+      "overcountOz": 0.0041300942053061895
+    },
+    {
+      "radialSteps": 48,
+      "angularSteps": 64,
+      "summedRemovalLb": 0.14857771931744143,
+      "unionRemovalLb": 0.14831861551985276,
+      "overcountOz": 0.004145660761418757
+    },
+    {
+      "radialSteps": 96,
+      "angularSteps": 128,
+      "summedRemovalLb": 0.14857475392106523,
+      "unionRemovalLb": 0.1483151552202615,
+      "overcountOz": 0.004153579212859526
+    },
+    {
+      "radialSteps": 192,
+      "angularSteps": 256,
+      "summedRemovalLb": 0.1485740125718649,
+      "unionRemovalLb": 0.14831438069089645,
+      "overcountOz": 0.004154110095495156
+    }
+  ]
+}

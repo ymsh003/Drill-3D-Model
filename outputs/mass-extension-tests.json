@@ -1,0 +1,86 @@
+{
+  "revision": "mass-moments-2026-09-25",
+  "status": "pass",
+  "checks": [
+    "Duplicated cylindrical and conical holes are removed once",
+    "Nested coaxial holes equal their larger outer hole",
+    "Axially overlapping cylinders match analytic union moments",
+    "Crossed cylinders agree with independent Steinmetz integral and converge",
+    "Hole order does not affect union result",
+    "Quadratic ray clipping handles tangent, parallel and inside rays",
+    "Initial COM uses parallel-axis translation in both directions",
+    "Measured annular insert has analytic mass, first moment and inertia",
+    "Completed ball includes added mass, initial first moment and tensor",
+    "Invalid or overlapping inserts and invalid COM are rejected",
+    "Explicit neutral options preserve the prior default calculation"
+  ],
+  "steinmetz": {
+    "exact": 5.616518640512919,
+    "crossRuns": [
+      {
+        "radialSteps": 24,
+        "angularSteps": 48,
+        "volume": 5.616277236297491,
+        "error": -0.00024140421542817592
+      },
+      {
+        "radialSteps": 64,
+        "angularSteps": 128,
+        "volume": 5.616479652057089,
+        "error": -0.000038988455830057944
+      },
+      {
+        "radialSteps": 128,
+        "angularSteps": 256,
+        "volume": 5.616508007972115,
+        "error": -0.000010632540804245139
+      }
+    ]
+  },
+  "example": {
+    "assumption": "Synthetic inputs, not measurements",
+    "inputs": {
+      "initialCenterOfMassIn": {
+        "x": 0.01,
+        "y": 0,
+        "z": 0
+      },
+      "inserts": [
+        {
+          "holeIndex": 0,
+          "massLb": 0.003,
+          "outerRadiusIn": 0.3,
+          "innerRadiusIn": 0.2,
+          "lengthIn": 0.5,
+          "startDepthIn": 0.15
+        }
+      ]
+    },
+    "before": {
+      "massAfter": 14.851668549990979,
+      "rgPrincipal": [
+        2.4794327811850017,
+        2.5031669314547145,
+        2.52604758962962
+      ],
+      "centerOfMass": {
+        "x": -0.0005783642314471271,
+        "y": -0.020344507814526912,
+        "z": -0.02238215569140794
+      }
+    },
+    "after": {
+      "massAfter": 14.85466854999098,
+      "rgPrincipal": [
+        2.479755115061692,
+        2.5034186926771347,
+        2.52597379821865
+      ],
+      "centerOfMass": {
+        "x": 0.009112092636220667,
+        "y": -0.019733284205193543,
+        "z": -0.02208621357604032
+      }
+    }
+  }
+}

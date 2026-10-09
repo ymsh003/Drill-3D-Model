@@ -1,0 +1,11 @@
+{
+  "layout": {"drillAngleDeg":45,"pinPapIn":4.5,"valAngleDeg":45},
+  "catalog": {"weightLb":15,"rgLowIn":2.480,"totalDiffIn":0.052,"intermediateDiffIn":0.018},
+  "massOptions": {
+    "initialCenterOfMassIn":{"x":0.01,"y":0,"z":0},
+    "radialSteps":48,
+    "angularSteps":64,
+    "inserts":[{"holeIndex":0,"massLb":0.003,"outerRadiusIn":0.3,"innerRadiusIn":0.2,"lengthIn":0.5,"startDepthIn":0.15}]
+  }
+}
+

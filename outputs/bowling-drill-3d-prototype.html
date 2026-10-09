@@ -8521,11 +8521,11 @@ body[data-profile-view="register"] .shell-header {
       </div>
       <div class="zoom-hud">ズーム <output id="zoomValue">100%</output></div>
     </section>
-      <section class="motion-simulation-panel" aria-label="オイルフレアシミュレーション">
-        <h3>オイルフレアシミュレーション</h3>
+      <section class="motion-simulation-panel" aria-label="無外力回転軸の参考モデル">
+        <h3>無外力回転軸の参考モデル</h3>
         <label class="motion-internal-setting">表示モード
           <select id="motionSimulationMode" aria-hidden="true" tabindex="-1">
-            <option value="migration" selected>オイルフレア</option>
+            <option value="migration" selected>無外力軸移動（実油リングではない）</option>
           </select>
         </label>
         <label class="motion-internal-setting">フレア表示
@@ -11439,8 +11439,9 @@ body[data-profile-view="register"] .shell-header {
 
     function createFlareTrack(axis, data, revolution = 0, first = false) {
       const n = normalize(axis);
-      const laneDown = { x: 0, y: 1, z: 0 };
-      let tangent = sub(laneDown, scalePoint(n, dot(laneDown, n)));
+      // Arbitrary marker on the normal great circle, not a lane contact point.
+      const markerReference = { x: 0, y: 1, z: 0 };
+      let tangent = sub(markerReference, scalePoint(n, dot(markerReference, n)));
       if (Math.hypot(tangent.x, tangent.y, tangent.z) < 1e-8) tangent = cross(n, { x: 1, y: 0, z: 0 });
       tangent = normalize(tangent);
       return {
@@ -11484,7 +11485,7 @@ body[data-profile-view="register"] .shell-header {
           ctx.arc(marker.x, marker.y, 3.5, 0, Math.PI * 2);
           ctx.fill();
           ctx.font = "600 11px system-ui, sans-serif";
-          ctx.fillText("1st track", marker.x + 7, marker.y - 7);
+          ctx.fillText("initial-axis reference", marker.x + 7, marker.y - 7);
           ctx.restore();
         }
       });
@@ -11794,8 +11795,8 @@ body[data-profile-view="register"] .shell-header {
       const diff = Math.max(0, value("layoutCatalogDiff"));
       const intDiff = clamp(value("layoutCatalogIntDiff"), 0, diff);
       const core = stampedCoreRelationship();
-      const rgMid = rgLow + intDiff;
       const rgHigh = rgLow + diff;
+      const rgMid = rgHigh - intDiff;
       const papAxis = normalize(data.dualLayout?.pap || { x: 0, y: 0, z: data.ballRadius });
       const basis = physicalPrincipalBasis(data);
       const iLow = mass * rgLow * rgLow;
@@ -11803,17 +11804,30 @@ body[data-profile-view="register"] .shell-header {
       const iHigh = mass * rgHigh * rgHigh;
       const tensorBefore = tensorFromPrincipal(basis, iLow, iMid, iHigh);
       const iBefore = axisInertia(papAxis, tensorBefore);
+      const massOptions = checkedMassOptions(data);
+      const initialCenterOfMass = massOptions.initialCenterOfMassIn;
+      const tensorBeforeOrigin = matrixAdd(tensorBefore, parallelAxisTensor(mass, initialCenterOfMass));
       const removed = drilledRemovalProperties(data, mass);
-      const massAfter = Math.max(0.001, mass - removed.mass);
-      const firstMomentAfter = scalePoint(removed.firstMoment, -1);
+      const inserted = insertedMassProperties(data, massOptions);
+      const massAfter = mass - removed.mass + inserted.mass;
+      if (!(massAfter > 0)) throw new RangeError("Removed mass exceeds ball mass");
+      const firstMomentAfter = add(sub(scalePoint(initialCenterOfMass, mass), removed.firstMoment), inserted.firstMoment);
       const centerOfMass = scalePoint(firstMomentAfter, 1 / massAfter);
-      const tensorAboutOrigin = matrixSubtract(tensorBefore, removed.tensor);
+      const tensorAboutOrigin = matrixAdd(matrixSubtract(tensorBeforeOrigin, removed.tensor), inserted.tensor);
       const tensorAfter = matrixSubtract(tensorAboutOrigin, parallelAxisTensor(massAfter, centerOfMass));
       const iAfter = Math.max(0, axisInertia(papAxis, tensorAfter));
       const rgBefore = Math.sqrt(iBefore / mass);
       const rgAfter = Math.sqrt(iAfter / massAfter);
       const eigen = symmetricEigen3(tensorAfter);
-      const rgPrincipal = eigen.values.map((moment) => Math.sqrt(Math.max(0, moment) / massAfter));
+      if (eigen.values.some((moment) => !Number.isFinite(moment) || !(moment > 0)) || eigen.values[2] > eigen.values[0] + eigen.values[1] + 1e-9) throw new RangeError("Nonphysical inertia tensor");
+      const rgPrincipal = eigen.values.map((moment) => Math.sqrt(moment / massAfter));
+      const totalDiffAfter = rgPrincipal[2] - rgPrincipal[0];
+      const intDiffAfter = rgPrincipal[2] - rgPrincipal[1];
+      const diagnostics = inertiaAxisDiagnostics(papAxis, tensorAfter, eigen);
+      // Historical columns are retained for file compatibility, never as flare predictions.
+      const performanceDiffAfter = Math.hypot(totalDiffAfter, intDiffAfter);
+      const flareUtilizationAfter = diagnostics.normalizedMisalignment;
+      const effectiveFlareDiffAfter = performanceDiffAfter * flareUtilizationAfter;
       return {
         mass,
         massAfter,
@@ -11829,17 +11843,23 @@ body[data-profile-view="register"] .shell-header {
         rgBefore,
         rgAfter,
         tensorBefore,
+        tensorBeforeOrigin, initialCenterOfMass, inserted,
+        modelRevision: "mass-moments-2026-09-25",
         tensorAfter,
         tensorAboutOrigin,
         centerOfMass,
         principalMoments: eigen.values,
         principalAxes: eigen.vectors,
         rgPrincipal,
-        totalDiffAfter: rgPrincipal[2] - rgPrincipal[0],
-        intDiffAfter: rgPrincipal[1] - rgPrincipal[0],
+        totalDiffAfter, intDiffAfter,
+        performanceDiffAfter, flareUtilizationAfter, effectiveFlareDiffAfter,
+        diagnostics,
+        modelStatus: "uniform-density drill union; optional measured initial COM and homogeneous annular inserts; torque-free diagnostics; no lane-flare prediction",
         removedMass: removed.mass,
         removedOz: removed.mass * 16,
-        removedInertia: iBefore - axisInertia(papAxis, tensorAboutOrigin),
+        removedInertia: axisInertia(papAxis, removed.tensor),
+        insertedMass: inserted.mass, insertedOz: inserted.mass * 16,
+        netMassLoss: removed.mass - inserted.mass,
         axisDifferential: rgAfter - rgBefore
       };
     }
@@ -11868,11 +11888,27 @@ body[data-profile-view="register"] .shell-header {
     function physicalPrincipalBasis(data) {
       const lowAxis = normalize(data.dualLayout?.pin || { x: 0, y: 1, z: 0 });
       const mbPoint = data.dualLayout?.layoutMb || data.dualLayout?.virtualMb || { x: 1, y: 0, z: 0 };
-      let mbAxis = sub(normalize(mbPoint), scalePoint(lowAxis, dot(normalize(mbPoint), lowAxis)));
-      if (Math.hypot(mbAxis.x, mbAxis.y, mbAxis.z) < 0.0001) mbAxis = Math.abs(lowAxis.y) < 0.9 ? cross(lowAxis, { x: 0, y: 1, z: 0 }) : cross(lowAxis, { x: 1, y: 0, z: 0 });
-      mbAxis = normalize(mbAxis);
-      const highAxis = normalize(cross(lowAxis, mbAxis));
-      return { lowAxis, midAxis: mbAxis, highAxis };
+      let highAxis = sub(normalize(mbPoint), scalePoint(lowAxis, dot(normalize(mbPoint), lowAxis)));
+      if (Math.hypot(highAxis.x, highAxis.y, highAxis.z) < 1e-8) highAxis = Math.abs(lowAxis.y) < 0.9 ? cross(lowAxis, { x: 0, y: 1, z: 0 }) : cross(lowAxis, { x: 1, y: 0, z: 0 });
+      highAxis = normalize(highAxis);
+      const midAxis = normalize(cross(highAxis, lowAxis));
+      return { lowAxis, midAxis, highAxis };
+    }
+
+    function inertiaAxisDiagnostics(axis, tensor, eigen) {
+      const u = normalize(axis);
+      const coords = [u.x, u.y, u.z];
+      const product = tensor.map((row) => row.reduce((sum, item, i) => sum + item * coords[i], 0));
+      const angularMomentumPerRadian = { x: product[0], y: product[1], z: product[2] };
+      const migrationVector = cross(u, angularMomentumPerRadian);
+      const spread = eigen.values[2] - eigen.values[0];
+      const normalizedMisalignment = spread > 1e-12
+        ? clamp(2 * Math.hypot(migrationVector.x, migrationVector.y, migrationVector.z) / spread, 0, 1) : 0;
+      const principal = { x: dot(u, eigen.vectors[0]), y: dot(u, eigen.vectors[1]), z: dot(u, eigen.vectors[2]) };
+      const acceleration = principalToBallVector(eulerAngularAcceleration(principal, eigen.values), eigen.vectors);
+      const tangent = sub(acceleration, scalePoint(u, dot(u, acceleration)));
+      // |du/dt| / |omega|, dimensionless, for torque-free motion at this instant only.
+      return { normalizedMisalignment, axisRatePerSpin: Math.hypot(tangent.x, tangent.y, tangent.z) };
     }
 
     function zeroMatrix() {
@@ -11932,15 +11968,167 @@ body[data-profile-view="register"] .shell-header {
 
     function drilledRemovalProperties(data, ballMass) {
       const density = ballMass / (4 / 3 * Math.PI * data.ballRadius ** 3);
-      return data.holes.reduce((total, hole) => {
-        const segment = drillSegment(hole, data, drilledOpeningRadius(hole));
-        const cylinder = cylinderRemovalContribution(segment.start, segment.axis, segment.radius, segment.cylinderLength, density);
-        const cone = coneRemovalContribution(segment.cylinderEnd, segment.axis, segment.radius, segment.pointLength, density);
-        total.mass += cylinder.mass + cone.mass;
-        total.firstMoment = add(total.firstMoment, add(cylinder.firstMoment, cone.firstMoment));
-        total.tensor = matrixAdd(total.tensor, matrixAdd(cylinder.tensor, cone.tensor));
-        return total;
-      }, { mass: 0, firstMoment: { x: 0, y: 0, z: 0 }, tensor: zeroMatrix() });
+      const options = checkedMassOptions(data);
+      const segments = data.holes.map(hole => drillSegment(hole, data, drilledOpeningRadius(hole)));
+      return drillUnionProperties(segments, density, options.radialSteps, options.angularSteps);
+    }
+
+    function clippedDrillRemovalContribution(segment, density, radialSteps = 24, angularSteps = 32, exclusions = []) {
+      // Integrate axial rays exactly; midpoint quadrature over the circular aperture.
+      // Sphere intersection removes material outside the curved surface.
+      const { start, axis, radius, cylinderLength, pointLength, ballRadius } = segment;
+      if (!(radius > 0) || !(cylinderLength + pointLength > 0)) return { mass: 0, firstMoment: { x: 0, y: 0, z: 0 }, tensor: zeroMatrix() };
+      const helper = Math.abs(axis.z) < 0.9 ? { x: 0, y: 0, z: 1 } : { x: 0, y: 1, z: 0 };
+      const a = normalize(cross(axis, helper));
+      const b = cross(axis, a);
+      const av = [axis.x, axis.y, axis.z];
+      const first = [0, 0, 0];
+      const second = zeroMatrix();
+      let mass = 0;
+      for (let i = 0; i < radialSteps; i++) {
+        const r = radius * (i + 0.5) / radialSteps;
+        const area = r * radius / radialSteps * 2 * Math.PI / angularSteps;
+        const drillEnd = cylinderLength + pointLength * (1 - r / radius);
+        for (let j = 0; j < angularSteps; j++) {
+          const angle = 2 * Math.PI * (j + 0.5) / angularSteps;
+          const origin = add(start, add(scalePoint(a, r * Math.cos(angle)), scalePoint(b, r * Math.sin(angle))));
+          const along = dot(origin, axis);
+          const discriminant = along * along - dot(origin, origin) + ballRadius * ballRadius;
+          if (discriminant <= 0) continue;
+          const root = Math.sqrt(discriminant);
+          const rayLo = Math.max(0, -along - root);
+          const rayHi = Math.min(drillEnd, -along + root);
+          if (rayHi <= rayLo) continue;
+          let intervals = [[rayLo, rayHi]];
+          for (const other of exclusions) intervals = intervalSubtract(intervals, rayDrillIntervals(origin, axis, other, rayLo, rayHi));
+          for (const [lo, hi] of intervals) {
+          const weight = density * area;
+          const q0 = weight * (hi - lo);
+          const q1 = weight * (hi * hi - lo * lo) / 2;
+          const q2 = weight * (hi ** 3 - lo ** 3) / 3;
+          const ov = [origin.x, origin.y, origin.z];
+          mass += q0;
+          for (let k = 0; k < 3; k++) {
+            first[k] += ov[k] * q0 + av[k] * q1;
+            for (let l = 0; l < 3; l++) second[k][l] += ov[k] * ov[l] * q0 + (ov[k] * av[l] + av[k] * ov[l]) * q1 + av[k] * av[l] * q2;
+          }
+          }
+        }
+      }
+      const trace = second[0][0] + second[1][1] + second[2][2];
+      return { mass, firstMoment: { x: first[0], y: first[1], z: first[2] }, tensor: matrixSubtract(matrixScale(identityMatrix(), trace), second) };
+    }
+
+    // Signed mass moments use MIT 8.09 Eqs. (2.38), (2.49).
+    // Length: in; mass: lb; inertia: lb in^2. No material density is inferred.
+    function checkedMassOptions(data) {
+      const o = data.massOptions || {};
+      for(const k of Object.keys(o))if(!["initialCenterOfMassIn","radialSteps","angularSteps","inserts"].includes(k))throw new TypeError("Unknown mass option: " + k);
+      const center = o.initialCenterOfMassIn || {x:0,y:0,z:0};
+      if (!['x','y','z'].every(k => Number.isFinite(center[k])) || Math.hypot(center.x,center.y,center.z) >= data.ballRadius) throw new RangeError('Invalid initial center of mass');
+      const radialSteps = o.radialSteps ?? 24, angularSteps = o.angularSteps ?? 32;
+      if (![radialSteps,angularSteps].every(n => Number.isInteger(n) && n >= 8 && n <= 512)) throw new RangeError('Quadrature steps must be integers from 8 to 512');
+      if (o.inserts !== undefined && !Array.isArray(o.inserts)) throw new TypeError('inserts must be an array');
+      return { ...o, initialCenterOfMassIn:center, radialSteps, angularSteps, inserts:o.inserts || [] };
+    }
+
+    function intervalSubtract(intervals, cuts) {
+      let out = intervals;
+      for (const [a,b] of cuts) {
+        const next=[];
+        for (const [lo,hi] of out) {
+          if (b<=lo || a>=hi) next.push([lo,hi]);
+          else { if (a>lo) next.push([lo,a]); if (b<hi) next.push([b,hi]); }
+        }
+        out=next;
+      }
+      return out;
+    }
+
+    function quadraticInsideIntervals(A,B,C,lo,hi) {
+      if (!(hi>lo)) return [];
+      const points=[lo,hi];
+      const eps=1e-14*Math.max(1,Math.abs(A),Math.abs(B),Math.abs(C));
+      if (Math.abs(A)<eps) {
+        if (Math.abs(B)>eps) { const t=-C/B; if(t>lo && t<hi)points.push(t); }
+      } else {
+        const disc=B*B-4*A*C;
+        if(disc>=0) {
+          const root=Math.sqrt(disc),q=-0.5*(B+(B>=0?root:-root));
+          for(const t of [q/A,C/q])if(t>lo && t<hi)points.push(t);
+        }
+      }
+      points.sort((a,b)=>a-b);
+      const result=[];
+      for(let i=1;i<points.length;i++) {
+        const a=points[i-1],b=points[i],t=(a+b)/2;
+        if (b>a && (A*t+B)*t+C<=eps)result.push([a,b]);
+      }
+      return result;
+    }
+
+    function rayDrillIntervals(origin, direction, segment, lo, hi) {
+      const w=sub(origin,segment.start),v=segment.axis;
+      const z0=dot(w,v),zd=dot(direction,v);
+      const wp=sub(w,scalePoint(v,z0)),dp=sub(direction,scalePoint(v,zd));
+      const A=dot(dp,dp),B=2*dot(wp,dp),C=dot(wp,wp);
+      const out=[];
+      for(const [zmin,zmax,cone] of [[0,segment.cylinderLength,false],[segment.cylinderLength,segment.cylinderLength+segment.pointLength,true]]) {
+        if (!(zmax>zmin))continue;
+        let l=lo,h=hi;
+        if(Math.abs(zd)<1e-14) { if(z0<zmin || z0>zmax)continue; }
+        else {const a=(zmin-z0)/zd,b=(zmax-z0)/zd;l=Math.max(l,Math.min(a,b));h=Math.min(h,Math.max(a,b));}
+        const r0=cone?segment.radius*(zmax-z0)/segment.pointLength:segment.radius;
+        const rd=cone?-segment.radius*zd/segment.pointLength:0;
+        out.push(...quadraticInsideIntervals(A-rd*rd,B-2*r0*rd,C-r0*r0,l,h));
+      }
+      return out;
+    }
+
+    function drillUnionProperties(segments,density,radialSteps=24,angularSteps=32) {
+      // A deterministic ordering makes the quadrature independent of input order.
+      const ordered=segments.slice().sort((a,b)=> { if(a.radius!==b.radius)return b.radius-a.radius;
+        const av=[a.start.x,a.start.y,a.start.z,a.axis.x,a.axis.y,a.axis.z,a.radius,a.cylinderLength,a.pointLength];
+        const bv=[b.start.x,b.start.y,b.start.z,b.axis.x,b.axis.y,b.axis.z,b.radius,b.cylinderLength,b.pointLength];
+        for(let i=0;i<av.length;i++)if(av[i]!==bv[i])return av[i]-bv[i];return 0;
+      });
+      const total={mass:0,firstMoment:{x:0,y:0,z:0},tensor:zeroMatrix()};
+      for(let i=0;i<ordered.length;i++) {
+        const q=clippedDrillRemovalContribution(ordered[i],density,radialSteps,angularSteps,ordered.slice(0,i));
+        total.mass+=q.mass;total.firstMoment=add(total.firstMoment,q.firstMoment);total.tensor=matrixAdd(total.tensor,q.tensor);
+      }
+      return total;
+    }
+
+    function insertedMassProperties(data,options) {
+      const total={mass:0,firstMoment:{x:0,y:0,z:0},tensor:zeroMatrix(),parts:[]};
+      const placements=[];
+      for(const part of options.inserts) {
+        for(const k of Object.keys(part))if(!["holeIndex","massLb","outerRadiusIn","innerRadiusIn","lengthIn","startDepthIn"].includes(k))throw new TypeError("Unknown insert option: " + k);
+        const {holeIndex,massLb,outerRadiusIn:ro,innerRadiusIn:ri,lengthIn:L,startDepthIn:z}=part;
+        if(!Number.isInteger(holeIndex) || !data.holes[holeIndex])throw new RangeError('Invalid insert holeIndex');
+        if(![massLb,ro,ri,L,z].every(Number.isFinite) || !(massLb>0 && ro>ri && ri>=0 && L>0 && z>=0))throw new RangeError('Invalid insert dimensions or measured mass');
+        const seg=drillSegment(data.holes[holeIndex],data,drilledOpeningRadius(data.holes[holeIndex]));
+        if(ro>seg.radius+1e-10 || z+L>seg.cylinderLength+1e-10)throw new RangeError('Insert must fit inside cylindrical portion of its hole');
+        const start=addScaled(seg.start,seg.axis,z),end=addScaled(start,seg.axis,L);
+        const perp=sub(start,scalePoint(seg.axis,dot(start,seg.axis)));
+        const farthest2=Math.max(dot(start,start),dot(end,end))+ro*ro+2*ro*Math.hypot(perp.x,perp.y,perp.z);
+        if(farthest2>data.ballRadius**2+1e-10)throw new RangeError('Flat-ended insert extends outside spherical surface');
+        for(const p of placements) {
+          if(p.holeIndex===holeIndex && Math.min(z+L,p.z+p.L)>Math.max(z,p.z)+1e-10 && Math.min(ro,p.ro)>Math.max(ri,p.ri)+1e-10)throw new RangeError('Insert material volumes overlap');
+          // Different bores: conservatively reject intersecting bounding spheres.
+          if(p.holeIndex!==holeIndex) {
+            const center=addScaled(start,seg.axis,L/2),distance=Math.hypot(...['x','y','z'].map(k=>center[k]-p.center[k]));
+            if(distance<Math.hypot(L/2,ro)+Math.hypot(p.L/2,p.ro))throw new RangeError('Insert separation not established; overlapping bounds');
+          }
+        }
+        const center=addScaled(start,seg.axis,L/2);
+        const axial=massLb*(ro*ro+ri*ri)/2,transverse=massLb*(3*(ro*ro+ri*ri)+L*L)/12;
+        const tensor=matrixAdd(bodyTensor(seg.axis,axial,transverse),parallelAxisTensor(massLb,center));
+        total.mass+=massLb;total.firstMoment=add(total.firstMoment,scalePoint(center,massLb));total.tensor=matrixAdd(total.tensor,tensor);
+        total.parts.push({holeIndex,massLb,center,tensor});placements.push({holeIndex,z,L,ro,ri,center});
+      }
+      return total;
     }
 
     function cylinderRemovalContribution(start, drillAxis, radius, length, density) {
@@ -12008,6 +12196,8 @@ body[data-profile-view="register"] .shell-header {
         value: a[i][i],
         vector: normalize({ x: v[0][i], y: v[1][i], z: v[2][i] })
       })).sort((left, right) => left.value - right.value);
+      // Euler component equations require a right-handed principal frame after sorting.
+      if (dot(cross(pairs[0].vector, pairs[1].vector), pairs[2].vector) < 0) pairs[2].vector = scalePoint(pairs[2].vector, -1);
       return { values: pairs.map((pair) => pair.value), vectors: pairs.map((pair) => pair.vector) };
     }
 
@@ -12800,7 +12990,11 @@ body[data-profile-view="register"] .shell-header {
     }
 
     function drillSegment(hole, data, radiusOverride = null) {
-      const start = toSphere(hole.x, hole.y, data.ballRadius);
+      // Mass properties must not depend on draw() having set global projection state.
+      const basis = data.usesDualAngleLayout ? data.dualLayout.layoutBasis : null;
+      const start = basis
+        ? scalePoint(normalize(add(add(scalePoint(basis.normal, data.ballRadius), scalePoint(basis.right, hole.x)), scalePoint(basis.up, hole.y))), data.ballRadius)
+        : scalePoint(normalize({ x: hole.x, y: hole.y, z: data.ballRadius }), data.ballRadius);
       const drillDepth = hole.drillDepth ?? data.drillDepth;
       // Pitch fixes the axis through an aim point in the center-depth plane.
       // Depth only chooses the endpoint along that already-fixed unit axis.
@@ -13686,37 +13880,12 @@ body[data-profile-view="register"] .shell-header {
       motionSim.initialAxis = initial;
       motionSim.initialAxisRg = Math.sqrt(axisInertia(initial, data.physicalModel.tensorAfter) / data.physicalModel.massAfter);
       motionSim.currentAxisRg = motionSim.initialAxisRg;
-      const empiricalFlareInches = usbcDifferentialFlareEstimate(data.physicalModel.totalDiffAfter);
-      motionSim.maxFlareRadians = empiricalFlareInches / data.ballRadius;
       motionSim.ballRadius = data.ballRadius;
       motionSim.omegaPrincipal = {
         x: dot(initial, axes[0]) * omegaMagnitude,
         y: dot(initial, axes[1]) * omegaMagnitude,
         z: dot(initial, axes[2]) * omegaMagnitude
       };
-      const gripBasis = data.dualLayout?.layoutBasis;
-      const gripNormal = normalize(data.dualLayout?.gripCenter || { x: 0, y: 0, z: data.ballRadius });
-      let landingReference;
-      if (data.hasThumb && gripBasis) {
-        landingReference = normalize(add(
-          add(scalePoint(gripNormal, data.ballRadius), scalePoint(gripBasis.right, data.thumb.x)),
-          scalePoint(gripBasis.up, data.thumb.y - data.thumb.radius)
-        ));
-      } else if (!data.hasThumb && data.dualLayout?.pin) {
-        landingReference = normalize(data.dualLayout.pin);
-      } else if (gripBasis) {
-        landingReference = normalize(add(scalePoint(gripNormal, data.ballRadius), scalePoint(gripBasis.up, -data.ballRadius)));
-      } else {
-        landingReference = normalize({ x: 0, y: -1, z: 0 });
-      }
-      let bowtieTowardLanding = sub(landingReference, scalePoint(initial, dot(landingReference, initial)));
-      if (Math.hypot(bowtieTowardLanding.x, bowtieTowardLanding.y, bowtieTowardLanding.z) < 1e-9) {
-        bowtieTowardLanding = sub(axes[0], scalePoint(initial, dot(axes[0], initial)));
-      }
-      motionSim.bowtieAxis = normalize(bowtieTowardLanding);
-      motionSim.migrationDirectionSign = data.hasThumb
-        ? flareDirectionAwayFromGrip(initial, motionSim.bowtieAxis, data)
-        : 0;
       motionSim.flareTracks = [createFlareTrack(initial, data, 0, true)];
       motionSim.lastFlareRevolution = 0;
       motionSim.lastTimestamp = 0;
@@ -13754,16 +13923,6 @@ body[data-profile-view="register"] .shell-header {
       ));
     }
 
-    function flareDirectionAwayFromGrip(initialAxis, bowtieAxis, data) {
-      const holes = data.holes.map((hole) => layoutHoleSurfaceDirection(hole, data));
-      const probeAngle = 2 * Math.PI / 180;
-      const clearance = (sign) => {
-        const axis = normalize(rotateAroundAxis(initialAxis, bowtieAxis, sign * probeAngle));
-        return Math.min(...holes.map((hole) => Math.asin(clamp(Math.abs(dot(axis, hole)), 0, 1))));
-      };
-      return clearance(1) >= clearance(-1) ? 1 : -1;
-    }
-
     function eulerAngularAcceleration(omega, moments) {
       const [i1, i2, i3] = moments;
       return {
@@ -13794,50 +13953,6 @@ body[data-profile-view="register"] .shell-header {
       );
     }
 
-    function projectAxisToInitialRg(candidateAxis, initialAxis, model) {
-      const moments = model.principalMoments;
-      const axes = model.principalAxes;
-      const initialMoment = axisInertia(initialAxis, model.tensorAfter);
-      const candidate = {
-        x: dot(candidateAxis, axes[0]),
-        y: dot(candidateAxis, axes[1]),
-        z: dot(candidateAxis, axes[2])
-      };
-      const initial = {
-        x: dot(initialAxis, axes[0]),
-        y: dot(initialAxis, axes[1]),
-        z: dot(initialAxis, axes[2])
-      };
-      let projected;
-      if (initialMoment <= moments[1]) {
-        const yRadius = Math.sqrt(clamp((initialMoment - moments[0]) / Math.max(1e-12, moments[1] - moments[0]), 0, 1));
-        const zRadius = Math.sqrt(clamp((initialMoment - moments[0]) / Math.max(1e-12, moments[2] - moments[0]), 0, 1));
-        const phase = Math.atan2(candidate.z / Math.max(zRadius, 1e-9), candidate.y / Math.max(yRadius, 1e-9));
-        const y = yRadius * Math.cos(phase);
-        const z = zRadius * Math.sin(phase);
-        const x = Math.sign(initial.x || 1) * Math.sqrt(Math.max(0, 1 - y * y - z * z));
-        projected = { x, y, z };
-      } else {
-        const xRadius = Math.sqrt(clamp((moments[2] - initialMoment) / Math.max(1e-12, moments[2] - moments[0]), 0, 1));
-        const yRadius = Math.sqrt(clamp((moments[2] - initialMoment) / Math.max(1e-12, moments[2] - moments[1]), 0, 1));
-        const phase = Math.atan2(candidate.y / Math.max(yRadius, 1e-9), candidate.x / Math.max(xRadius, 1e-9));
-        const x = xRadius * Math.cos(phase);
-        const y = yRadius * Math.sin(phase);
-        const z = Math.sign(initial.z || 1) * Math.sqrt(Math.max(0, 1 - x * x - y * y));
-        projected = { x, y, z };
-      }
-      return normalize(principalToBallVector(projected, axes));
-    }
-
-    function limitAxisMigration(initialAxis, candidateAxis, maxAngle) {
-      const from = normalize(initialAxis);
-      const to = normalize(candidateAxis);
-      const angle = Math.acos(clamp(dot(from, to), -1, 1));
-      if (angle <= maxAngle || angle < 1e-10) return to;
-      const tangent = normalize(sub(to, scalePoint(from, Math.cos(angle))));
-      return normalize(add(scalePoint(from, Math.cos(maxAngle)), scalePoint(tangent, Math.sin(maxAngle))));
-    }
-
     function motionSimulationFrame(timestamp) {
       if (!motionSim.running) return;
       const dt = motionSim.lastTimestamp ? Math.min(0.05, Math.max(0, (timestamp - motionSim.lastTimestamp) / 1000)) : 0;
@@ -13860,23 +13975,9 @@ body[data-profile-view="register"] .shell-header {
           data.physicalModel.principalMoments,
           simulationDt
         );
-        const constantRgAxis = projectAxisToInitialRg(
-          principalToBallVector(motionSim.omegaPrincipal, data.physicalModel.principalAxes),
-          motionSim.initialAxis,
-          data.physicalModel
-        );
-        const migrationAngle = Math.min(
-          Math.acos(clamp(dot(normalize(motionSim.initialAxis), constantRgAxis), -1, 1)),
-          motionSim.maxFlareRadians
-        );
-        const migrationTangent = normalize(cross(motionSim.bowtieAxis, motionSim.initialAxis));
-        const dynamicsDirection = dot(constantRgAxis, migrationTangent) >= 0 ? 1 : -1;
-        const direction = motionSim.migrationDirectionSign || dynamicsDirection;
-        motionSim.axis = normalize(rotateAroundAxis(
-          motionSim.initialAxis,
-          motionSim.bowtieAxis,
-          direction * migrationAngle
-        ));
+        // Display the integrated torque-free axis without constant-RG projection,
+        // empirical clipping, or an invented direction away from the grip.
+        motionSim.axis = normalize(principalToBallVector(motionSim.omegaPrincipal, data.physicalModel.principalAxes));
         motionSim.currentAxisRg = Math.sqrt(axisInertia(motionSim.axis, data.physicalModel.tensorAfter) / data.physicalModel.massAfter);
         if (motionSim.revolutions - motionSim.lastFlareRevolution >= 0.9) {
           const previous = motionSim.flareTracks[motionSim.flareTracks.length - 1];
@@ -13909,7 +14010,7 @@ body[data-profile-view="register"] .shell-header {
       if (!readout) return;
       const migration = axisAngleDegrees(motionSim.initialAxis, motionSim.axis);
       const flareWidth = motionSim.ballRadius * migration * Math.PI / 180;
-      readout.textContent = `距離 ${motionSim.distanceFeet.toFixed(1)} / 60.0 ft・回転 ${motionSim.revolutions.toFixed(1)} / 軸移動 ${migration.toFixed(2)}° / フレア幅 ${flareWidth.toFixed(2)} in / 軸RG ${motionSim.initialAxisRg.toFixed(3)}→${motionSim.currentAxisRg.toFixed(3)} / リング ${motionSim.flareTracks.length || 1}`;
+      readout.textContent = `距離 ${motionSim.distanceFeet.toFixed(1)} / 60.0 ft・回転 ${motionSim.revolutions.toFixed(1)} / 軸移動 ${migration.toFixed(2)}° / 軸差×半径 ${flareWidth.toFixed(2)} in（実フレア幅ではない） / 軸RG ${motionSim.initialAxisRg.toFixed(3)}→${motionSim.currentAxisRg.toFixed(3)} / リング ${motionSim.flareTracks.length || 1}`;
       const progress = document.querySelector("#motionSimulationProgress");
       if (progress) progress.value = motionSim.distanceFeet;
     }
@@ -15029,3 +15130,5 @@ body[data-profile-view="register"] .shell-header {
 </script>
 </body>
 </html>
+
+
