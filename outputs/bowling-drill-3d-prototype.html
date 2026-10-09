@@ -13013,7 +13013,6 @@ body[data-profile-view="register"] .shell-header {
       const axis = [];
       for (let i = 0; i <= 48; i++) axis.push(lerpPoint(segment.start, segment.tip, i / 48));
       strokeProjected(axis, cx, cy, scale, "rgba(255,255,255,.78)", 1.2);
-      drawDrillHoleMesh(segment, cx, cy, scale);
     }
 
     function openingBoundaryPoints(hole, openingRadius, data, sides = 192) {
